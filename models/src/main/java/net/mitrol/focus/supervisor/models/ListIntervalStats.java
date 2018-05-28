@@ -23,4 +23,36 @@ public class ListIntervalStats {
                 InteractionAccumulator.parse(sockMessage.getString("ala")),
                 sockMessage.getBoolean("d"));
     }
+
+    public Integer getListIntervalStatsId() {
+        return listIntervalStatsId;
+    }
+
+    public void setListIntervalStatsId(Integer listIntervalStatsId) {
+        this.listIntervalStatsId = listIntervalStatsId;
+    }
+
+    public TimeAccumulator getTimes() {
+        return times;
+    }
+
+    public void setTimes(TimeAccumulator times) {
+        this.times = times;
+    }
+
+    public InteractionAccumulator getiInteractions() {
+        return iInteractions;
+    }
+
+    public void setiInteractions(InteractionAccumulator iInteractions) {
+        this.iInteractions = iInteractions;
+    }
+
+    public Boolean getCanBeDialed() {
+        return canBeDialed;
+    }
+
+    public void setCanBeDialed(Boolean canBeDialed) {
+        this.canBeDialed = canBeDialed;
+    }
 }

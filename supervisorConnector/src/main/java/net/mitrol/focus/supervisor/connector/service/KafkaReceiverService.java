@@ -1,15 +1,9 @@
 package net.mitrol.focus.supervisor.connector.service;
 
-import java.util.List;
 import javax.annotation.PostConstruct;
 
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
-import net.mitrol.ct.api.controllers.responses.AgentProfileResponse;
-import net.mitrol.ct.api.controllers.responses.CampaignResponse;
-import net.mitrol.ct.api.controllers.responses.ListResponse;
-import net.mitrol.ct.api.entities.Group;
-import net.mitrol.focus.supervisor.connector.api.client.CTApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +23,7 @@ public class KafkaReceiverService {
   @Autowired
   private KafkaReceiver receiver;
   @Autowired
-  private CTApiClient ctApiClient;
+  private ProcessMessageService processMessageService;
 
   @PostConstruct
   public void init() {
@@ -37,15 +31,7 @@ public class KafkaReceiverService {
       @Override
       public void processMessage(String source, String topic, String value) {
         logger.info("processMessage " + source + " " + topic + " " + value);
-        /*
-        * This part is only to Test.
-        * */
-        List<CampaignResponse> campaignResponseList = ctApiClient.getCampaigns();
-        CampaignResponse campaignResponse = ctApiClient.getCampaignById(Long.valueOf(20));
-        List<AgentProfileResponse> agentProfileResponse = ctApiClient.getAgentProfilesById(Long.valueOf(3));
-        List<ListResponse> listResponse = ctApiClient.getLotesById(Long.valueOf(5));
-        Group group = ctApiClient.getGroupById(Long.valueOf(5));
-        logger.info("Testing");
+        processMessageService.processMessage(value);
       }
     });
   }
