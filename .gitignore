@@ -1,0 +1,8 @@
+.idea/
+.gradle/
+focus-supervisor.iml
+*/build/*
+common/out/*
+models/out/*
+supervisorConnector/out/*
+mitAcdConnector/out/*
