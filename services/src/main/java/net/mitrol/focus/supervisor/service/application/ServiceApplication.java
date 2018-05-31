@@ -1,6 +1,5 @@
-package net.mitrol.focus.supervisor.common;
+package net.mitrol.focus.supervisor.service.application;
 
-import net.mitrol.focus.supervisor.common.configuration.CommonConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,8 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author ladassus
  */
 @SpringBootApplication
-public class CommonApplication {
+public class ServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CommonApplication.class, args);
+        SpringApplication.run(ServiceApplication.class, args);
     }
 }
