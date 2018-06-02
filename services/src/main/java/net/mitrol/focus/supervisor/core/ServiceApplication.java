@@ -1,4 +1,4 @@
-package net.mitrol.focus.supervisor.service.application;
+package net.mitrol.focus.supervisor.core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

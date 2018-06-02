@@ -4,8 +4,8 @@ import net.mitrol.ct.api.controllers.responses.AgentProfileResponse;
 import net.mitrol.ct.api.controllers.responses.CampaignResponse;
 import net.mitrol.ct.api.controllers.responses.ListResponse;
 import net.mitrol.ct.api.entities.Group;
-import net.mitrol.focus.supervisor.connector.api.client.CTApiClient;
 import net.mitrol.focus.supervisor.models.*;
+import net.mitrol.focus.supervisor.core.service.impl.ElasticSearchService;
 import net.mitrol.utils.json.JsonMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +26,10 @@ public class ProcessMessageService {
     private final Logger logger = Logger.getLogger("ProcessMessageService");
 
     @Autowired
-    private CTApiClient ctApiClient;
+    private CTApiClientService ctApiClient;
+
+    @Autowired
+    private ElasticSearchService esService;
 
     public void processMessage(String message) {
         try {

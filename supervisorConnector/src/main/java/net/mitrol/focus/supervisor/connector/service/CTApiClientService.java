@@ -1,4 +1,4 @@
-package net.mitrol.focus.supervisor.connector.api.client;
+package net.mitrol.focus.supervisor.connector.service;
 
 import java.util.List;
 
@@ -8,8 +8,10 @@ import net.mitrol.ct.api.controllers.responses.AgentProfileResponse;
 import net.mitrol.ct.api.controllers.responses.CampaignResponse;
 import net.mitrol.ct.api.controllers.responses.ListResponse;
 import net.mitrol.ct.api.entities.Group;
+import org.springframework.stereotype.Service;
 
-public interface CTApiClient {
+@Service
+public interface CTApiClientService {
   
   @RequestLine("GET /campaigns")
   List<CampaignResponse> getCampaigns();

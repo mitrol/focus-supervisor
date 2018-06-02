@@ -4,5 +4,6 @@ focus-supervisor.iml
 */build/*
 common/out/*
 models/out/*
+services/out/*
 supervisorConnector/out/*
 mitAcdConnector/out/*
