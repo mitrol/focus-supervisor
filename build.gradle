@@ -45,7 +45,7 @@ subprojects {
 
   dependencies {
     compile ("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-websocket")
+    //compile("org.springframework.boot:spring-boot-starter-websocket")
     compile "org.springframework.kafka:spring-kafka:$springKafkaVersion"
     compile "org.json:org.json:$orgJsonVersion"
     compile "com.google.guava:guava:$guavaVersion"

@@ -1,6 +1,4 @@
-package net.mitrol.focus.supervisor.connector.service;
-
-import java.util.List;
+package net.mitrol.focus.supervisor.core.service;
 
 import feign.Param;
 import feign.RequestLine;
@@ -9,6 +7,8 @@ import net.mitrol.ct.api.controllers.responses.CampaignResponse;
 import net.mitrol.ct.api.controllers.responses.ListResponse;
 import net.mitrol.ct.api.entities.Group;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public interface CTApiClientService {

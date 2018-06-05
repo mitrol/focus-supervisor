@@ -1,15 +1,22 @@
 package net.mitrol.focus.supervisor.core.service;
 
-import org.json.JSONObject;
-
-import java.util.Map;
+import feign.RequestLine;
+import net.mitrol.focus.supervisor.core.service.dto.ESInfoDTO;
+import org.springframework.stereotype.Service;
 
 /**
  * @author ladassus
  */
+@Service
 public interface ESSearchService {
 
-    public boolean buildIndex(String index);
+    @RequestLine("GET /")
+    public ESInfoDTO getInfoElasticsearch();
+
+
+    //TODO: to complete this
+
+    /*public boolean buildIndex(String index);
 
     public boolean deleteIndex(String index);
 
@@ -21,5 +28,5 @@ public interface ESSearchService {
 
     public void deleteDataById(String index, String type, String id);
 
-    public boolean isIndexExist(String index);
+    public boolean isIndexExist(String index);*/
 }
