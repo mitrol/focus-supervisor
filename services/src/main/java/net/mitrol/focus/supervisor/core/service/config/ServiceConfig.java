@@ -1,12 +1,9 @@
 package net.mitrol.focus.supervisor.core.service.config;
 
-import java.net.InetAddress;
-
 import net.mitrol.focus.supervisor.common.feign.FeignClientFactory;
 import net.mitrol.focus.supervisor.core.service.CTApiClientService;
 import net.mitrol.focus.supervisor.core.service.ESSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 
@@ -16,7 +13,7 @@ import org.springframework.core.env.Environment;
  */
 @Configuration
 @PropertySources({@PropertySource("classpath:application.properties")})
-public class ServiceConfig {
+public class ServiceConfig  {
 
     @Autowired
     private Environment environment;

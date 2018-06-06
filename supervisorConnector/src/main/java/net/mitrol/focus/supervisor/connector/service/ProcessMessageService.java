@@ -5,6 +5,7 @@ import net.mitrol.ct.api.controllers.responses.CampaignResponse;
 import net.mitrol.ct.api.controllers.responses.ListResponse;
 import net.mitrol.ct.api.entities.Group;
 import net.mitrol.focus.supervisor.core.service.CTApiClientService;
+import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.core.service.ESSearchService;
 import net.mitrol.focus.supervisor.models.*;
 import net.mitrol.utils.json.JsonMapper;
@@ -28,9 +29,6 @@ public class ProcessMessageService {
 
     @Autowired
     private CTApiClientService ctApiClient;
-
-    @Autowired
-    private ESSearchService esService;
 
     public void processMessage(String message) {
         try {
