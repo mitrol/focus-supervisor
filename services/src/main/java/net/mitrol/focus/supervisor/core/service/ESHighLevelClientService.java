@@ -1,7 +1,6 @@
 package net.mitrol.focus.supervisor.core.service;
 
 import net.mitrol.focus.supervisor.core.service.domain.ESRepository;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ public class ESHighLevelClientService {
     @Autowired
     private ESRepository esRepository;
 
-    public String buildIndexByParam(JSONObject data, String index, String type, String id) {
+    public String buildIndexByParam(Map<String, Object> data, String index, String type, String id) {
         return esRepository.buildIndexByParam(data, index, type, id);
     }
 
@@ -24,7 +23,7 @@ public class ESHighLevelClientService {
         return esRepository.searchDataByParam(index, type, id);
     }
 
-    public Map<String, Object> updateDataByParam(JSONObject data, String index, String type, String id){
+    public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
         return esRepository.updateDataByParam(data, index, type, id);
     }
 

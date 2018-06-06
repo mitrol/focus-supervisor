@@ -54,6 +54,7 @@ subprojects {
     compile "org.slf4j:jcl-over-slf4j:$slf4jLog4jVersion"
     compile "log4j:log4j:$log4jVersion"
     compile "log4j:apache-log4j-extras:$log4jExtrasVersion"
+    testCompile 'junit:junit:4.12'
     testCompile("org.springframework.boot:spring-boot-starter-test")
   }
 }

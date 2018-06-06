@@ -12,7 +12,6 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +24,7 @@ public class ESRepository {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
-    public String buildIndexByParam(JSONObject data, String index, String type, String id) {
+    public String buildIndexByParam(Map<String, Object> data, String index, String type, String id) {
         IndexRequest indexRequest = new IndexRequest(index, type, id).source(data);
         IndexResponse response = null;
         try {
@@ -53,7 +52,7 @@ public class ESRepository {
         return sourceAsMap;
     }
 
-    public Map<String, Object> updateDataByParam(JSONObject data, String index, String type, String id){
+    public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
         UpdateRequest updateRequest = new UpdateRequest(index, type, id).fetchSource(true);// Fetch Object after its update
         try {
             updateRequest.doc(data, XContentType.JSON);
