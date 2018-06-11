@@ -1,7 +1,9 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -12,9 +14,11 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,12 +33,10 @@ public class ESRepository {
         IndexResponse response = null;
         try {
             response = restHighLevelClient.index(indexRequest);
-        } catch (ElasticsearchException e) {
-            e.getDetailedMessage();
-        } catch (java.io.IOException ex) {
-            ex.getLocalizedMessage();
+            return response.getId();
+        } catch (ElasticsearchException |  IOException e) {
+            throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
         }
-        return response.getId();
     }
 
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
@@ -45,11 +47,11 @@ public class ESRepository {
         GetResponse getResponse = null;
         try {
             getResponse = restHighLevelClient.get(getRequest);
-        } catch (java.io.IOException e){
-            e.getLocalizedMessage();
+            Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
+            return sourceAsMap;
+        } catch (IOException e) {
+            throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch", e);
         }
-        Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
-        return sourceAsMap;
     }
 
     public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
@@ -59,20 +61,28 @@ public class ESRepository {
             UpdateResponse updateResponse = restHighLevelClient.update(updateRequest);
             Map<String, Object> sourceAsMap = updateResponse.getGetResult().sourceAsMap();
             return sourceAsMap;
-        }catch (JsonProcessingException e){
-            e.getMessage();
-        } catch (java.io.IOException e){
-            e.getLocalizedMessage();
+        } catch (IOException e){
+            throw new MitrolSupervisorError("Unable to do an update in Elasticsearch", e);
         }
-        return (Map<String, Object>) new HashMap<>().put("Error", "Unable to update book");
     }
 
     public void deleteDataByParam(String index, String type, String id) {
         DeleteRequest deleteRequest = new DeleteRequest(index, type, id);
         try {
             DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest);
-        } catch (java.io.IOException e){
-            e.getLocalizedMessage();
+        } catch (IOException e){
+            throw new MitrolSupervisorError("Unable to remove index in Elasticsearch", e);
+        }
+    }
+
+    public void exists (String index, String type, String id) {
+        GetRequest getRequest = new GetRequest(index, type, id);
+        getRequest.fetchSourceContext(new FetchSourceContext(false)); //Disable fetching _source.
+        getRequest.storedFields("_none_"); //Disable fetching stored fields.
+        try {
+            boolean exists = restHighLevelClient.exists(getRequest);
+        } catch (IOException e) {
+            throw new MitrolSupervisorError("Unable to verify if an index exist in Elasticsearch", e);
         }
     }
 }
