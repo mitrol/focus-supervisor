@@ -3,6 +3,7 @@ package net.mitrol.focus.supervisor.common.feign;
 import com.google.gson.Gson;
 import feign.Response;
 import feign.codec.ErrorDecoder;
+import net.mitrol.focus.supervisor.common.error.ErrorDescription;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 

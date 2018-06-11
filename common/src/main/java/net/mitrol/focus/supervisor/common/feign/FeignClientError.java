@@ -1,5 +1,7 @@
 package net.mitrol.focus.supervisor.common.feign;
 
+import net.mitrol.focus.supervisor.common.error.ErrorDescription;
+
 /**
  * Client thrown by http clients.
  * 

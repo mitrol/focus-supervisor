@@ -1,4 +1,8 @@
-package net.mitrol.focus.supervisor.common.feign;
+package net.mitrol.focus.supervisor.common.error;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * This class shows information about an error occurred inside the platform.
@@ -231,4 +235,106 @@ public class ErrorDescription {
 	private void setTrace(String trace) {
 		this.trace = trace;
 	}
+
+    /** Creates an instance of the ErrorDescription.
+     *
+     * @param code the error code.
+     * @param module the name of the module.
+     * @param throwable throwable that produced the error.
+     * @return an ErrorDescription.
+     */
+    public static ErrorDescription buildError(int code,
+                                              String module,
+                                              Throwable throwable) {
+        ErrorDescription dto = new ErrorDescription();
+        dto.setCode(code);
+        dto.setModule(module);
+        if(throwable != null) {
+            dto.setDescription(throwable.getMessage());
+            dto.setTrace(buildStringTrace(throwable.getStackTrace()));
+        }
+        return dto;
+    }
+
+	/** Creates an instance of the ErrorDescription.
+	 *
+	 * @param code the error code.
+	 * @param module the name of the module.
+	 * @param throwable throwable that produced the error.
+	 * @param request the http request. If this was executed inside an http context.
+	 * @return an ErrorDescription.
+	 */
+	public static ErrorDescription buildError(int code,
+											  String module,
+											  Throwable throwable,
+											  HttpServletRequest request) {
+		ErrorDescription dto = new ErrorDescription();
+		dto.setCode(code);
+		dto.setModule(module);
+		if(throwable != null) {
+			dto.setDescription(throwable.getMessage());
+			dto.setTrace(buildStringTrace(throwable.getStackTrace()));
+		}
+		return requestInformation(dto, request);
+	}
+
+	/** Builds an error description.
+	 * @param module the module name.
+	 * @param error the error thrown.
+	 * @param request the request that causes the error.
+	 * @return an ErrorDescription.
+	 */
+	public static ErrorDescription buildError(String module,
+											  MitrolSupervisorError error,
+											  HttpServletRequest request) {
+		ErrorDescription description = new ErrorDescription();
+		description.setCode(error.getErrorCode());
+		description.setModule(module);
+		description.setDescription(error.getMessage());
+		description.setTrace(buildStringTrace(error.getStackTrace()));
+		return requestInformation(description, request);
+	}
+
+	/** Enhance the error description with request information.
+	 * @param description the error description.
+	 * @param request the request.
+	 * @return the error description with request information.
+	 */
+	private static ErrorDescription requestInformation(ErrorDescription description,
+													   HttpServletRequest request) {
+		if(request != null) {
+			description.setHostName(request.getServerName());
+			description.setLocalAddr(request.getLocalAddr());
+			description.setRemoteAddr(request.getRemoteAddr());
+			description.setLocalHostName(request.getLocalName());
+			description.setHttpMethod(request.getMethod());
+			description.setUri(request.getRequestURI());
+		}
+		return description;
+	}
+
+	/** Receives an stack trace and returns a String containing some lines.
+	 * @param elements the stack trace.
+	 * @return a String with some lines of the stack trace.
+	 */
+	private static String buildStringTrace(StackTraceElement []elements) {
+		if(elements != null && elements.length > 0) {
+			StringBuilder builder = new StringBuilder();
+			int length = elements.length;
+			for(int t=0; t < length && t < MAX_STACK_LINES; t++) {
+				builder.append(String.format("%s:%s:%s(%s) ",
+						elements[t].getClassName(),
+						elements[t].getMethodName(),
+						elements[t].getLineNumber(),
+						elements[t].getFileName()));
+			}
+			return builder.toString();
+		}
+		return "";
+	}
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 }

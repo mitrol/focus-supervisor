@@ -14,5 +14,6 @@ libraries.feign = [
 
 dependencies {
     compile libraries.feign
+    compile ("org.apache.commons:commons-lang3:3.7")
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
