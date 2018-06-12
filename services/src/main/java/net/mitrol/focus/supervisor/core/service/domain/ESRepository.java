@@ -1,7 +1,8 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
+import net.mitrol.utils.log.MitrolLogger;
+import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -25,6 +26,8 @@ import java.util.Map;
 @Component
 public class ESRepository {
 
+    private static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);
+
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
@@ -37,6 +40,22 @@ public class ESRepository {
         } catch (ElasticsearchException |  IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
         }
+    }
+
+    public void buildIndexByParamAsync(Map<String, Object> data, String index, String type, String id) {
+        IndexRequest indexRequest = new IndexRequest(index, type, id).source(data);
+        IndexResponse response = null;
+        restHighLevelClient.indexAsync(indexRequest, new ActionListener<IndexResponse>() {
+            @Override
+            public void onResponse(IndexResponse indexResponse) {
+                log.debug("Index created in Elasticsearch: " + indexResponse.getId());
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
+            }
+        });
     }
 
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
@@ -75,12 +94,12 @@ public class ESRepository {
         }
     }
 
-    public void exists (String index, String type, String id) {
+    public boolean exists (String index, String type, String id) {
         GetRequest getRequest = new GetRequest(index, type, id);
         getRequest.fetchSourceContext(new FetchSourceContext(false)); //Disable fetching _source.
         getRequest.storedFields("_none_"); //Disable fetching stored fields.
         try {
-            boolean exists = restHighLevelClient.exists(getRequest);
+            return restHighLevelClient.exists(getRequest);
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to verify if an index exist in Elasticsearch", e);
         }
