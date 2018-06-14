@@ -4,6 +4,7 @@ import net.mitrol.focus.supervisor.core.service.domain.ESRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -21,6 +22,10 @@ public class ESHighLevelClientService {
 
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
         return esRepository.searchDataByParam(index, type, id);
+    }
+
+    public Map<String, Object> searchDataByIndex(String index, String type) throws IOException {
+        return null;//esRepository.searchDataByIndex(index, type);
     }
 
     public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
