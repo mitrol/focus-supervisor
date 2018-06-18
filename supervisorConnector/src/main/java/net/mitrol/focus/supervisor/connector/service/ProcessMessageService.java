@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -30,6 +31,30 @@ public class ProcessMessageService {
 
     private final Logger logger = Logger.getLogger("ProcessMessageService");
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${index.type}")
+    private String index_type;
+
+    @Value("${index.campaign.daily.stats}")
+    private String index_campaign_daily;
+
+    @Value("${index.campaign.interval.stats}")
+    private String index_campaign_interval;
+
+    @Value("${index.agent.daily.stats}")
+    private String index_agent_daily;
+
+    @Value("${index.agent.interval.stats}")
+    private String index_agent_interval;
+
+    @Value("${index.list.daily.stats}")
+    private String index_list_daily;
+
+    @Value("${index.list.interval.stats}")
+    private String index_list_interval;
+
+    @Value("${index.interaction.stats}")
+    private String index_interaction;
 
     @Autowired
     private CTApiClientService ctApiClient;
@@ -116,7 +141,7 @@ public class ProcessMessageService {
             data.put("lasIntervalInteractions", lasIntervalInteractions);
             data.put("dailyTimes", dailyTimes);
             data.put("dailyInteractions", dailyInteractions);
-            esService.buildIndexByParam(data, "mitrol-model", "campaign-daily-stats", "");
+            esService.buildIndexByParam(data, index_campaign_daily, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -137,7 +162,7 @@ public class ProcessMessageService {
             data.put("lasIntervalInteractions", lasIntervalInteractions);
             data.put("dailyTimes", dailyTimes);
             data.put("dailyInteractions", dailyInteractions);
-            esService.buildIndexByParam(data, "mitrol-model", "list-daily-stats", "");
+            esService.buildIndexByParam(data, index_list_daily, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -156,7 +181,7 @@ public class ProcessMessageService {
             data.put("times", times);
             data.put("iInteractions", iInteractions);
             data.put("canBeDialed", canBeDialed);
-            esService.buildIndexByParam(data, "mitrol-model", "list-interval-stats", "");
+            esService.buildIndexByParam(data, index_list_interval, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -191,7 +216,7 @@ public class ProcessMessageService {
             data.put("estimatedWaitingTime", estimatedWaitingTime);
             data.put("averageHandlingTime", averageHandlingTime);
             data.put("averageTalkingTime", averageTalkingTime);
-            esService.buildIndexByParam(data, "mitrol-model", "campaign-interval-stats", "");
+            esService.buildIndexByParam(data, index_campaign_interval, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -218,7 +243,7 @@ public class ProcessMessageService {
             data.put("agentAccumulator", agentAccumulator);
             data.put("internalOutboundStats", internalOutboundStats);
             data.put("internalInboundStats", internalInboundStats);
-            esService.buildIndexByParam(data, "mitrol-model", "agent-interval-stats", "");
+            esService.buildIndexByParam(data, index_agent_interval, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -243,7 +268,7 @@ public class ProcessMessageService {
             data.put("dailyStats", dailyStats);
             data.put("dailyOutboundStats", dailyOutboundStats);
             data.put("dailyInboundStats", dailyInboundStats);
-            esService.buildIndexByParam(data, "mitrol-model", "agent-daily-stats", "");
+            esService.buildIndexByParam(data, index_agent_daily, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -300,7 +325,7 @@ public class ProcessMessageService {
             data.put("localGender", localGender);
             data.put("remoteWordSpotting", remoteWordSpotting);
             data.put("remoteGender", remoteGender);
-            esService.buildIndexByParam(data, "mitrol-model", "interaction-stats", "");
+            esService.buildIndexByParam(data, index_interaction, index_type, "");
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
