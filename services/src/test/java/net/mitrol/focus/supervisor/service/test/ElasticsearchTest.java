@@ -34,24 +34,24 @@ public class ElasticsearchTest{
     @Before
     public void setUp() {
         index = "net-mitrol";
-        type = "test";
-        id = "hello";
+        type = "_doc";
+        id = "abcd1234";
         data.put("title", "hello world");
     }
 
     @Test
     @Ignore
     public void test_sync_create_delete_index() {
-        String id_created = esService.buildIndexByParam(data, index, type, id);
-        Assert.assertEquals(id, id_created);
+        String id_created = esService.buildIndexByParam(data, index, type, "");
+        Assert.assertTrue(esService.exists(index, type, id_created));
 
-        Map<String, Object> map = esService.searchDataByParam(index, type, id);
+        Map<String, Object> map = esService.searchDataByParam(index, type, id_created);
         Assert.assertNotNull(map);
         Assert.assertEquals(map.get("title"), "hello world");
 
-        esService.deleteDataByParam(index, type, id);
+        esService.deleteDataByParam(index, type, id_created);
 
-        Map<String, Object> map1 = esService.searchDataByParam(index, type, id);
+        Map<String, Object> map1 = esService.searchDataByParam(index, type, id_created);
         Assert.assertNull(map1);
     }
 }

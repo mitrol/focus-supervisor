@@ -3,35 +3,24 @@ package net.mitrol.focus.supervisor.core.service.domain;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.transport.TransportRequestOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -42,20 +31,40 @@ public class ESRepository {
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
+    /**
+     * Create an index document in Elasticsesarch
+     *
+     * @param data document to insert
+     * @param index
+     * @param type document
+     * @param id document, this is optional
+     * @return id created
+     */
     public String buildIndexByParam(Map<String, Object> data, String index, String type, String id) {
-        IndexRequest indexRequest = new IndexRequest(index, type).source(data);
-        IndexResponse response = null;
+        IndexRequest indexRequest;
+        if (StringUtils.isEmpty(id)) {
+            indexRequest = new IndexRequest(index, type).source(data);
+        } else {
+            indexRequest = new IndexRequest(index, type, id).source(data);
+        }
         try {
-            response = restHighLevelClient.index(indexRequest);
+            IndexResponse response = restHighLevelClient.index(indexRequest);
             return response.getId();
         } catch (ElasticsearchException |  IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
         }
     }
 
+    /**
+     * Create an index document asynchronously in Elasticsesarch
+     *
+     * @param data document to insert
+     * @param index
+     * @param type document
+     * @param id document
+     */
     public void buildIndexByParamAsync(Map<String, Object> data, String index, String type, String id) {
         IndexRequest indexRequest = new IndexRequest(index, type, id).source(data);
-        IndexResponse response = null;
         restHighLevelClient.indexAsync(indexRequest, new ActionListener<IndexResponse>() {
             @Override
             public void onResponse(IndexResponse indexResponse) {
@@ -69,14 +78,21 @@ public class ESRepository {
         });
     }
 
+    /**
+     * Search data document in Elasticsearch
+     *
+     * @param index
+     * @param type document
+     * @param id document
+     * @return data source
+     */
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
         if(index == null || type == null || id == null) {
             return null;
         }
         GetRequest getRequest = new GetRequest(index, type, id);
-        GetResponse getResponse = null;
         try {
-            getResponse = restHighLevelClient.get(getRequest);
+            GetResponse getResponse = restHighLevelClient.get(getRequest);
             Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
             return sourceAsMap;
         } catch (IOException e) {
@@ -116,6 +132,15 @@ public class ESRepository {
         }
     }*/
 
+    /**
+     * Update an index document in Elasticsesarch
+     *
+     * @param data document to insert
+     * @param index
+     * @param type document
+     * @param id document
+     * @return data source updated
+     */
     public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
         UpdateRequest updateRequest = new UpdateRequest(index, type, id).fetchSource(true);// Fetch Object after its update
         try {
@@ -128,6 +153,13 @@ public class ESRepository {
         }
     }
 
+    /**
+     * Delete a index document in Elasticsearch
+     *
+     * @param index
+     * @param type document
+     * @param id document
+     */
     public void deleteDataByParam(String index, String type, String id) {
         DeleteRequest deleteRequest = new DeleteRequest(index, type, id);
         try {
@@ -137,6 +169,12 @@ public class ESRepository {
         }
     }
 
+    /**
+     * Verify existence of the index.
+     *
+     * @param index
+     * @return true if exist the index, otherwise false
+     */
     public boolean exists (String index, String type, String id) {
         GetRequest getRequest = new GetRequest(index, type, id);
         getRequest.fetchSourceContext(new FetchSourceContext(false)); //Disable fetching _source.

@@ -35,4 +35,8 @@ public class ESHighLevelClientService {
     public void deleteDataByParam(String index, String type, String id) {
         esRepository.deleteDataByParam(index, type, id);
     }
+
+    public boolean exists (String index, String type, String id) {
+        return esRepository.exists(index, type, id);
+    }
 }
