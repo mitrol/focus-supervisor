@@ -76,8 +76,6 @@ public class ElasticsearchTest{
     public void test_searc_by_user_index() throws IllegalAccessException, IOException, InvocationTargetException {
         String user_index = "user_index";
         String user_type = "_doc";
-        String user_id = "abcd1234";
-        Map<String, Object> data_user = new HashMap<String, Object>();
         List<User> result = esService.searchDataByIndex(user_index, user_type, User.class);
         Assert.assertNotNull(result);
     }

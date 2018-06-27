@@ -137,14 +137,7 @@ public class ESRepository {
             searchRequest.source(searchSourceBuilder);
             searchRequest.indices(index);
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
-            SearchHits hits = searchResponse.getHits();
-            List<T> dataInforList = Lists.newArrayList();
-            for (SearchHit hit : hits.getHits()) {
-                T data = MAPPER.readValue(hit.getSourceAsString(), valueType);
-                dataInforList.add(data);
-            }
-
-            return dataInforList;
+            return getObjects(searchResponse, valueType);
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
         }
@@ -202,5 +195,30 @@ public class ESRepository {
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to verify if an index exist in Elasticsearch", e);
         }
+    }
+
+    public static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException{
+        List<T> res = Lists.newArrayList();
+        for(SearchHit hit:response.getHits()){
+            res.add(getObject(hit, valueType));
+        }
+        return res;
+    }
+
+    public static <T> T getObject(SearchResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, IOException, InvocationTargetException {
+        for(SearchHit hit:response.getHits()){
+            return getObject(hit, valueType);
+        }
+        return null;
+    }
+
+    public static <T> T getObject(SearchHit hit, Class<T> valueType) throws JsonParseException, JsonMappingException, IOException, IllegalArgumentException, IllegalAccessException, InvocationTargetException{
+        T res = MAPPER.readValue(hit.getSourceAsString(), valueType);
+        return res;
+    }
+
+    public static <T> T getObject(GetResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, IOException, InvocationTargetException {
+        T res = MAPPER.readValue(response.getSourceAsString(), valueType);
+        return res;
     }
 }
