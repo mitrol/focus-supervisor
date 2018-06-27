@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,8 +26,8 @@ public class ESHighLevelClientService {
         return esRepository.searchDataByParam(index, type, id);
     }
 
-    public Map<String, Object> searchDataByIndex(String index, String type) throws IOException {
-        return null;//esRepository.searchDataByIndex(index, type);
+    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws IllegalAccessException, IOException, InvocationTargetException {
+        return esRepository.searchDataByIndex(index, type, valueType);
     }
 
     public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){

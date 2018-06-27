@@ -1,5 +1,9 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
@@ -12,24 +16,36 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class ESRepository {
 
     private static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
+
+    private Client client;
 
     /**
      * Create an index document in Elasticsesarch
@@ -87,6 +103,8 @@ public class ESRepository {
      * @return data source
      */
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
+        IndexResponse response = client.prepareIndex(index, type).setSource("sdf").execute().actionGet();
+
         if(index == null || type == null || id == null) {
             return null;
         }
@@ -100,37 +118,37 @@ public class ESRepository {
         }
     }
 
-    /*
-    * Ver en el proximo revision
-    * */
-    /*public Map<String, Object> searchDataByIndex(String index, String type) throws IOException {
+    /**
+     * Search data document in Elasticsearch and mapper generic
+     *
+     * @param index
+     * @param type document
+     * @param valueType Class type
+     * @return T List<T>
+     */
+    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException {
         if(index == null || type == null) {
             return null;
         }
-        GetRequest getRequest = new GetRequest(index);
-        getRequest.type(type);
-        getRequest.id("pc7O-WMBeYS9DCYg7-l3");
-        GetResponse getResponse = null;
-        SearchRequest searchRequest = new SearchRequest();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-        searchRequest.source(searchSourceBuilder);
-        searchRequest.indices(index);
-        SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
-        SearchHits hits = searchResponse.getHits();
-        List<Map<String, Object>> adds = null;
-        for (SearchHit hit : hits.getHits()) {
-            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-            adds.add(sourceAsMap);
-        }
         try {
-            getResponse = restHighLevelClient.get(getRequest);
-            Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
-            return sourceAsMap;
+            SearchRequest searchRequest = new SearchRequest();
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+            searchRequest.source(searchSourceBuilder);
+            searchRequest.indices(index);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
+            SearchHits hits = searchResponse.getHits();
+            List<T> dataInforList = Lists.newArrayList();
+            for (SearchHit hit : hits.getHits()) {
+                T data = MAPPER.readValue(hit.getSourceAsString(), valueType);
+                dataInforList.add(data);
+            }
+
+            return dataInforList;
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
         }
-    }*/
+    }
 
     /**
      * Update an index document in Elasticsesarch
