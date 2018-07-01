@@ -1,7 +1,9 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
+import net.mitrol.focus.supervisor.core.service.model.Direccion;
 import net.mitrol.focus.supervisor.core.service.model.User;
+import net.mitrol.focus.supervisor.core.service.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,6 +31,9 @@ public class ElasticsearchTest{
     private String index;
     private String type;
     private String id;
+    private String user_index;
+    private String vendedor_index;
+    private String direccion_index;
     private Map<String, Object> data = new HashMap<String, Object>();
 
     @Before
@@ -37,6 +42,9 @@ public class ElasticsearchTest{
         type = "_doc";
         id = "abcd1234";
         data.put("title", "hello world");
+        user_index = "user_index";
+        vendedor_index = "vendedor_index";
+        direccion_index = "direccion_index";
     }
 
     @Test
@@ -58,8 +66,6 @@ public class ElasticsearchTest{
     @Test
     @Ignore
     public void test_sync_create_user_index() {
-        String user_index = "user_index";
-        String user_type = "_doc";
         String user_id = "abcd1234";
         Map<String, Object> data_user = new HashMap<String, Object>();
         data_user.put("id", user_id);
@@ -67,7 +73,7 @@ public class ElasticsearchTest{
         data_user.put("lastname", "cruz");
         data_user.put("mail", "marcelo@gmail.com");
 
-        String id_created = esService.buildIndexByParam(data_user, user_index, user_type, user_id);
+        String id_created = esService.buildIndexByParam(data_user, user_index, type, user_id);
         Assert.assertTrue(esService.exists(index, type, id_created));
     }
 
@@ -77,6 +83,47 @@ public class ElasticsearchTest{
         String user_index = "user_index";
         String user_type = "_doc";
         List<User> result = esService.searchDataByIndex(user_index, user_type, User.class);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void create_entity_by_entity() throws IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException {
+        User user = new User();
+        user.setId("mac700");
+        user.setName("majo");
+        user.setLastname("jose");
+        user.setMail("");
+
+        String id_created = esService.insertData(user, user_index, type, user.getId());
+
+        Assert.assertTrue(esService.exists(user_index, type, id_created));
+    }
+
+    @Test
+    @Ignore
+    public void createVendedorWithDireccion() throws IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException {
+        Direccion direccion = new Direccion();
+        direccion.setId_direccion("dir1");
+        direccion.setCalle("cordoba");
+        direccion.setCodigoPostal("3500");
+        direccion.setLocalidad("Resistencia");
+        direccion.setNumero(1887);
+        Vendedor vendedor = new Vendedor();
+        vendedor.setId_vendedor("vendedor657");
+        vendedor.setName("martin");
+        vendedor.setLastname("veuthey");
+        vendedor.setDireccion(direccion);
+
+        String id_created = esService.insertData(vendedor, vendedor_index, type, vendedor.getId_vendedor());
+
+        Assert.assertTrue(esService.exists(vendedor_index, type, id_created));
+    }
+
+    @Test
+    @Ignore
+    public void test_searc_by_vendedor_index() throws IllegalAccessException, IOException, InvocationTargetException {
+        List<Vendedor> result = esService.searchDataByIndex(vendedor_index, type, Vendedor.class);
         Assert.assertNotNull(result);
     }
 }

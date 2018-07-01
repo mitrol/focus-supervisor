@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-/**
- * This class is only test and the future should be delete
- */
-public class User implements Serializable {
+public class Vendedor implements Serializable {
 
     @JsonProperty
-    private String id;
+    private String id_vendedor;
 
     @JsonProperty
     private String name;
@@ -19,24 +16,17 @@ public class User implements Serializable {
     private String lastname;
 
     @JsonProperty
-    private String mail;
+    private Direccion direccion;
 
-    public User() {
+    public Vendedor() {
     }
 
-    public User(String id, String name, String lastname, String mail) {
-        this.id = id;
-        this.name = name;
-        this.lastname = lastname;
-        this.mail = mail;
+    public String getId_vendedor() {
+        return id_vendedor;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public void setId_vendedor(String id_vendedor) {
+        this.id_vendedor = id_vendedor;
     }
 
     public String getName() {
@@ -55,11 +45,11 @@ public class User implements Serializable {
         this.lastname = lastname;
     }
 
-    public String getMail() {
-        return mail;
+    public Direccion getDireccion() {
+        return direccion;
     }
 
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setDireccion(Direccion direccion) {
+        this.direccion = direccion;
     }
 }

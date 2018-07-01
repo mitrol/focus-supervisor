@@ -22,6 +22,10 @@ public class ESHighLevelClientService {
         return esRepository.buildIndexByParam(data, index, type, id);
     }
 
+    public String insertData(Object object, String index, String type, String id) throws NoSuchMethodException, IOException, IllegalAccessException, InvocationTargetException {
+        return esRepository.insertData(object, index, type, id);
+    }
+
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
         return esRepository.searchDataByParam(index, type, id);
     }

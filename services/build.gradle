@@ -1,4 +1,5 @@
 dependencies{
     compile("org.elasticsearch.client:elasticsearch-rest-high-level-client:6.2.4")
+    compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile project(':models')
 }
