@@ -26,6 +26,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.AbstractQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -161,6 +162,31 @@ public class ESRepository {
             SearchRequest searchRequest = new SearchRequest();
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
             searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+            searchRequest.source(searchSourceBuilder);
+            searchRequest.indices(index);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
+            return getObjects(searchResponse, valueType);
+        } catch (IOException e) {
+            throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
+        }
+    }
+
+    /**
+     * Search data document in Elasticsearch and mapper generic
+     *
+     * @param index
+     * @param type document
+     * @param valueType Class type
+     * @return T List<T>
+     */
+    public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException {
+        if(index == null || type == null) {
+            return null;
+        }
+        try {
+            SearchRequest searchRequest = new SearchRequest();
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            if (null != matchQueryBuilder) searchSourceBuilder.query(matchQueryBuilder);
             searchRequest.source(searchSourceBuilder);
             searchRequest.indices(index);
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest);

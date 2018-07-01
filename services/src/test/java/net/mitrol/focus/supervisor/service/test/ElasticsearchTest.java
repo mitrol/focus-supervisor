@@ -5,6 +5,10 @@ import net.mitrol.focus.supervisor.core.service.model.Direccion;
 import net.mitrol.focus.supervisor.core.service.model.User;
 import net.mitrol.focus.supervisor.core.service.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
+import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -124,6 +128,33 @@ public class ElasticsearchTest{
     @Ignore
     public void test_searc_by_vendedor_index() throws IllegalAccessException, IOException, InvocationTargetException {
         List<Vendedor> result = esService.searchDataByIndex(vendedor_index, type, Vendedor.class);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByField() throws IllegalAccessException, IOException, InvocationTargetException {
+        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", "martin");
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, matchQueryBuilder);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByDifferentsFields() throws IllegalAccessException, IOException, InvocationTargetException {
+        MultiMatchQueryBuilder matchQueryBuilder = QueryBuilders.multiMatchQuery("Resistencia", "name", "direccion.localidad");
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, matchQueryBuilder);
+        Assert.assertNotNull(result);
+    }
+
+    /*
+    * Test to working search for like as LIKE "%etc%"
+    * */
+    @Test
+    @Ignore
+    public void shouldBeSearchByMatchPhrases() throws IllegalAccessException, IOException, InvocationTargetException {
+        MoreLikeThisQueryBuilder moreLikeThisQuery = QueryBuilders.moreLikeThisQuery(new String[]{"name", "direccion.localidad"}, new String[]{"a"}, null);
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, moreLikeThisQuery);
         Assert.assertNotNull(result);
     }
 }

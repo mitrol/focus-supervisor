@@ -1,6 +1,11 @@
 package net.mitrol.focus.supervisor.core.service;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import net.mitrol.focus.supervisor.core.service.domain.ESRepository;
+import org.elasticsearch.index.query.AbstractQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +37,10 @@ public class ESHighLevelClientService {
 
     public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws IllegalAccessException, IOException, InvocationTargetException {
         return esRepository.searchDataByIndex(index, type, valueType);
+    }
+
+    public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException {
+        return esRepository.searchDataByQuery(index, type, valueType, matchQueryBuilder);
     }
 
     public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
