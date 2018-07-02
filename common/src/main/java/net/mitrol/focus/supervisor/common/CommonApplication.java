@@ -1,6 +1,5 @@
 package net.mitrol.focus.supervisor.common;
 
-import net.mitrol.focus.supervisor.common.configuration.CommonConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
