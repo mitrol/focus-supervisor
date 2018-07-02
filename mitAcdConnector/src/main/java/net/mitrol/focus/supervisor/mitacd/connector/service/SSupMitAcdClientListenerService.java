@@ -2,8 +2,6 @@ package net.mitrol.focus.supervisor.mitacd.connector.service;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.mitrol.focus.supervisor.mitacd.connector.client.SSupMitAcdClient;
 import net.mitrol.focus.supervisor.mitacd.connector.client.SSupMitAcdClientListener;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import net.mitrol.acd.client.entities.MitAcdConnectionInfo;
 import net.mitrol.acd.client.tcp.MitAcdClient;
-import net.mitrol.utils.json.JsonMapper;
 
 /**
  * 
@@ -27,11 +24,11 @@ public class SSupMitAcdClientListenerService implements SSupMitAcdClientListener
 	private MitrolLogger logger = MitrolLoggerImpl.getLogger(SSupMitAcdClientListenerService.class);
 
 	private SSupMitAcdClient ssupMitAcdClient;
-	private List<Object> listMessageMitACD = new ArrayList<>();
-	
+
 	@Autowired
-    private KafkaSendService kafkaSendService;
-	
+	private ESModelService esModelService;
+
+
 	@Autowired
 	public SSupMitAcdClientListenerService (MitAcdConnectionInfo connectionInfo) {
 		 ssupMitAcdClient = new SSupMitAcdClient(this, connectionInfo, Duration.ofMillis(500));
@@ -64,46 +61,41 @@ public class SSupMitAcdClientListenerService implements SSupMitAcdClientListener
 	@Override
 	public void onBatchFinished(SSupMitAcdClient ssupMitAcdClient,
 			Integer intervalId, Instant serverDateTime, Duration intervalDuration) {
-		String json = JsonMapper.getInstance().getStringJsonFromObject(listMessageMitACD);
-		logger.info("Sending messages to kafka -> " + json);
-		kafkaSendService.sender(json);
-		listMessageMitACD.clear();
 	}
 
 	@Override
 	public void onCampaignIntervalStats(SSupMitAcdClient ssupMitAcdClient,
 			CampaignIntervalStats campaignIntervalStats) {
-		listMessageMitACD.add(campaignIntervalStats);
+
 	}
 
 	@Override
 	public void onCampaignDailyStats(SSupMitAcdClient ssupMitAcdClient, CampaignDailyStats campaignDailyStats) {
-		listMessageMitACD.add(campaignDailyStats);
+	    esModelService.generateCampaignDailyStats(campaignDailyStats);
 	}
 
 	@Override
 	public void onListIntervalStats(SSupMitAcdClient sSupMitAcdClient, ListIntervalStats listIntervalStats) {
-		listMessageMitACD.add(listIntervalStats);
+		esModelService.generateListIntervalStats(listIntervalStats);
 	}
 
 	@Override
 	public void onListDailyStats(SSupMitAcdClient ssupMitAcdClient, ListDailyStats listDailyStats) {
-		listMessageMitACD.add(listDailyStats);
+		esModelService.generateListDailyStats(listDailyStats);
 	}
 
 	@Override
 	public void onAgentIntervalStats(SSupMitAcdClient ssupMitAcdClient, AgentIntervalStats agentIntervalStats) {
-		listMessageMitACD.add(agentIntervalStats);
+		esModelService.generateAgentIntervalStats(agentIntervalStats);
 	}
 
 	@Override
 	public void onAgentDailyStats(SSupMitAcdClient ssupMitAcdClient, AgentDailyStats agentDailyStats) {
-		listMessageMitACD.add(agentDailyStats);
-		
+		esModelService.generateAgentDailyStats(agentDailyStats);
 	}
 
 	@Override
-	public void onInteractionsStats(SSupMitAcdClient ssupMitAcdClient, InteractionStats interactionStatsss) {
-		listMessageMitACD.add(interactionStatsss);
+	public void onInteractionsStats(SSupMitAcdClient ssupMitAcdClient, InteractionStats interactionStats) {
+		esModelService.generateInteractionStats(interactionStats);
 	}
 }

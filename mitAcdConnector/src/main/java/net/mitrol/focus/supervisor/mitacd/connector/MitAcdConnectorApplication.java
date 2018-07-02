@@ -1,7 +1,8 @@
 package net.mitrol.focus.supervisor.mitacd.connector;
 
+import net.mitrol.focus.supervisor.common.CommonApplication;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 
 import net.mitrol.kafka.KafkaContext;
 
@@ -12,7 +13,6 @@ import net.mitrol.kafka.KafkaContext;
 public class MitAcdConnectorApplication {
 
   public static void main(String[] args) {
-    new SpringApplicationBuilder(MitAcdConnectorApplication.class)
-        .sources(new Class[] {KafkaContext.class}).run(args);
+    SpringApplication.run(MitAcdConnectorApplication.class, args);
   }
 }

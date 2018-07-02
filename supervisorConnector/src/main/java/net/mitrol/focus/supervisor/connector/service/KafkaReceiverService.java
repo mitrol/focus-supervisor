@@ -22,8 +22,6 @@ public class KafkaReceiverService {
 
   @Autowired
   private KafkaReceiver receiver;
-  @Autowired
-  private ProcessMessageService processMessageService;
 
   @PostConstruct
   public void init() {
@@ -31,7 +29,6 @@ public class KafkaReceiverService {
       @Override
       public void processMessage(String source, String topic, String value) {
         logger.info("processMessage " + source + " " + topic + " " + value);
-        processMessageService.processMessage(value);
       }
     });
   }

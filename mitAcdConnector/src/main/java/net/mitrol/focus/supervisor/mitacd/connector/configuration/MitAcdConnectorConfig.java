@@ -1,9 +1,9 @@
 package net.mitrol.focus.supervisor.mitacd.connector.configuration;
 
+import net.mitrol.focus.supervisor.core.service.config.ElasticSearchConfig;
+import net.mitrol.focus.supervisor.core.service.config.ServiceConfig;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 import net.mitrol.acd.client.entities.MitAcdConnectionInfo;
 
@@ -12,7 +12,9 @@ import net.mitrol.acd.client.entities.MitAcdConnectionInfo;
  *
  * */
 @Configuration
-@ComponentScan("net.mitrol.focus.supervisor.mitacd.connector.service")
+@Import({ServiceConfig.class, ElasticSearchConfig.class})
+@ComponentScan("net.mitrol.focus.supervisor.mitacd.connector.service, net.mitrol.focus.supervisor.core.service")
+@PropertySources({@PropertySource("classpath:application.properties")})
 public class MitAcdConnectorConfig {
 
 	@Value("${mitacd.conn.host}")

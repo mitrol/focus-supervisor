@@ -1,35 +1,25 @@
-package net.mitrol.focus.supervisor.connector.service;
+package net.mitrol.focus.supervisor.mitacd.connector.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.mitrol.ct.api.controllers.responses.AgentProfileResponse;
-import net.mitrol.ct.api.controllers.responses.CampaignResponse;
-import net.mitrol.ct.api.controllers.responses.ListResponse;
-import net.mitrol.ct.api.entities.Group;
-import net.mitrol.focus.supervisor.core.service.CTApiClientService;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.models.*;
-import net.mitrol.utils.json.JsonMapper;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import net.mitrol.utils.log.MitrolLogger;
+import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by marce on 5/27/18.
  */
 @Service
-public class ProcessMessageService {
+public class ESModelService {
 
-    private final Logger logger = Logger.getLogger("ProcessMessageService");
+    private MitrolLogger logger = MitrolLoggerImpl.getLogger(ESModelService.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${index.type}")
@@ -57,73 +47,9 @@ public class ProcessMessageService {
     private String index_interaction;
 
     @Autowired
-    private CTApiClientService ctApiClient;
-
-    @Autowired
     private ESHighLevelClientService esService;
 
-    public void processMessage(String message) {
-        try {
-            JSONArray jsonArray = new JSONArray(message);
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject obj = jsonArray.getJSONObject(i);
-                if (obj.toString().contains("campaignDailyStatsId")) {
-                    CampaignDailyStats campaignDailyStats = JsonMapper.getInstance().getObjectFromJSON(obj, CampaignDailyStats.class);
-                    generateCampaignDailyStats(campaignDailyStats);
-                    statusInCampaignDailyStats(campaignDailyStats.getCampaignDailyStatsId().longValue());
-                } else if (obj.toString().contains("campaignIntervalStatsId")) {
-                    CampaignIntervalStats campaignIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, CampaignIntervalStats.class);
-                    generateCampaignIntervalStats(campaignIntervalStats);
-                    statusInCampaignDailyStats(campaignIntervalStats.getCampaignIntervalStatsId().longValue());
-                } else if (obj.toString().contains("listIntervalStatsId")) {
-                    ListIntervalStats listIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, ListIntervalStats.class);
-                    generateListIntervalStats(listIntervalStats);
-                    statusInLotes(listIntervalStats.getListIntervalStatsId().longValue());
-                } else if (obj.toString().contains("listDailyStatsId")) {
-                    ListDailyStats listDailyStats =  JsonMapper.getInstance().getObjectFromJSON(obj, ListDailyStats.class);
-                    generateListDailyStats(listDailyStats);
-                    statusInLotes(listDailyStats.getListDailyStatsId().longValue());
-                } else if (obj.toString().contains("agentIntervalStatsId")) {
-                    AgentIntervalStats agentIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, AgentIntervalStats.class);
-                    generateAgentIntervalStats(agentIntervalStats);
-                    statusInAgents(agentIntervalStats.getAgentIntervalStatsId().longValue());
-                } else if (obj.toString().contains("agentDailyStatsId")) {
-                    AgentDailyStats agentDailyStats=  JsonMapper.getInstance().getObjectFromJSON(obj, AgentDailyStats.class);
-                    generateAgentDailyStats(agentDailyStats);
-                    statusInAgents(agentDailyStats.getAgentDailyStatsId().longValue());
-                } else if (obj.toString().contains("interactionStatsId")) {
-                    // Todavia no se si pertenece al grupo
-                    InteractionStats interactionStats =  JsonMapper.getInstance().getObjectFromJSON(obj, InteractionStats.class);
-                    generateInteractionStats(interactionStats);
-                    statusInGroup(interactionStats.getInteractionStatsId().longValue());
-                }
-            }
-        } catch (JSONException jsonE) {
-            logger.log(Level.WARNING, jsonE.getMessage());
-        }
-    }
-
-    private void statusInCampaignDailyStats(Long id) {
-        CampaignResponse campaignResponse = ctApiClient.getCampaignById(id);
-        logger.info("Get Campaign");
-    }
-
-    private void statusInAgents(Long id) {
-        List<AgentProfileResponse> agentProfileResponse = ctApiClient.getAgentProfilesById(id);
-        logger.info("Get Agents");
-    }
-
-    private void statusInLotes(Long id) {
-        List<ListResponse> listResponse = ctApiClient.getLotesById(id);
-        logger.info("Get Lotes");
-    }
-
-    private void statusInGroup(Long id) {
-        Group group = ctApiClient.getGroupById(id);
-        logger.info("Get Group");
-    }
-
-    private void generateCampaignDailyStats(CampaignDailyStats campaignDailyStats) {
+    public void generateCampaignDailyStats(CampaignDailyStats campaignDailyStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -147,7 +73,7 @@ public class ProcessMessageService {
         }
     }
 
-    private void generateListDailyStats(ListDailyStats listDailyStats) {
+    public void generateListDailyStats(ListDailyStats listDailyStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -168,7 +94,7 @@ public class ProcessMessageService {
         }
     }
 
-    private void generateListIntervalStats(ListIntervalStats listIntervalStats) {
+    public void generateListIntervalStats(ListIntervalStats listIntervalStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -187,7 +113,7 @@ public class ProcessMessageService {
         }
     }
 
-    private void generateCampaignIntervalStats(CampaignIntervalStats campaignIntervalStats) {
+    public void generateCampaignIntervalStats(CampaignIntervalStats campaignIntervalStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -222,7 +148,7 @@ public class ProcessMessageService {
         }
     }
 
-    private void generateAgentIntervalStats(AgentIntervalStats agentIntervalStats) {
+    public void generateAgentIntervalStats(AgentIntervalStats agentIntervalStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -249,7 +175,7 @@ public class ProcessMessageService {
         }
     }
 
-    private void generateAgentDailyStats(AgentDailyStats agentDailyStats) {
+    public void generateAgentDailyStats(AgentDailyStats agentDailyStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -274,7 +200,7 @@ public class ProcessMessageService {
         }
     }
 
-    private void generateInteractionStats(InteractionStats interactionStats) {
+    public void generateInteractionStats(InteractionStats interactionStats) {
         try {
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -330,5 +256,4 @@ public class ProcessMessageService {
             e.printStackTrace();
         }
     }
-
 }
