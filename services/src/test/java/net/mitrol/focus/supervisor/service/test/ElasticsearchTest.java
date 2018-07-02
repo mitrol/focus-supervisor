@@ -1,9 +1,9 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
-import net.mitrol.focus.supervisor.core.service.model.Direccion;
-import net.mitrol.focus.supervisor.core.service.model.User;
-import net.mitrol.focus.supervisor.core.service.model.Vendedor;
+import net.mitrol.focus.supervisor.service.test.model.Direccion;
+import net.mitrol.focus.supervisor.service.test.model.User;
+import net.mitrol.focus.supervisor.service.test.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;

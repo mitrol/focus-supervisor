@@ -1,4 +1,4 @@
-package net.mitrol.focus.supervisor.core.service.model;
+package net.mitrol.focus.supervisor.service.test.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

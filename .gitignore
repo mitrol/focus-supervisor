@@ -1,9 +1,7 @@
 .idea/
 .gradle/
-focus-supervisor.iml
+*.iml
 */build/*
-common/out/*
-models/out/*
-services/out/*
-supervisorConnector/out/*
-mitAcdConnector/out/*
+*/out/*
+gradlew
+gradlew.bat
