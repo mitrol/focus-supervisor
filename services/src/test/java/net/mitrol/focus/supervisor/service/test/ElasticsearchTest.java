@@ -26,7 +26,6 @@ import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={ TestConfig.class })
-@Ignore
 public class ElasticsearchTest{
 
     @Autowired
@@ -105,7 +104,6 @@ public class ElasticsearchTest{
     }
 
     @Test
-    @Ignore
     public void createVendedorWithDireccion() throws IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException {
         Direccion direccion = new Direccion();
         direccion.setId_direccion("dir1");
@@ -151,7 +149,6 @@ public class ElasticsearchTest{
     * Test to working search for like as LIKE "%etc%"
     * */
     @Test
-    @Ignore
     public void shouldBeSearchByMatchPhrases() throws IllegalAccessException, IOException, InvocationTargetException {
         MoreLikeThisQueryBuilder moreLikeThisQuery = QueryBuilders.moreLikeThisQuery(new String[]{"name", "direccion.localidad"}, new String[]{"a"}, null);
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, moreLikeThisQuery);
