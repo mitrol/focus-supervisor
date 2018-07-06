@@ -10,6 +10,9 @@ public class ListDailyStats {
     private TimeAccumulator dailyTimes;
     private InteractionAccumulator dailyInteractions;
 
+    public ListDailyStats() {
+    }
+
     private ListDailyStats(Integer listDailyStatsId, TimeAccumulator lastIntervalTimes, InteractionAccumulator lasIntervalInteractions, TimeAccumulator dailyTimes, InteractionAccumulator dailyInteractions) {
         this.listDailyStatsId = listDailyStatsId;
         this.lastIntervalTimes = lastIntervalTimes;

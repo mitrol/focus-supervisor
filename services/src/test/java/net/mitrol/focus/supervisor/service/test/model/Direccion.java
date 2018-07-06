@@ -1,24 +1,17 @@
 package net.mitrol.focus.supervisor.service.test.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 
 public class Direccion implements Serializable {
 
-    @JsonProperty
     private String id_direccion;
 
-    @JsonProperty
     private String localidad;
 
-    @JsonProperty
     private String calle;
 
-    @JsonProperty
     private Integer numero;
 
-    @JsonProperty
     private String codigoPostal;
 
     public Direccion() {

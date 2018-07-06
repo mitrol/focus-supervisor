@@ -22,6 +22,9 @@ public class AgentAccumulator {
     private Integer outboundTransfer;
     private Map<ResolutionCategory, Integer> resolutions;
 
+    public AgentAccumulator() {
+    }
+
     private AgentAccumulator(Duration unstaffed, Duration avail, Duration preview, Duration dial,
                              Duration ring, Duration connect, Duration hold, Duration afterCallWork, Duration notReady,
                              Duration break0, Duration break1, Duration break2, Duration break3, Duration break4,

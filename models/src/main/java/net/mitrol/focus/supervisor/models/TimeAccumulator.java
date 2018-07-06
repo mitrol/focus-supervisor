@@ -18,6 +18,9 @@ public class TimeAccumulator {
     private Duration talking;
     private Map<ResolutionCategory, Integer> resolutions;
 
+    public TimeAccumulator() {
+    }
+
     private TimeAccumulator(
             Duration agentUnstaffed, Duration agnetAvail, Duration agentPreview, Duration agentDial,
             Duration agentRing, Duration agentConnect, Duration agentHold, Duration agentAfterCallWork, Duration agentNotReady,

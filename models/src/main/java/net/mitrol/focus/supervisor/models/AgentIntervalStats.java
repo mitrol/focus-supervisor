@@ -15,6 +15,9 @@ public class AgentIntervalStats {
     private AgentInternalAccumulator internalOutboundStats;
     private AgentInternalAccumulator internalInboundStats;
 
+    public AgentIntervalStats() {
+    }
+
     private AgentIntervalStats(int agentIntervalStatsId, AgentState status, Duration currentState, String extension, String ip,
                                AgentAccumulator agentAccumulator, AgentInternalAccumulator internalOutboundStats, AgentInternalAccumulator internalInboundStats) {
         this.agentIntervalStatsId = agentIntervalStatsId;

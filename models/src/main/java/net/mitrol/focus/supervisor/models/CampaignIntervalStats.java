@@ -19,6 +19,9 @@ public class CampaignIntervalStats {
     private Duration averageHandlingTime;
     private Duration averageTalkingTime;
 
+    public CampaignIntervalStats() {
+    }
+
     private CampaignIntervalStats(Integer campaignIntervalStatsId, TimeAccumulator times, InteractionAccumulator interactions, Integer queued, Duration waitingTime, Integer serviceLevel, Duration averageSpeedOfAnswer, Duration impatience, Integer liveVoiceProbability, Duration estimatedWaitingTime, Duration averageHandlingTime, Duration averageTalkingTime) {
         this.campaignIntervalStatsId = campaignIntervalStatsId;
         this.times = times;

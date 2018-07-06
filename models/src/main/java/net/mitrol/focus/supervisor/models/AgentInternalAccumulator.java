@@ -20,6 +20,9 @@ public class AgentInternalAccumulator {
         this.outboundTransfer = outboundTransfer;
     }
 
+    public AgentInternalAccumulator() {
+    }
+
     public static AgentInternalAccumulator parse(String s) {
         Integer[] values = MitAcdUtils.StrToIntSin0(s);
         return new AgentInternalAccumulator(

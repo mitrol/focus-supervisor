@@ -91,20 +91,21 @@ public class ElasticsearchTest{
 
     @Test
     @Ignore
-    public void create_entity_by_entity() throws IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException {
+    public void create_entity_by_entity() {
         User user = new User();
         user.setId("mac700");
         user.setName("majo");
         user.setLastname("jose");
         user.setMail("");
 
-        String id_created = esService.insertData(user, user_index, type, user.getId());
+        String id_created = esService.buildDocumentIndex(user, user_index, type, user.getId());
 
         Assert.assertTrue(esService.exists(user_index, type, id_created));
     }
 
     @Test
-    public void createVendedorWithDireccion() throws IllegalAccessException, IOException, InvocationTargetException, NoSuchMethodException {
+    @Ignore
+    public void createVendedorWithDireccion() {
         Direccion direccion = new Direccion();
         direccion.setId_direccion("dir1");
         direccion.setCalle("cordoba");
@@ -117,7 +118,7 @@ public class ElasticsearchTest{
         vendedor.setLastname("veuthey");
         vendedor.setDireccion(direccion);
 
-        String id_created = esService.insertData(vendedor, vendedor_index, type, vendedor.getId_vendedor());
+        String id_created = esService.buildDocumentIndex(vendedor, vendedor_index, type, "");
 
         Assert.assertTrue(esService.exists(vendedor_index, type, id_created));
     }
@@ -149,6 +150,7 @@ public class ElasticsearchTest{
     * Test to working search for like as LIKE "%etc%"
     * */
     @Test
+    @Ignore
     public void shouldBeSearchByMatchPhrases() throws IllegalAccessException, IOException, InvocationTargetException {
         MoreLikeThisQueryBuilder moreLikeThisQuery = QueryBuilders.moreLikeThisQuery(new String[]{"name", "direccion.localidad"}, new String[]{"a"}, null);
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, moreLikeThisQuery);

@@ -12,6 +12,9 @@ public class AgentDailyStats {
     private AgentInternalAccumulator dailyOutboundStats;
     private AgentInternalAccumulator dailyInboundStats;
 
+    public AgentDailyStats() {
+    }
+
     private AgentDailyStats(Integer agentDailyStatsId, AgentAccumulator lastIntervalStats, AgentInternalAccumulator lastIntervalInternalOutboundStats, AgentInternalAccumulator lastIntervalInternalInboundStats, AgentAccumulator dailyStats, AgentInternalAccumulator dailyOutboundStats, AgentInternalAccumulator dailyInboundStats) {
         this.agentDailyStatsId = agentDailyStatsId;
         this.lastIntervalStats = lastIntervalStats;

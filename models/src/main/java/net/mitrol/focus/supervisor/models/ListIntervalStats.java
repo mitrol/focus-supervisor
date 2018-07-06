@@ -9,6 +9,9 @@ public class ListIntervalStats {
     private InteractionAccumulator iInteractions;
     private Boolean canBeDialed;
 
+    public ListIntervalStats() {
+    }
+
     private ListIntervalStats(Integer listIntervalStatsId, TimeAccumulator times, InteractionAccumulator iInteractions, Boolean canBeDialed) {
         this.listIntervalStatsId = listIntervalStatsId;
         this.times = times;

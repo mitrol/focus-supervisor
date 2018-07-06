@@ -30,6 +30,9 @@ public class InteractionAccumulator {
     private Integer inboundBeforeSLA; //NSAtendidasAntes + NSAbandonadasAntes
     private Integer inboundAfterSLA; //NSAtendidasDespues + NSAbandonadasDespues
 
+    public InteractionAccumulator() {
+    }
+
     private InteractionAccumulator(Integer attempted, Integer notExecuted, Integer notContacted, Integer contacted, Integer busy, Integer noAnswer, Integer notContactedByOtherReason, Integer fax, Integer answeringMachine, Integer mute, Integer answeredByAgent, Integer notAnsweredByAgent, Integer notTransferredToAgent, Integer inbound, Integer transferredToAgent, Integer abandoned, Integer incomingTransfer, Integer outboundTransfer, Integer inboundOverflow, Integer outboundOverflow, Integer inboundBeforeSLA, Integer inboundAfterSLA) {
         this.attempted = attempted;
         this.notExecuted = notExecuted;

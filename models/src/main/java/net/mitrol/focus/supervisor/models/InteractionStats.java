@@ -30,6 +30,9 @@ public class InteractionStats {
     private Boolean remoteWordSpotting;
     private Integer remoteGender;
 
+    public InteractionStats() {
+    }
+
     private InteractionStats(Integer interactionStatsId, Integer remoteAgentId, Integer campaignId, Integer listId, Integer interactionType, Integer contactType, Integer state, Duration duration, String remoteParty, String interactionId, Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime, Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting, Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
         this.interactionStatsId = interactionStatsId;
         this.remoteAgentId = remoteAgentId;

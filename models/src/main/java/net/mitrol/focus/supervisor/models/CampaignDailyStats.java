@@ -10,6 +10,9 @@ public class CampaignDailyStats {
     private TimeAccumulator dailyTimes;
     private InteractionAccumulator dailyInteractions;
 
+    public CampaignDailyStats() {
+    }
+
     private CampaignDailyStats(Integer campaignDailyStatsId, TimeAccumulator lastIntervalTimes, InteractionAccumulator lasIntervalInteractions, TimeAccumulator dailyTimes, InteractionAccumulator dailyInteractions) {
         this.campaignDailyStatsId = campaignDailyStatsId;
         this.lastIntervalTimes = lastIntervalTimes;

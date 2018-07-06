@@ -17,6 +17,9 @@ public class ListAgentAccumulator {
     private Duration play;
     private Map<ResolutionCategory, Integer> resolutions;
 
+    public ListAgentAccumulator() {
+    }
+
     private ListAgentAccumulator(Duration login, Duration talking, Duration play, Integer otherResolutions, Integer successfulResolutions, Integer unsuccessfulResolutions, Integer ineffectiveResolutions, Integer neutralResolutions) {
         this.login = login;
         this.talking = talking;

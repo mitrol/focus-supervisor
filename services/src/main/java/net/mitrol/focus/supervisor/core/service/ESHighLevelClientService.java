@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import net.mitrol.focus.supervisor.core.service.domain.ESRepository;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +25,8 @@ public class ESHighLevelClientService {
         return esRepository.buildIndexByParam(data, index, type, id);
     }
 
-    public String insertData(Object object, String index, String type, String id) throws NoSuchMethodException, IOException, IllegalAccessException, InvocationTargetException {
-        return esRepository.insertData(object, index, type, id);
+    public String buildDocumentIndex(Object object, String index, String type, String id) {
+        return esRepository.buildDocumentIndex(object, index, type, id);
     }
 
     public Map<String, Object> searchDataByParam(String index, String type, String id) {

@@ -1,7 +1,5 @@
 package net.mitrol.focus.supervisor.service.test.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 
 /**
@@ -9,16 +7,12 @@ import java.io.Serializable;
  */
 public class User implements Serializable {
 
-    @JsonProperty
     private String id;
 
-    @JsonProperty
     private String name;
 
-    @JsonProperty
     private String lastname;
 
-    @JsonProperty
     private String mail;
 
     public User() {

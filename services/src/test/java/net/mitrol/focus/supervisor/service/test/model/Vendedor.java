@@ -1,21 +1,15 @@
 package net.mitrol.focus.supervisor.service.test.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.io.Serializable;
 
 public class Vendedor implements Serializable {
 
-    @JsonProperty
     private String id_vendedor;
 
-    @JsonProperty
     private String name;
 
-    @JsonProperty
     private String lastname;
 
-    @JsonProperty
     private Direccion direccion;
 
     public Vendedor() {

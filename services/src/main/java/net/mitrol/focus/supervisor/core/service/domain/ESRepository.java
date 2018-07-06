@@ -1,14 +1,13 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
@@ -23,8 +22,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -35,13 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class ESRepository {
@@ -85,18 +78,19 @@ public class ESRepository {
      * @param id document, this is optional
      * @return id created
      */
-    public String insertData(Object data, String index, String type, String id) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException {
+    public String buildDocumentIndex(Object data, String index, String type, String id) {
         IndexRequest indexRequest;
-        byte[] json = MAPPER.writeValueAsBytes(data);
-        if (StringUtils.isEmpty(id)) {
-            indexRequest = new IndexRequest(index, type).source(json, XContentType.JSON);
-        } else {
-            indexRequest = new IndexRequest(index, type, id).source(json, XContentType.JSON);
-        }
         try {
+            byte[] json = MAPPER.writeValueAsBytes(data);
+            if (StringUtils.isEmpty(id)) {
+                indexRequest = new IndexRequest(index, type).source(json, XContentType.JSON);
+            } else {
+                indexRequest = new IndexRequest(index, type, id).source(json, XContentType.JSON);
+            }
+
             IndexResponse response = restHighLevelClient.index(indexRequest);
             return response.getId();
-        } catch (ElasticsearchException |  IOException e) {
+        } catch ( ElasticsearchException  | IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
         }
     }
@@ -273,42 +267,5 @@ public class ESRepository {
     public static <T> T getObject(GetResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, IOException, InvocationTargetException {
         T res = MAPPER.readValue(response.getSourceAsString(), valueType);
         return res;
-    }
-
-    public static XContentBuilder getSource(Object o) throws IOException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException{
-        XContentBuilder result = XContentFactory.jsonBuilder().startObject();
-        for (Field field : getAllFields(o.getClass())) {
-            if (field.isAnnotationPresent(JsonProperty.class)) {
-                Object value = PropertyUtils.getProperty(o, field.getName());
-                if (value != null) {
-                    String name = field.getAnnotation(JsonProperty.class).value();
-                    if (name == null || "".equals(name.trim())) {
-                        name = field.getName();
-                    }
-                    if (value instanceof Set) {
-                        Set<?> val = (Set<?>)value;
-                        if (val.size() > 0) {
-                            result.startArray(name);
-                            for (Object f : val) {
-                                result.value(f.toString());
-                            }
-                            result.endArray();
-                        }
-                    } else {
-                        result.field(name, value);
-                    }
-                }
-            }
-        }
-        result.endObject();
-        return result;
-    }
-
-    private static List<Field> getAllFields(Class<?> type) {
-        List<Field> fields = new ArrayList<Field>();
-        for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-            fields.addAll(Arrays.asList(c.getDeclaredFields()));
-        }
-        return fields;
     }
 }
