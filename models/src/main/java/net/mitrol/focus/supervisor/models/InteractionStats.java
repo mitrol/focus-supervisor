@@ -12,7 +12,7 @@ public class InteractionStats {
     private Integer listId;
     private Integer interactionType;
     private Integer contactType;
-    private Integer state;
+    private InteractionState state;
     private Duration duration;
     private String remoteParty;
     private String interactionId;
@@ -33,7 +33,11 @@ public class InteractionStats {
     public InteractionStats() {
     }
 
-    private InteractionStats(Integer interactionStatsId, Integer remoteAgentId, Integer campaignId, Integer listId, Integer interactionType, Integer contactType, Integer state, Duration duration, String remoteParty, String interactionId, Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime, Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting, Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
+    private InteractionStats(Integer interactionStatsId, Integer remoteAgentId, Integer campaignId, Integer listId, Integer interactionType,
+                             Integer contactType, InteractionState state, Duration duration, String remoteParty, String interactionId,
+                             Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime,
+                             Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting,
+                             Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
         this.interactionStatsId = interactionStatsId;
         this.remoteAgentId = remoteAgentId;
         this.campaignId = campaignId;
@@ -67,7 +71,7 @@ public class InteractionStats {
                 sockMessage.getInteger("idl"),
                 sockMessage.getInteger("t"),
                 sockMessage.getInteger("tct"),
-                sockMessage.getInteger("st"),
+                InteractionState.getFromCode(sockMessage.getInteger("st")),
                 sockMessage.getInteger("Te") == null ? null : Duration.ofSeconds(sockMessage.getInteger("Te")),
                 sockMessage.getString("C"),
                 sockMessage.getString("idLl"),
@@ -110,7 +114,7 @@ public class InteractionStats {
         return contactType;
     }
 
-    public Integer getState() {
+    public InteractionState getState() {
         return state;
     }
 
