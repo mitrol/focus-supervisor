@@ -2,12 +2,14 @@ package net.mitrol.focus.supervisor.mitacd.connector.service;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.models.*;
+import net.mitrol.utils.DateTimeUtils;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -18,9 +20,6 @@ import java.time.format.DateTimeFormatter;
 public class ESModelService {
 
     private MitrolLogger logger = MitrolLoggerImpl.getLogger(ESModelService.class);
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter FORMATTER_COMPLETE = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-    private static final DateTimeFormatter TRANSFORM_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Value("${index.type}")
     private String index_type;
@@ -50,44 +49,35 @@ public class ESModelService {
     private ESHighLevelClientService esService;
 
     public void generateCampaignDailyStats(CampaignDailyStats campaignDailyStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(campaignDailyStats, index_campaign_daily + date, index_type, "");
+        esService.buildDocumentIndex(campaignDailyStats, getIndexDateValue(index_campaign_daily), index_type, "");
     }
 
     public void generateListDailyStats(ListDailyStats listDailyStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(listDailyStats, index_list_daily + date, index_type, "");
+        esService.buildDocumentIndex(listDailyStats, getIndexDateValue(index_list_daily), index_type, "");
     }
 
     public void generateListIntervalStats(ListIntervalStats listIntervalStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(listIntervalStats, index_list_interval + date, index_type, "");
+        esService.buildDocumentIndex(listIntervalStats, getIndexDateValue(index_list_interval), index_type, "");
     }
 
     public void generateCampaignIntervalStats(CampaignIntervalStats campaignIntervalStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(campaignIntervalStats, index_campaign_interval + date, index_type, "");
+        esService.buildDocumentIndex(campaignIntervalStats, getIndexDateValue(index_campaign_interval), index_type, "");
     }
 
     public void generateAgentIntervalStats(AgentIntervalStats agentIntervalStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(agentIntervalStats, index_agent_interval + date, index_type, "");
+        esService.buildDocumentIndex(agentIntervalStats, getIndexDateValue(index_agent_interval), index_type, "");
     }
 
     public void generateAgentDailyStats(AgentDailyStats agentDailyStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(agentDailyStats, index_agent_daily + date, index_type, "");
+        esService.buildDocumentIndex(agentDailyStats, getIndexDateValue(index_agent_daily), index_type, "");
     }
 
     public void generateInteractionStats(InteractionStats interactionStats) {
-        LocalDateTime schedule = LocalDateTime.now();
-        String date = schedule.format(TRANSFORM_FORMATTER);
-        esService.buildDocumentIndex(interactionStats, index_interaction + date, index_type, "");
+        esService.buildDocumentIndex(interactionStats, getIndexDateValue(index_interaction), index_type, "");
+    }
+
+    private String getIndexDateValue (String indexName){
+        String today = DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_FORMAT);
+        return indexName + "-" + today;
     }
 }
