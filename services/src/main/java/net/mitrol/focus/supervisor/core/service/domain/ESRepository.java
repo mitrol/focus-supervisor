@@ -1,8 +1,5 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
@@ -32,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
@@ -133,8 +129,7 @@ public class ESRepository {
         GetRequest getRequest = new GetRequest(index, type, id);
         try {
             GetResponse getResponse = restHighLevelClient.get(getRequest);
-            Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
-            return sourceAsMap;
+            return getResponse.getSourceAsMap();
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch", e);
         }
@@ -148,7 +143,7 @@ public class ESRepository {
      * @param valueType Class type
      * @return T List<T>
      */
-    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException {
+    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws IllegalArgumentException {
         if(index == null || type == null) {
             return null;
         }
@@ -173,7 +168,7 @@ public class ESRepository {
      * @param valueType Class type
      * @return T List<T>
      */
-    public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException {
+    public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) {
         if(index == null || type == null) {
             return null;
         }
@@ -199,13 +194,12 @@ public class ESRepository {
      * @param id document
      * @return data source updated
      */
-    public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
+    public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id) {
         UpdateRequest updateRequest = new UpdateRequest(index, type, id).fetchSource(true);// Fetch Object after its update
         try {
             updateRequest.doc(data, XContentType.JSON);
             UpdateResponse updateResponse = restHighLevelClient.update(updateRequest);
-            Map<String, Object> sourceAsMap = updateResponse.getGetResult().sourceAsMap();
-            return sourceAsMap;
+            return updateResponse.getGetResult().sourceAsMap();
         } catch (IOException e){
             throw new MitrolSupervisorError("Unable to do an update in Elasticsearch", e);
         }
@@ -244,7 +238,7 @@ public class ESRepository {
         }
     }
 
-    public static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException{
+    private static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws IllegalArgumentException, IOException {
         List<T> res = Lists.newArrayList();
         for(SearchHit hit:response.getHits()){
             res.add(getObject(hit, valueType));
@@ -252,19 +246,19 @@ public class ESRepository {
         return res;
     }
 
-    public static <T> T getObject(SearchResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, IOException, InvocationTargetException {
+    private static <T> T getObject(SearchResponse response, Class<T> valueType) throws IllegalArgumentException, IOException {
         for(SearchHit hit:response.getHits()){
             return getObject(hit, valueType);
         }
         return null;
     }
 
-    public static <T> T getObject(SearchHit hit, Class<T> valueType) throws JsonParseException, JsonMappingException, IOException, IllegalArgumentException, IllegalAccessException, InvocationTargetException{
+    private static <T> T getObject(SearchHit hit, Class<T> valueType) throws IOException, IllegalArgumentException {
         T res = MAPPER.readValue(hit.getSourceAsString(), valueType);
         return res;
     }
 
-    public static <T> T getObject(GetResponse response, Class<T> valueType) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, IOException, InvocationTargetException {
+    private static <T> T getObject(GetResponse response, Class<T> valueType) throws IllegalArgumentException, IOException {
         T res = MAPPER.readValue(response.getSourceAsString(), valueType);
         return res;
     }
