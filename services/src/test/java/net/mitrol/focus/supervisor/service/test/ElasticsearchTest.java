@@ -82,7 +82,7 @@ public class ElasticsearchTest{
 
     @Test
     @Ignore
-    public void test_searc_by_user_index() throws IllegalAccessException, IOException, InvocationTargetException {
+    public void test_searc_by_user_index() {
         String user_index = "user_index";
         String user_type = "_doc";
         List<User> result = esService.searchDataByIndex(user_index, user_type, User.class);
@@ -125,14 +125,14 @@ public class ElasticsearchTest{
 
     @Test
     @Ignore
-    public void test_searc_by_vendedor_index() throws IllegalAccessException, IOException, InvocationTargetException {
+    public void test_searc_by_vendedor_index() {
         List<Vendedor> result = esService.searchDataByIndex(vendedor_index, type, Vendedor.class);
         Assert.assertNotNull(result);
     }
 
     @Test
     @Ignore
-    public void shouldBeSearchByField() throws IllegalAccessException, IOException, InvocationTargetException {
+    public void shouldBeSearchByField() {
         MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery("name", "martin");
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, matchQueryBuilder);
         Assert.assertNotNull(result);
@@ -140,7 +140,7 @@ public class ElasticsearchTest{
 
     @Test
     @Ignore
-    public void shouldBeSearchByDifferentsFields() throws IllegalAccessException, IOException, InvocationTargetException {
+    public void shouldBeSearchByDifferentsFields() {
         MultiMatchQueryBuilder matchQueryBuilder = QueryBuilders.multiMatchQuery("Resistencia", "name", "direccion.localidad");
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, matchQueryBuilder);
         Assert.assertNotNull(result);
@@ -151,7 +151,7 @@ public class ElasticsearchTest{
     * */
     @Test
     @Ignore
-    public void shouldBeSearchByMatchPhrases() throws IllegalAccessException, IOException, InvocationTargetException {
+    public void shouldBeSearchByMatchPhrases() {
         MoreLikeThisQueryBuilder moreLikeThisQuery = QueryBuilders.moreLikeThisQuery(new String[]{"name", "direccion.localidad"}, new String[]{"a"}, null);
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, moreLikeThisQuery);
         Assert.assertNotNull(result);

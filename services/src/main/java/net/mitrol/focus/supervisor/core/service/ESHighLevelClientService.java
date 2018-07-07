@@ -33,11 +33,11 @@ public class ESHighLevelClientService {
         return esRepository.searchDataByParam(index, type, id);
     }
 
-    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws IllegalAccessException, IOException, InvocationTargetException {
+    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) {
         return esRepository.searchDataByIndex(index, type, valueType);
     }
 
-    public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) throws JsonParseException, JsonMappingException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, IOException {
+    public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) {
         return esRepository.searchDataByQuery(index, type, valueType, matchQueryBuilder);
     }
 

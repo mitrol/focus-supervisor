@@ -143,7 +143,7 @@ public class ESRepository {
      * @param valueType Class type
      * @return T List<T>
      */
-    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) throws IllegalArgumentException {
+    public <T> List<T> searchDataByIndex(String index, String type, Class<T> valueType) {
         if(index == null || type == null) {
             return null;
         }
@@ -238,7 +238,7 @@ public class ESRepository {
         }
     }
 
-    private static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws IllegalArgumentException, IOException {
+    private static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws IOException {
         List<T> res = Lists.newArrayList();
         for(SearchHit hit:response.getHits()){
             res.add(getObject(hit, valueType));
@@ -246,20 +246,11 @@ public class ESRepository {
         return res;
     }
 
-    private static <T> T getObject(SearchResponse response, Class<T> valueType) throws IllegalArgumentException, IOException {
-        for(SearchHit hit:response.getHits()){
-            return getObject(hit, valueType);
-        }
-        return null;
+    private static <T> T getObject(SearchHit hit, Class<T> valueType) throws IOException {
+        return MAPPER.readValue(hit.getSourceAsString(), valueType);
     }
 
-    private static <T> T getObject(SearchHit hit, Class<T> valueType) throws IOException, IllegalArgumentException {
-        T res = MAPPER.readValue(hit.getSourceAsString(), valueType);
-        return res;
-    }
-
-    private static <T> T getObject(GetResponse response, Class<T> valueType) throws IllegalArgumentException, IOException {
-        T res = MAPPER.readValue(response.getSourceAsString(), valueType);
-        return res;
+    private static <T> T getObject(GetResponse response, Class<T> valueType) throws IOException {
+        return MAPPER.readValue(response.getSourceAsString(), valueType);
     }
 }
