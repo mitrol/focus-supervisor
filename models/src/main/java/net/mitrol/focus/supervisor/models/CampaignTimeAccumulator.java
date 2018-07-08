@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Created by marce on 5/18/18.
  */
-public class TimeAccumulator {
+public class CampaignTimeAccumulator {
 
     private Map<AgentState, Duration> agentStateDurations;
     private Map<InteractionState, Duration> interactionStateDuration;
@@ -18,10 +18,9 @@ public class TimeAccumulator {
     private Duration talking;
     private Map<ResolutionCategory, Integer> resolutions;
 
-    public TimeAccumulator() {
-    }
+    public CampaignTimeAccumulator(){}
 
-    private TimeAccumulator(
+    private CampaignTimeAccumulator(
             Duration agentUnstaffed, Duration agnetAvail, Duration agentPreview, Duration agentDial,
             Duration agentRing, Duration agentConnect, Duration agentHold, Duration agentAfterCallWork, Duration agentNotReady,
             Duration agentBreak0, Duration agentBreak1, Duration agentBreak2, Duration agentBreak3, Duration agentBreak4,
@@ -80,9 +79,9 @@ public class TimeAccumulator {
         resolutions = Collections.unmodifiableMap(resolutions);
     }
 
-    public static TimeAccumulator parse(String s) {
+    public static CampaignTimeAccumulator parse(String s) {
         Integer[] values = MitAcdUtils.StrToIntSin0(s);
-        return new TimeAccumulator(
+        return new CampaignTimeAccumulator(
                 values.length > 0 ? values[0] == null ? null : Duration.ofSeconds(values[0]) : null,
                 values.length > 1 ? values[1] == null ? null : Duration.ofSeconds(values[1]) : null,
                 values.length > 2 ? values[2] == null ? null : Duration.ofSeconds(values[2]) : null,

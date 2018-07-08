@@ -12,15 +12,15 @@ public class AgentInternalAccumulator {
     private Integer incomingTransfer;
     private Integer outboundTransfer;
 
+    public AgentInternalAccumulator() {
+    }
+
     private AgentInternalAccumulator(Duration talking, Integer abandoned, Integer answered, Integer incomingTransfer, Integer outboundTransfer) {
         this.talking = talking;
         this.abandoned = abandoned;
         this.answered = answered;
         this.incomingTransfer = incomingTransfer;
         this.outboundTransfer = outboundTransfer;
-    }
-
-    public AgentInternalAccumulator() {
     }
 
     public static AgentInternalAccumulator parse(String s) {

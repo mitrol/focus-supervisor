@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Created by marce on 5/27/18.
@@ -36,11 +34,11 @@ public class ESModelService {
     @Value("${index.agent.interval.stats}")
     private String index_agent_interval;
 
-    @Value("${index.list.daily.stats}")
-    private String index_list_daily;
+    @Value("${index.split.daily.stats}")
+    private String index_split_daily;
 
-    @Value("${index.list.interval.stats}")
-    private String index_list_interval;
+    @Value("${index.split.interval.stats}")
+    private String index_split_interval;
 
     @Value("${index.interaction.stats}")
     private String index_interaction;
@@ -52,12 +50,12 @@ public class ESModelService {
         esService.buildDocumentIndex(campaignDailyStats, getIndexDateValue(index_campaign_daily), index_type, "");
     }
 
-    public void generateListDailyStats(ListDailyStats listDailyStats) {
-        esService.buildDocumentIndex(listDailyStats, getIndexDateValue(index_list_daily), index_type, "");
+    public void generateSplitDailyStats(SplitDailyStats SplitDailyStats) {
+        esService.buildDocumentIndex(SplitDailyStats, getIndexDateValue(index_split_daily), index_type, "");
     }
 
-    public void generateListIntervalStats(ListIntervalStats listIntervalStats) {
-        esService.buildDocumentIndex(listIntervalStats, getIndexDateValue(index_list_interval), index_type, "");
+    public void generateSplitIntervalStats(SplitIntervalStats splitIntervalStats) {
+        esService.buildDocumentIndex(splitIntervalStats, getIndexDateValue(index_split_interval), index_type, "");
     }
 
     public void generateCampaignIntervalStats(CampaignIntervalStats campaignIntervalStats) {

@@ -65,13 +65,13 @@ public class SSupMitAcdClientTest {
             }
 
             @Override
-            public void onListIntervalStats(SSupMitAcdClient sSupMitAcdClient, ListIntervalStats listIntervalStats) {
-                Assert.assertNotNull(listIntervalStats);
+            public void onSplitIntervalStats(SSupMitAcdClient sSupMitAcdClient, SplitIntervalStats splitIntervalStats) {
+                Assert.assertNotNull(splitIntervalStats);
             }
 
             @Override
-            public void onListDailyStats(SSupMitAcdClient ssupMitAcdClient, ListDailyStats listDailyStats) {
-                Assert.assertNotNull(listDailyStats);
+            public void onSplitDailyStats(SSupMitAcdClient ssupMitAcdClient, SplitDailyStats splitDailyStats) {
+                Assert.assertNotNull(splitDailyStats);
             }
 
             @Override
