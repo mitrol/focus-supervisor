@@ -1,8 +1,5 @@
 package net.mitrol.focus.supervisor.models;
 
-import net.mitrol.focus.supervisor.models.util.MitAcdUtils;
-import net.mitrol.utils.entities.SockMessage;
-
 import java.time.Duration;
 
 public class InteractionStats {
@@ -35,7 +32,7 @@ public class InteractionStats {
     public InteractionStats() {
     }
 
-    private InteractionStats(Integer agentId, Integer destinationAgentId, Integer groupId, Integer campaignId, Integer splitId, Integer interactionType, Integer contactType, InteractionState state, Duration duration, String remoteParty, String interactionId, Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime, Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting, Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
+    public InteractionStats(Integer agentId, Integer destinationAgentId, Integer groupId, Integer campaignId, Integer splitId, Integer interactionType, Integer contactType, InteractionState state, Duration duration, String remoteParty, String interactionId, Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime, Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting, Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
         this.agentId = agentId;
         this.destinationAgentId = destinationAgentId;
         this.groupId = groupId;
@@ -60,34 +57,6 @@ public class InteractionStats {
         this.localGender = localGender;
         this.remoteWordSpotting = remoteWordSpotting;
         this.remoteGender = remoteGender;
-    }
-
-    public static InteractionStats parse(SockMessage sockMessage) {
-        return new InteractionStats(
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("ida")),
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idd")),
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idg")),
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idc")),
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idl")),
-                sockMessage.getInteger("t"),
-                sockMessage.getInteger("tct"),
-                InteractionState.getFromCode(sockMessage.getInteger("st")),
-                sockMessage.getInteger("Te") == null ? null : Duration.ofSeconds(sockMessage.getInteger("Te")),
-                sockMessage.getString("C"),
-                sockMessage.getString("idLl"),
-                sockMessage.getInteger("s"),
-                sockMessage.getInteger("rec"),
-                sockMessage.getBoolean("aa"),
-                sockMessage.getBoolean("ad"),
-                sockMessage.getInteger("TC") == null ? null : Duration.ofSeconds(sockMessage.getInteger("TC")),
-                sockMessage.getInteger("TCA") == null ? null : Duration.ofSeconds(sockMessage.getInteger("TCA")),
-                sockMessage.getInteger("Th") == null ? null : Duration.ofSeconds(sockMessage.getInteger("Th")),
-                sockMessage.getBoolean("spro"),
-                sockMessage.getBoolean("emo"),
-                sockMessage.getBoolean("wso"),
-                sockMessage.getInteger("go"),
-                sockMessage.getBoolean("wsc"),
-                sockMessage.getInteger("gc"));
     }
 
     public Integer getAgentId() {

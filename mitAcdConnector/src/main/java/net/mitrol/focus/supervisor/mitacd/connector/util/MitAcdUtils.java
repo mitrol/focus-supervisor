@@ -1,8 +1,7 @@
-package net.mitrol.focus.supervisor.models.util;
+package net.mitrol.focus.supervisor.mitacd.connector.util;
 
 import com.google.common.base.Strings;
 
-import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 

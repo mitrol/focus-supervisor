@@ -1,7 +1,5 @@
 package net.mitrol.focus.supervisor.models;
 
-import net.mitrol.utils.entities.SockMessage;
-
 import java.time.Duration;
 
 public class CampaignIntervalStats {
@@ -22,7 +20,7 @@ public class CampaignIntervalStats {
     public CampaignIntervalStats() {
     }
 
-    private CampaignIntervalStats(Integer campaignId, CampaignTimeAccumulator times, InteractionAccumulator interactions, Integer queued, Duration waitingTime, Integer serviceLevel, Duration averageSpeedOfAnswer, Duration impatience, Integer liveVoiceProbability, Duration estimatedWaitingTime, Duration averageHandlingTime, Duration averageTalkingTime) {
+    public CampaignIntervalStats(Integer campaignId, CampaignTimeAccumulator times, InteractionAccumulator interactions, Integer queued, Duration waitingTime, Integer serviceLevel, Duration averageSpeedOfAnswer, Duration impatience, Integer liveVoiceProbability, Duration estimatedWaitingTime, Duration averageHandlingTime, Duration averageTalkingTime) {
         this.campaignId = campaignId;
         this.times = times;
         this.interactions = interactions;
@@ -35,22 +33,6 @@ public class CampaignIntervalStats {
         this.estimatedWaitingTime = estimatedWaitingTime;
         this.averageHandlingTime = averageHandlingTime;
         this.averageTalkingTime = averageTalkingTime;
-    }
-
-    public static CampaignIntervalStats parse(SockMessage sockMessage) {
-        return new CampaignIntervalStats(
-                sockMessage.getInteger("id"),
-                CampaignTimeAccumulator.parse(sockMessage.getString("ata")),
-                InteractionAccumulator.parse(sockMessage.getString("ala")),
-                sockMessage.getInteger("L"),
-                sockMessage.getInteger("WT") == null ? null : Duration.ofSeconds(sockMessage.getInteger("WT")),
-                sockMessage.getInteger("FS"),
-                sockMessage.getInteger("ASA") == null ? null : Duration.ofSeconds(sockMessage.getInteger("ASA")),
-                sockMessage.getInteger("Imp") == null ? null : Duration.ofSeconds(sockMessage.getInteger("Imp")),
-                sockMessage.getInteger("Pvv"),
-                sockMessage.getInteger("ewt") == null ? null : Duration.ofSeconds(sockMessage.getInteger("ewt")),
-                sockMessage.getInteger("AHT") == null ? null : Duration.ofSeconds(sockMessage.getInteger("AHT")),
-                sockMessage.getInteger("ATT") == null ? null : Duration.ofSeconds(sockMessage.getInteger("ATT")));
     }
 
     public Integer getCampaignId() {

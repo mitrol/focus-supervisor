@@ -1,4 +1,5 @@
 dependencies{
     compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile project(':models')
+    compile project(':common')
 }
