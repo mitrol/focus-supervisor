@@ -1,12 +1,14 @@
 package net.mitrol.focus.supervisor.models;
 
+import net.mitrol.focus.supervisor.models.util.MitAcdUtils;
 import net.mitrol.utils.entities.SockMessage;
 
 import java.time.Duration;
 
 public class AgentIntervalStats {
 
-    private Integer agentIntervalStatsId;
+    private Integer agentId;
+    private Integer groupId;
     private AgentState agentState;
     private Duration currentState;
     private String extension;
@@ -18,9 +20,9 @@ public class AgentIntervalStats {
     public AgentIntervalStats() {
     }
 
-    private AgentIntervalStats(int agentIntervalStatsId, AgentState status, Duration currentState, String extension, String ip,
-                               AgentAccumulator agentAccumulator, AgentInternalAccumulator internalOutboundStats, AgentInternalAccumulator internalInboundStats) {
-        this.agentIntervalStatsId = agentIntervalStatsId;
+    private AgentIntervalStats(int agentId, int groupId, AgentState status, Duration currentState, String extension, String ip, AgentAccumulator agentAccumulator, AgentInternalAccumulator internalOutboundStats, AgentInternalAccumulator internalInboundStats) {
+        this.agentId = agentId;
+        this.groupId = groupId;
         this.agentState = status;
         this.currentState = currentState;
         this.extension = extension;
@@ -33,6 +35,7 @@ public class AgentIntervalStats {
     public static AgentIntervalStats parse(SockMessage sockMessage) {
         return new AgentIntervalStats(
                 sockMessage.getInteger("id"),
+                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idg")),
                 AgentState.getFromCode(sockMessage.getInteger("st")),
                 sockMessage.getInteger("Tce") == null ? null : Duration.ofSeconds(sockMessage.getInteger("Tce")),
                 sockMessage.getString("Ext"),
@@ -42,8 +45,12 @@ public class AgentIntervalStats {
                 AgentInternalAccumulator.parse(sockMessage.getString("iea")));
     }
 
-    public Integer getAgentIntervalStatsId() {
-        return agentIntervalStatsId;
+    public Integer getAgentId() {
+        return agentId;
+    }
+
+    public Integer getGroupId() {
+        return groupId;
     }
 
     public AgentState getAgentState() {

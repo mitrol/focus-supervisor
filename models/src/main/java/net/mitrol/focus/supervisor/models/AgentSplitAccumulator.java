@@ -10,17 +10,17 @@ import java.util.Map;
 /**
  * Created by marce on 5/18/18.
  */
-public class ListAgentAccumulator {
+public class AgentSplitAccumulator {
 
     private Duration login;
     private Duration talking;
     private Duration play;
     private Map<ResolutionCategory, Integer> resolutions;
 
-    public ListAgentAccumulator() {
+    public AgentSplitAccumulator() {
     }
 
-    private ListAgentAccumulator(Duration login, Duration talking, Duration play, Integer otherResolutions, Integer successfulResolutions, Integer unsuccessfulResolutions, Integer ineffectiveResolutions, Integer neutralResolutions) {
+    private AgentSplitAccumulator(Duration login, Duration talking, Duration play, Integer otherResolutions, Integer successfulResolutions, Integer unsuccessfulResolutions, Integer ineffectiveResolutions, Integer neutralResolutions) {
         this.login = login;
         this.talking = talking;
         this.play = play;
@@ -33,9 +33,9 @@ public class ListAgentAccumulator {
         resolutions = Collections.unmodifiableMap(resolutions);
     }
 
-    public static ListAgentAccumulator parse(String s) {
+    public static AgentSplitAccumulator parse(String s) {
         Integer[] values = MitAcdUtils.StrToIntSin0(s);
-        return new ListAgentAccumulator(
+        return new AgentSplitAccumulator(
                 values.length > 0 ? values[0] == null ? null : Duration.ofSeconds(values[0]) : null,
                 values.length > 1 ? values[1] == null ? null : Duration.ofSeconds(values[1]) : null,
                 values.length > 2 ? values[2] == null ? null : Duration.ofSeconds(values[2]) : null,

@@ -2,6 +2,7 @@ package net.mitrol.focus.supervisor.models.util;
 
 import com.google.common.base.Strings;
 
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,4 +55,13 @@ public class MitAcdUtils {
         return sb.toString();
     }
 
+    /**
+     * Filter integer if is zero or null
+     *
+     * @param value original input value
+     * @return Integer value or null if the value is zero or null
+     */
+    public static Integer getIntNullZero(Integer value) {
+        return value == 0 ? null : value;
+    }
 }

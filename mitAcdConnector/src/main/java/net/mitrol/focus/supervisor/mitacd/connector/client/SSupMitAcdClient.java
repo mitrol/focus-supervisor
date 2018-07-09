@@ -61,10 +61,10 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
 			mitAcdClientListener.onCampaignDailyStats(this, CampaignDailyStats.parse(sockMessage));
 			break;
 		case 1311: // datos de lotes de este intervalo (desde la última media hora hasta ahora)
-			mitAcdClientListener.onListIntervalStats(this, ListIntervalStats.parse(sockMessage));
+			mitAcdClientListener.onSplitIntervalStats(this, SplitIntervalStats.parse(sockMessage));
 			break;
 		case 1313: // datos de lotes de hoy y la última media hora completa
-			mitAcdClientListener.onListDailyStats(this, ListDailyStats.parse(sockMessage));
+			mitAcdClientListener.onSplitDailyStats(this, SplitDailyStats.parse(sockMessage));
 			break;
 		case 1321: // datos de agente de este intervalo (desde la última media hora hasta ahora)
 			mitAcdClientListener.onAgentIntervalStats(this, AgentIntervalStats.parse(sockMessage));

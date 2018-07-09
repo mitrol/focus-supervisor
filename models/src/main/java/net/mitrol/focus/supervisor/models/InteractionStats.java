@@ -1,15 +1,17 @@
 package net.mitrol.focus.supervisor.models;
 
+import net.mitrol.focus.supervisor.models.util.MitAcdUtils;
 import net.mitrol.utils.entities.SockMessage;
 
 import java.time.Duration;
 
 public class InteractionStats {
 
-    private Integer interactionStatsId;
-    private Integer remoteAgentId;
+    private Integer agentId;
+    private Integer destinationAgentId;
+    private Integer groupId;
     private Integer campaignId;
-    private Integer listId;
+    private Integer splitId;
     private Integer interactionType;
     private Integer contactType;
     private InteractionState state;
@@ -33,15 +35,12 @@ public class InteractionStats {
     public InteractionStats() {
     }
 
-    private InteractionStats(Integer interactionStatsId, Integer remoteAgentId, Integer campaignId, Integer listId, Integer interactionType,
-                             Integer contactType, InteractionState state, Duration duration, String remoteParty, String interactionId,
-                             Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime,
-                             Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting,
-                             Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
-        this.interactionStatsId = interactionStatsId;
-        this.remoteAgentId = remoteAgentId;
+    private InteractionStats(Integer agentId, Integer destinationAgentId, Integer groupId, Integer campaignId, Integer splitId, Integer interactionType, Integer contactType, InteractionState state, Duration duration, String remoteParty, String interactionId, Integer segment, Integer recordingCriterionId, Boolean active, Boolean activeInOrigin, Duration queueTime, Duration totalQueueTime, Duration talking, Boolean detectingSpeech, Boolean detectingEmotion, Boolean localWordSpotting, Integer localGender, Boolean remoteWordSpotting, Integer remoteGender) {
+        this.agentId = agentId;
+        this.destinationAgentId = destinationAgentId;
+        this.groupId = groupId;
         this.campaignId = campaignId;
-        this.listId = listId;
+        this.splitId = splitId;
         this.interactionType = interactionType;
         this.contactType = contactType;
         this.state = state;
@@ -65,10 +64,11 @@ public class InteractionStats {
 
     public static InteractionStats parse(SockMessage sockMessage) {
         return new InteractionStats(
-                sockMessage.getInteger("ida"),
-                sockMessage.getInteger("idd"),
-                sockMessage.getInteger("idc"),
-                sockMessage.getInteger("idl"),
+                MitAcdUtils.getIntNullZero(sockMessage.getInteger("ida")),
+                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idd")),
+                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idg")),
+                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idc")),
+                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idl")),
                 sockMessage.getInteger("t"),
                 sockMessage.getInteger("tct"),
                 InteractionState.getFromCode(sockMessage.getInteger("st")),
@@ -90,20 +90,24 @@ public class InteractionStats {
                 sockMessage.getInteger("gc"));
     }
 
-    public Integer getInteractionStatsId() {
-        return interactionStatsId;
+    public Integer getAgentId() {
+        return agentId;
     }
 
-    public Integer getRemoteAgentId() {
-        return remoteAgentId;
+    public Integer getDestinationAgentId() {
+        return destinationAgentId;
+    }
+
+    public Integer getGroupId() {
+        return groupId;
     }
 
     public Integer getCampaignId() {
         return campaignId;
     }
 
-    public Integer getListId() {
-        return listId;
+    public Integer getSplitId() {
+        return splitId;
     }
 
     public Integer getInteractionType() {

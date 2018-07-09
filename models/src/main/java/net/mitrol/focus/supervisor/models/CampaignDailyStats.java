@@ -4,17 +4,17 @@ import net.mitrol.utils.entities.SockMessage;
 
 public class CampaignDailyStats {
 
-    private Integer campaignDailyStatsId;
-    private TimeAccumulator lastIntervalTimes;
+    private Integer campaignId;
+    private CampaignTimeAccumulator lastIntervalTimes;
     private InteractionAccumulator lasIntervalInteractions;
-    private TimeAccumulator dailyTimes;
+    private CampaignTimeAccumulator dailyTimes;
     private InteractionAccumulator dailyInteractions;
 
     public CampaignDailyStats() {
     }
 
-    private CampaignDailyStats(Integer campaignDailyStatsId, TimeAccumulator lastIntervalTimes, InteractionAccumulator lasIntervalInteractions, TimeAccumulator dailyTimes, InteractionAccumulator dailyInteractions) {
-        this.campaignDailyStatsId = campaignDailyStatsId;
+    private CampaignDailyStats(Integer campaignId, CampaignTimeAccumulator lastIntervalTimes, InteractionAccumulator lasIntervalInteractions, CampaignTimeAccumulator dailyTimes, InteractionAccumulator dailyInteractions) {
+        this.campaignId = campaignId;
         this.lastIntervalTimes = lastIntervalTimes;
         this.lasIntervalInteractions = lasIntervalInteractions;
         this.dailyTimes = dailyTimes;
@@ -24,17 +24,17 @@ public class CampaignDailyStats {
     public static CampaignDailyStats parse(SockMessage sockMessage) {
         return new CampaignDailyStats(
                 sockMessage.getInteger("id"),
-                TimeAccumulator.parse(sockMessage.getString("atn")),
+                CampaignTimeAccumulator.parse(sockMessage.getString("atn")),
                 InteractionAccumulator.parse(sockMessage.getString("aln")),
-                TimeAccumulator.parse(sockMessage.getString("atd")),
+                CampaignTimeAccumulator.parse(sockMessage.getString("atd")),
                 InteractionAccumulator.parse(sockMessage.getString("ald")));
     }
 
-    public Integer getCampaignDailyStatsId() {
-        return campaignDailyStatsId;
+    public Integer getCampaignId() {
+        return campaignId;
     }
 
-    public TimeAccumulator getLastIntervalTimes() {
+    public CampaignTimeAccumulator getLastIntervalTimes() {
         return lastIntervalTimes;
     }
 
@@ -42,7 +42,7 @@ public class CampaignDailyStats {
         return lasIntervalInteractions;
     }
 
-    public TimeAccumulator getDailyTimes() {
+    public CampaignTimeAccumulator getDailyTimes() {
         return dailyTimes;
     }
 

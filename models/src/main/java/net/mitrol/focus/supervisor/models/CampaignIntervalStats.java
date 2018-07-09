@@ -6,8 +6,8 @@ import java.time.Duration;
 
 public class CampaignIntervalStats {
 
-    private Integer campaignIntervalStatsId;
-    private TimeAccumulator times;
+    private Integer campaignId;
+    private CampaignTimeAccumulator times;
     private InteractionAccumulator interactions;
     private Integer queued;
     private Duration waitingTime;
@@ -22,8 +22,8 @@ public class CampaignIntervalStats {
     public CampaignIntervalStats() {
     }
 
-    private CampaignIntervalStats(Integer campaignIntervalStatsId, TimeAccumulator times, InteractionAccumulator interactions, Integer queued, Duration waitingTime, Integer serviceLevel, Duration averageSpeedOfAnswer, Duration impatience, Integer liveVoiceProbability, Duration estimatedWaitingTime, Duration averageHandlingTime, Duration averageTalkingTime) {
-        this.campaignIntervalStatsId = campaignIntervalStatsId;
+    private CampaignIntervalStats(Integer campaignId, CampaignTimeAccumulator times, InteractionAccumulator interactions, Integer queued, Duration waitingTime, Integer serviceLevel, Duration averageSpeedOfAnswer, Duration impatience, Integer liveVoiceProbability, Duration estimatedWaitingTime, Duration averageHandlingTime, Duration averageTalkingTime) {
+        this.campaignId = campaignId;
         this.times = times;
         this.interactions = interactions;
         this.queued = queued;
@@ -40,7 +40,7 @@ public class CampaignIntervalStats {
     public static CampaignIntervalStats parse(SockMessage sockMessage) {
         return new CampaignIntervalStats(
                 sockMessage.getInteger("id"),
-                TimeAccumulator.parse(sockMessage.getString("ata")),
+                CampaignTimeAccumulator.parse(sockMessage.getString("ata")),
                 InteractionAccumulator.parse(sockMessage.getString("ala")),
                 sockMessage.getInteger("L"),
                 sockMessage.getInteger("WT") == null ? null : Duration.ofSeconds(sockMessage.getInteger("WT")),
@@ -53,11 +53,11 @@ public class CampaignIntervalStats {
                 sockMessage.getInteger("ATT") == null ? null : Duration.ofSeconds(sockMessage.getInteger("ATT")));
     }
 
-    public Integer getCampaignIntervalStatsId() {
-        return campaignIntervalStatsId;
+    public Integer getCampaignId() {
+        return campaignId;
     }
 
-    public TimeAccumulator getTimes() {
+    public CampaignTimeAccumulator getTimes() {
         return times;
     }
 

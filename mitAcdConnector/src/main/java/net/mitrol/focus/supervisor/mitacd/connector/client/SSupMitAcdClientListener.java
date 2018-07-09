@@ -14,9 +14,9 @@ public interface SSupMitAcdClientListener extends MitAcdClientListener {
 
     void onCampaignDailyStats(SSupMitAcdClient ssupMitAcdClient, CampaignDailyStats campaignDailyStats);
 
-    void onListIntervalStats(SSupMitAcdClient sSupMitAcdClient, ListIntervalStats listIntervalStats);
+    void onSplitIntervalStats(SSupMitAcdClient sSupMitAcdClient, SplitIntervalStats splitIntervalStats);
 
-    void onListDailyStats(SSupMitAcdClient ssupMitAcdClient, ListDailyStats listDailyStats);
+    void onSplitDailyStats(SSupMitAcdClient ssupMitAcdClient, SplitDailyStats SplitDailyStats);
 
     void onAgentIntervalStats(SSupMitAcdClient ssupMitAcdClient, AgentIntervalStats agentIntervalStats);
 
