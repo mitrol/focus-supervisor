@@ -1,8 +1,5 @@
 package net.mitrol.focus.supervisor.models;
 
-import net.mitrol.focus.supervisor.models.util.MitAcdUtils;
-import net.mitrol.utils.entities.SockMessage;
-
 import java.time.Duration;
 
 public class AgentIntervalStats {
@@ -20,7 +17,7 @@ public class AgentIntervalStats {
     public AgentIntervalStats() {
     }
 
-    private AgentIntervalStats(int agentId, int groupId, AgentState status, Duration currentState, String extension, String ip, AgentAccumulator agentAccumulator, AgentInternalAccumulator internalOutboundStats, AgentInternalAccumulator internalInboundStats) {
+    public AgentIntervalStats(int agentId, int groupId, AgentState status, Duration currentState, String extension, String ip, AgentAccumulator agentAccumulator, AgentInternalAccumulator internalOutboundStats, AgentInternalAccumulator internalInboundStats) {
         this.agentId = agentId;
         this.groupId = groupId;
         this.agentState = status;
@@ -30,19 +27,6 @@ public class AgentIntervalStats {
         this.agentAccumulator = agentAccumulator;
         this.internalOutboundStats = internalOutboundStats;
         this.internalInboundStats = internalInboundStats;
-    }
-
-    public static AgentIntervalStats parse(SockMessage sockMessage) {
-        return new AgentIntervalStats(
-                sockMessage.getInteger("id"),
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idg")),
-                AgentState.getFromCode(sockMessage.getInteger("st")),
-                sockMessage.getInteger("Tce") == null ? null : Duration.ofSeconds(sockMessage.getInteger("Tce")),
-                sockMessage.getString("Ext"),
-                sockMessage.getString("IP"),
-                AgentAccumulator.parse(sockMessage.getString("ata")),
-                AgentInternalAccumulator.parse(sockMessage.getString("isa")),
-                AgentInternalAccumulator.parse(sockMessage.getString("iea")));
     }
 
     public Integer getAgentId() {

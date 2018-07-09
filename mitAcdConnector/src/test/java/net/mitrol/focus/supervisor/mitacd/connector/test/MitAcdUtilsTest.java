@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.mitacd.connector.test;
 
-import net.mitrol.focus.supervisor.models.util.MitAcdUtils;
+import net.mitrol.focus.supervisor.mitacd.connector.util.MitAcdUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

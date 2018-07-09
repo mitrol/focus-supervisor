@@ -1,8 +1,5 @@
 package net.mitrol.focus.supervisor.models;
 
-import net.mitrol.focus.supervisor.models.util.MitAcdUtils;
-import net.mitrol.utils.entities.SockMessage;
-
 public class SplitIntervalStats {
 
     private Integer splitId;
@@ -14,21 +11,12 @@ public class SplitIntervalStats {
     public SplitIntervalStats() {
     }
 
-    private SplitIntervalStats(Integer splitId, Integer campaignId, AgentSplitAccumulator times, InteractionAccumulator interactions, Boolean canBeDialed) {
+    public SplitIntervalStats(Integer splitId, Integer campaignId, AgentSplitAccumulator times, InteractionAccumulator interactions, Boolean canBeDialed) {
         this.splitId = splitId;
         this.campaignId = campaignId;
         this.times = times;
         this.interactions = interactions;
         this.canBeDialed = canBeDialed;
-    }
-
-    public static SplitIntervalStats parse(SockMessage sockMessage) {
-        return new SplitIntervalStats(
-                sockMessage.getInteger("id"),
-                MitAcdUtils.getIntNullZero(sockMessage.getInteger("idc")),
-                AgentSplitAccumulator.parse(sockMessage.getString("ata")),
-                InteractionAccumulator.parse(sockMessage.getString("ala")),
-                sockMessage.getBoolean("d"));
     }
 
     public Integer getSplitId() {
