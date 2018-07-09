@@ -1,7 +1,5 @@
 package net.mitrol.focus.supervisor.mitacd.connector.configuration;
 
-import net.mitrol.focus.supervisor.core.service.config.ElasticSearchConfig;
-import net.mitrol.focus.supervisor.core.service.config.ServiceConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 
