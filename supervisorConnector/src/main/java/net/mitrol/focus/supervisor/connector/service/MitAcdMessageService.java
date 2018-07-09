@@ -1,23 +1,24 @@
-package net.mitrol.focus.supervisor.mitacd.connector.service;
+package net.mitrol.focus.supervisor.connector.service;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.models.*;
 import net.mitrol.utils.DateTimeUtils;
+import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
-/**
- * Created by marce on 5/27/18.
- */
 @Service
-public class ESModelService {
+public class MitAcdMessageService {
 
-    private MitrolLogger logger = MitrolLoggerImpl.getLogger(ESModelService.class);
+    private MitrolLogger logger = MitrolLoggerImpl.getLogger(MitAcdMessageService.class);
 
     @Value("${index.type}")
     private String index_type;
@@ -45,6 +46,39 @@ public class ESModelService {
 
     @Autowired
     private ESHighLevelClientService esService;
+
+    protected final void kafkaMsgProcess(String message) {
+        try {
+            JSONArray jsonArray = new JSONArray(message);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                if (obj.toString().contains("campaignDailyStatsId")) {
+                    CampaignDailyStats campaignDailyStats = JsonMapper.getInstance().getObjectFromJSON(obj, CampaignDailyStats.class);
+                    generateCampaignDailyStats(campaignDailyStats);
+                } else if (obj.toString().contains("campaignIntervalStatsId")) {
+                    CampaignIntervalStats campaignIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, CampaignIntervalStats.class);
+                    generateCampaignIntervalStats(campaignIntervalStats);
+                } else if (obj.toString().contains("splitIntervalStatsId")) {
+                    SplitIntervalStats splitIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, SplitIntervalStats.class);
+                    generateSplitIntervalStats(splitIntervalStats);
+                } else if (obj.toString().contains("listDailyStatsId")) {
+                    SplitDailyStats splitDailyStats =  JsonMapper.getInstance().getObjectFromJSON(obj, SplitDailyStats.class);
+                    generateSplitDailyStats(splitDailyStats);
+                } else if (obj.toString().contains("agentIntervalStatsId")) {
+                    AgentIntervalStats agentIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, AgentIntervalStats.class);
+                    generateAgentIntervalStats(agentIntervalStats);
+                } else if (obj.toString().contains("agentDailyStatsId")) {
+                    AgentDailyStats agentDailyStats=  JsonMapper.getInstance().getObjectFromJSON(obj, AgentDailyStats.class);
+                    generateAgentDailyStats(agentDailyStats);
+                } else if (obj.toString().contains("interactionStatsId")) {
+                    InteractionStats interactionStats =  JsonMapper.getInstance().getObjectFromJSON(obj, InteractionStats.class);
+                    generateInteractionStats(interactionStats);
+                }
+            }
+        } catch (JSONException e) {
+            logger.error(e, "Json parser error");
+        }
+    }
 
     public void generateCampaignDailyStats(CampaignDailyStats campaignDailyStats) {
         esService.buildDocumentIndex(campaignDailyStats, getIndexDateValue(index_campaign_daily), index_type, "");

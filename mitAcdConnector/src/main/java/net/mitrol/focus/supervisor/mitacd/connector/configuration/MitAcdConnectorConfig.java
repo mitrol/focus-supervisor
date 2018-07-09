@@ -12,9 +12,7 @@ import net.mitrol.acd.client.entities.MitAcdConnectionInfo;
  *
  * */
 @Configuration
-@Import({ServiceConfig.class, ElasticSearchConfig.class})
-@ComponentScan("net.mitrol.focus.supervisor.mitacd.connector.service, net.mitrol.focus.supervisor.core.service")
-@PropertySources({@PropertySource("classpath:application.properties")})
+@ComponentScan("net.mitrol.focus.supervisor.mitacd.connector.service")
 public class MitAcdConnectorConfig {
 
 	@Value("${mitacd.conn.host}")

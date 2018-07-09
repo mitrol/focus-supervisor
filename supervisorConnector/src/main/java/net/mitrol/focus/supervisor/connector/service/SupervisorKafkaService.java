@@ -16,19 +16,23 @@ import net.mitrol.kafka.KafkaReceiverListener;
  *
  */
 @Service
-public class KafkaReceiverService {
+public class SupervisorKafkaService {
 
-  private static MitrolLogger logger = MitrolLoggerImpl.getLogger(KafkaReceiverService.class);
+  private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SupervisorKafkaService.class);
 
   @Autowired
   private KafkaReceiver receiver;
+
+  @Autowired
+  private MitAcdMessageService msgService;
 
   @PostConstruct
   public void init() {
     this.receiver.registerListener("supervisor", new KafkaReceiverListener<String>() {
       @Override
       public void processMessage(String source, String topic, String value) {
-        logger.info("processMessage " + source + " " + topic + " " + value);
+        logger.debug("processMessage " + source + " " + topic + " " + value);
+        msgService.kafkaMsgProcess(value);
       }
     });
   }
