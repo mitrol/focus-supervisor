@@ -3,16 +3,20 @@ package net.mitrol.focus.supervisor.mitacd.connector.client;
 import net.mitrol.acd.client.entities.MitAcdConnectionInfo;
 import net.mitrol.acd.client.tcp.MitAcdClient;
 import net.mitrol.focus.supervisor.mitacd.connector.adapter.*;
+import net.mitrol.utils.ExecutorBuilder;
 import net.mitrol.utils.entities.SockMessage;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 
 import java.time.Duration;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupMitAcdClientListener> {
 
-    private MitrolLogger logger = MitrolLoggerImpl.getLogger(SSupMitAcdClient.class);
+    private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SSupMitAcdClient.class);
 
+    private ScheduledExecutorService scheduler = ExecutorBuilder.buildNewSingleScheduledExecutorService("SSupMitAcdExecutor");
     private SSupMitAcdClientStatus status;
     private Duration queryInterval;
 
@@ -80,14 +84,8 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
                 mitAcdClientListener.onBatchFinished(this, sockMessage.getInteger("idInt"),
                         sockMessage.getDateTime("HoraActual", "MM/dd/yyyy HH:mm:ss.SSS"),
                         Duration.ofMinutes(sockMessage.getInteger("TiempoIntervalo")));
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(queryInterval.toMillis());
-                        fetch();
-                    } catch (InterruptedException e) {
-                        logger.error(e, e.getMessage());
-                    }
-                }).start();
+                // scheduled fetch task
+                scheduler.schedule(() -> {fetch();}, queryInterval.toMillis(), TimeUnit.MILLISECONDS);
                 break;
         }
     }
