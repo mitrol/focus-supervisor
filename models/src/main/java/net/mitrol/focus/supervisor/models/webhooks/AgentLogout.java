@@ -1,9 +1,11 @@
 package net.mitrol.focus.supervisor.models.webhooks;
 
+import java.util.Date;
+
 public class AgentLogout {
 
-    private String loginTimestamp;
-    private String logoutTimestamp;
+    private Date loginTimestamp;
+    private Date logoutTimestamp;
     private Integer duration;
     private Integer agentId;
     private Integer groupId;
@@ -11,19 +13,33 @@ public class AgentLogout {
     private String ip;
     private String version;
 
-    public String getLoginTimestamp() {
+    public AgentLogout(Date loginTimestamp, Date logoutTimestamp, Integer duration, Integer agentId, Integer groupId, String extension, String ip, String version) {
+        this.loginTimestamp = loginTimestamp;
+        this.logoutTimestamp = logoutTimestamp;
+        this.duration = duration;
+        this.agentId = agentId;
+        this.groupId = groupId;
+        this.extension = extension;
+        this.ip = ip;
+        this.version = version;
+    }
+
+    public AgentLogout() {
+    }
+
+    public Date getLoginTimestamp() {
         return loginTimestamp;
     }
 
-    public void setLoginTimestamp(String loginTimestamp) {
+    public void setLoginTimestamp(Date loginTimestamp) {
         this.loginTimestamp = loginTimestamp;
     }
 
-    public String getLogoutTimestamp() {
+    public Date getLogoutTimestamp() {
         return logoutTimestamp;
     }
 
-    public void setLogoutTimestamp(String logoutTimestamp) {
+    public void setLogoutTimestamp(Date logoutTimestamp) {
         this.logoutTimestamp = logoutTimestamp;
     }
 

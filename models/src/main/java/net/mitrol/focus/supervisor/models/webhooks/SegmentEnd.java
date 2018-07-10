@@ -62,6 +62,81 @@ public class SegmentEnd {
     private Integer billingDuration;
     private String context;
 
+    public SegmentEnd(String interactionId, Integer segmentId, Integer dialerPending, Integer dialerFetching,
+                      Integer dialerDialing, Integer dialerRinging, Boolean liveVoiceDetected, Integer siteId,
+                      Integer serverId, Integer channelId, Integer ivrSiteId, Integer ivrServerId, Integer ivrChannelId,
+                      Date timestamp, Integer direction, Integer campaignId, String customerAgentLoginId,
+                      String agentLoginId, Integer answered, Integer preview, Integer agentDialing, Integer ringing,
+                      Integer talking, Integer hold, Integer afterCallWork, Integer inQueue, Integer transferred,
+                      Integer queuedTotal, Integer resolutionId, String originatingInteractionId, Boolean queued,
+                      Boolean firstTransferToAgent, Boolean inbound, Boolean transferredToAgent, Boolean dropped,
+                      Boolean flowIn, Boolean flowOut, Boolean agentAnswered, Boolean agentDropped, Boolean transferIn,
+                      Boolean transferOut, Boolean reply, Boolean forward, Integer contactType, Integer dialerRecordId,
+                      Integer dialerRecordContactId, Integer messageId, Integer caseId, String crmId,
+                      String remoteContact, String dnis, String ani, Integer q850Casue, Integer terminationSide,
+                      Integer duration, Integer billingDuration, String context) {
+        this.interactionId = interactionId;
+        this.segmentId = segmentId;
+        this.dialerPending = dialerPending;
+        this.dialerFetching = dialerFetching;
+        this.dialerDialing = dialerDialing;
+        this.dialerRinging = dialerRinging;
+        this.liveVoiceDetected = liveVoiceDetected;
+        this.siteId = siteId;
+        this.serverId = serverId;
+        this.channelId = channelId;
+        this.ivrSiteId = ivrSiteId;
+        this.ivrServerId = ivrServerId;
+        this.ivrChannelId = ivrChannelId;
+        this.timestamp = timestamp;
+        this.direction = direction;
+        this.campaignId = campaignId;
+        this.customerAgentLoginId = customerAgentLoginId;
+        this.agentLoginId = agentLoginId;
+        this.answered = answered;
+        this.preview = preview;
+        this.agentDialing = agentDialing;
+        this.ringing = ringing;
+        this.talking = talking;
+        this.hold = hold;
+        this.afterCallWork = afterCallWork;
+        this.inQueue = inQueue;
+        this.transferred = transferred;
+        this.queuedTotal = queuedTotal;
+        this.resolutionId = resolutionId;
+        this.originatingInteractionId = originatingInteractionId;
+        this.queued = queued;
+        this.firstTransferToAgent = firstTransferToAgent;
+        this.inbound = inbound;
+        this.transferredToAgent = transferredToAgent;
+        this.dropped = dropped;
+        this.flowIn = flowIn;
+        this.flowOut = flowOut;
+        this.agentAnswered = agentAnswered;
+        this.agentDropped = agentDropped;
+        this.transferIn = transferIn;
+        this.transferOut = transferOut;
+        this.reply = reply;
+        this.forward = forward;
+        this.contactType = contactType;
+        this.dialerRecordId = dialerRecordId;
+        this.dialerRecordContactId = dialerRecordContactId;
+        this.messageId = messageId;
+        this.caseId = caseId;
+        this.crmId = crmId;
+        this.remoteContact = remoteContact;
+        this.dnis = dnis;
+        this.ani = ani;
+        this.q850Casue = q850Casue;
+        this.terminationSide = terminationSide;
+        this.duration = duration;
+        this.billingDuration = billingDuration;
+        this.context = context;
+    }
+
+    public SegmentEnd() {
+    }
+
     public String getInteractionId() {
         return interactionId;
     }

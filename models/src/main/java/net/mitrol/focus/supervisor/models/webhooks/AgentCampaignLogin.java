@@ -1,17 +1,29 @@
 package net.mitrol.focus.supervisor.models.webhooks;
 
+import java.util.Date;
+
 public class AgentCampaignLogin {
 
-     private String timestamp;
+     private Date timestamp;
      private Integer agentId;
      private Integer campaignId;
      private Integer groupId;
 
-    public String getTimestamp() {
+    public AgentCampaignLogin(Date timestamp, Integer agentId, Integer campaignId, Integer groupId) {
+        this.timestamp = timestamp;
+        this.agentId = agentId;
+        this.campaignId = campaignId;
+        this.groupId = groupId;
+    }
+
+    public AgentCampaignLogin() {
+    }
+
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

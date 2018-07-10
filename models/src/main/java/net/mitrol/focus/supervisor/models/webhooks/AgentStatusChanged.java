@@ -1,20 +1,37 @@
 package net.mitrol.focus.supervisor.models.webhooks;
 
+import net.mitrol.focus.supervisor.models.AgentState;
+
+import java.util.Date;
+
 public class AgentStatusChanged {
 
-    private String timestamp;
+    private Date timestamp;
     private Integer agentId;
     private Integer order;
-    private Integer previousStateId;
-    private Integer stateId;
+    private AgentState previousStateId;
+    private AgentState stateId;
     private Integer duration;
     private Integer interactions;
 
-    public String getTimestamp() {
+    public AgentStatusChanged(Date timestamp, Integer agentId, Integer order, AgentState previousStateId, AgentState stateId, Integer duration, Integer interactions) {
+        this.timestamp = timestamp;
+        this.agentId = agentId;
+        this.order = order;
+        this.previousStateId = previousStateId;
+        this.stateId = stateId;
+        this.duration = duration;
+        this.interactions = interactions;
+    }
+
+    public AgentStatusChanged() {
+    }
+
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -34,22 +51,6 @@ public class AgentStatusChanged {
         this.order = order;
     }
 
-    public Integer getPreviousStateId() {
-        return previousStateId;
-    }
-
-    public void setPreviousStateId(Integer previousStateId) {
-        this.previousStateId = previousStateId;
-    }
-
-    public Integer getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(Integer stateId) {
-        this.stateId = stateId;
-    }
-
     public Integer getDuration() {
         return duration;
     }
@@ -64,5 +65,21 @@ public class AgentStatusChanged {
 
     public void setInteractions(Integer interactions) {
         this.interactions = interactions;
+    }
+
+    public AgentState getPreviousStateId() {
+        return previousStateId;
+    }
+
+    public void setPreviousStateId(AgentState previousStateId) {
+        this.previousStateId = previousStateId;
+    }
+
+    public AgentState getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(AgentState stateId) {
+        this.stateId = stateId;
     }
 }
