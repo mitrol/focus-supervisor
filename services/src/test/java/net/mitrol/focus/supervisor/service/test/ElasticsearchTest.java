@@ -1,14 +1,14 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
+import net.mitrol.focus.supervisor.models.AgentState;
 import net.mitrol.focus.supervisor.service.test.model.Direccion;
 import net.mitrol.focus.supervisor.service.test.model.User;
 import net.mitrol.focus.supervisor.service.test.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import net.mitrol.utils.DateTimeUtils;
+import org.elasticsearch.index.query.*;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -154,6 +154,82 @@ public class ElasticsearchTest{
     public void shouldBeSearchByMatchPhrases() {
         MoreLikeThisQueryBuilder moreLikeThisQuery = QueryBuilders.moreLikeThisQuery(new String[]{"name", "direccion.localidad"}, new String[]{"a"}, null);
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, moreLikeThisQuery);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void createVendedorWithDireccionAndDate() {
+        Direccion direccion = new Direccion();
+        direccion.setId_direccion("dir1");
+        direccion.setCalle("cordoba");
+        direccion.setCodigoPostal("3500");
+        direccion.setLocalidad("Resistencia");
+        direccion.setNumero(1887);
+        Vendedor vendedor = new Vendedor();
+        vendedor.setId_vendedor("vendedor657");
+        vendedor.setName("martin");
+        vendedor.setLastname("veuthey");
+        vendedor.setDireccion(direccion);
+        vendedor.setDate(DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT));
+
+        String id_created = esService.buildDocumentIndex(vendedor, vendedor_index, type, "");
+
+        Assert.assertTrue(esService.exists(vendedor_index, type, id_created));
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByDateField() {
+        final DateTime now = DateTime.now();
+        DateTime past = now.minusMinutes(60);
+        RangeQueryBuilder a = QueryBuilders.rangeQuery("date.keyword").gte("09/07/2018 15:25:29").lte("09/07/2018 15:26:34");
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, a);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void createVendedorWithDireccionAndEnum() {
+        Direccion direccion = new Direccion();
+        direccion.setId_direccion("dir1");
+        direccion.setCalle("cordoba");
+        direccion.setCodigoPostal("3500");
+        direccion.setLocalidad("Resistencia");
+        direccion.setNumero(1887);
+        Vendedor vendedor = new Vendedor();
+        vendedor.setId_vendedor("vendedor657");
+        vendedor.setName("martin");
+        vendedor.setLastname("veuthey");
+        vendedor.setDireccion(direccion);
+        vendedor.setDate(DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT));
+
+        Map<AgentState, Duration> agentStateDurations = new HashMap<>();
+        agentStateDurations.put(AgentState.NOT_READY, Duration.ofHours(1));
+        vendedor.setAgentStateDurations(agentStateDurations);
+
+        String id_created = esService.buildDocumentIndex(vendedor, vendedor_index, type, "");
+
+        Assert.assertTrue(esService.exists(vendedor_index, type, id_created));
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByDateWithDataComplexRompeSinJsonProperty() {
+        final DateTime now = DateTime.now();
+        DateTime past = now.minusMinutes(60);
+        RangeQueryBuilder a = QueryBuilders.rangeQuery("date.keyword").gte("09/07/2018 15:25:29").lte("10/07/2018 15:26:34");
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, a);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByDateWithDataComplexRompeConJsonPropertyAndDeserializer() {
+        final DateTime now = DateTime.now();
+        DateTime past = now.minusMinutes(60);
+        RangeQueryBuilder a = QueryBuilders.rangeQuery("date.keyword").gte("10/07/2018 00:50:29").lte("10/07/2018 01:26:34");
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, a);
         Assert.assertNotNull(result);
     }
 }

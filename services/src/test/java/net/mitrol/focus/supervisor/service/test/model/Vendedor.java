@@ -1,6 +1,16 @@
 package net.mitrol.focus.supervisor.service.test.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import net.mitrol.focus.supervisor.models.AgentState;
+import net.mitrol.focus.supervisor.service.test.model.jacksonn.VendedorDeserializer;
+
 import java.io.Serializable;
+import java.time.Duration;
+import java.util.Map;
 
 public class Vendedor implements Serializable {
 
@@ -11,6 +21,16 @@ public class Vendedor implements Serializable {
     private String lastname;
 
     private Direccion direccion;
+
+    private String date;
+
+    /*
+    * TODO Eliminar una vez que se trabaje con los datos reales.
+    * */
+    @JsonDeserialize(using = VendedorDeserializer.class)
+    @JsonProperty
+    ////@JsonIgnore
+    private Map<AgentState, Duration> agentStateDurations;
 
     public Vendedor() {
     }
@@ -45,5 +65,21 @@ public class Vendedor implements Serializable {
 
     public void setDireccion(Direccion direccion) {
         this.direccion = direccion;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public Map<AgentState, Duration> getAgentStateDurations() {
+        return agentStateDurations;
+    }
+
+    public void setAgentStateDurations(Map<AgentState, Duration> agentStateDurations) {
+        this.agentStateDurations = agentStateDurations;
     }
 }
