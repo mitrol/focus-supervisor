@@ -52,26 +52,33 @@ public class MitAcdMessageService {
             JSONArray jsonArray = new JSONArray(message);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                if (obj.toString().contains("campaignDailyStatsId")) {
-                    CampaignDailyStats campaignDailyStats = JsonMapper.getInstance().getObjectFromJSON(obj, CampaignDailyStats.class);
+                if (obj.has("CampaignDailyStats")) {
+                    CampaignDailyStats campaignDailyStats = JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("CampaignDailyStats"), CampaignDailyStats.class);
+                    //campaignDailyStats.setDate(getDateNowValue());
                     generateCampaignDailyStats(campaignDailyStats);
-                } else if (obj.toString().contains("campaignIntervalStatsId")) {
-                    CampaignIntervalStats campaignIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, CampaignIntervalStats.class);
+                } else if (obj.has("CampaignIntervalStats")) {
+                    CampaignIntervalStats campaignIntervalStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("CampaignIntervalStats"), CampaignIntervalStats.class);
+                    //campaignIntervalStats.setDate(getDateNowValue());
                     generateCampaignIntervalStats(campaignIntervalStats);
-                } else if (obj.toString().contains("splitIntervalStatsId")) {
-                    SplitIntervalStats splitIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, SplitIntervalStats.class);
+                } else if (obj.has("SplitIntervalStats")) {
+                    SplitIntervalStats splitIntervalStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("SplitIntervalStats"), SplitIntervalStats.class);
+                    //splitIntervalStats.setDate(getDateNowValue());
                     generateSplitIntervalStats(splitIntervalStats);
-                } else if (obj.toString().contains("listDailyStatsId")) {
-                    SplitDailyStats splitDailyStats =  JsonMapper.getInstance().getObjectFromJSON(obj, SplitDailyStats.class);
+                } else if (obj.has("SplitDailyStats")) {
+                    SplitDailyStats splitDailyStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("SplitDailyStats"), SplitDailyStats.class);
+                    //splitDailyStats.setDate(getDateNowValue());
                     generateSplitDailyStats(splitDailyStats);
-                } else if (obj.toString().contains("agentIntervalStatsId")) {
-                    AgentIntervalStats agentIntervalStats =  JsonMapper.getInstance().getObjectFromJSON(obj, AgentIntervalStats.class);
+                } else if (obj.has("AgentIntervalStats")) {
+                    AgentIntervalStats agentIntervalStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("AgentIntervalStats"), AgentIntervalStats.class);
+                    //agentIntervalStats.setDate(getDateNowValue());
                     generateAgentIntervalStats(agentIntervalStats);
-                } else if (obj.toString().contains("agentDailyStatsId")) {
-                    AgentDailyStats agentDailyStats=  JsonMapper.getInstance().getObjectFromJSON(obj, AgentDailyStats.class);
+                } else if (obj.has("AgentDailyStats")) {
+                    AgentDailyStats agentDailyStats=  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("AgentDailyStats"), AgentDailyStats.class);
+                    //agentDailyStats.setDate(getDateNowValue());
                     generateAgentDailyStats(agentDailyStats);
-                } else if (obj.toString().contains("interactionStatsId")) {
-                    InteractionStats interactionStats =  JsonMapper.getInstance().getObjectFromJSON(obj, InteractionStats.class);
+                } else if (obj.has("InteractionStats")) {
+                    InteractionStats interactionStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("InteractionStats"), InteractionStats.class);
+                    //interactionStats.setDate(getDateNowValue());
                     generateInteractionStats(interactionStats);
                 }
             }
@@ -110,6 +117,10 @@ public class MitAcdMessageService {
 
     private String getIndexDateValue (String indexName){
         String today = DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_FORMAT);
-        return indexName + "-" + today;
+        return indexName + "_" + today.replaceAll("/", "-");
+    }
+
+    private String getDateNowValue() {
+        return DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT);
     }
 }

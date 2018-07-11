@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -63,7 +64,7 @@ public class SSupMitAcdClientListenerService implements SSupMitAcdClientListener
     public void onBatchFinished(SSupMitAcdClient ssupMitAcdClient,
                                 Integer intervalId, Instant serverDateTime, Duration intervalDuration) {
         String json = JsonMapper.getInstance().getStringJsonFromObject(listMessageMitACD);
-        logger.debug("Sending messages to kafka -> " + json);
+        logger.info("Sending messages to kafka -> " + json);
         kafkaService.sender(json);
         listMessageMitACD.clear();
     }
@@ -71,36 +72,42 @@ public class SSupMitAcdClientListenerService implements SSupMitAcdClientListener
     @Override
     public void onCampaignIntervalStats(SSupMitAcdClient ssupMitAcdClient,
                                         CampaignIntervalStats campaignIntervalStats) {
-        listMessageMitACD.add(campaignIntervalStats);
+        listMessageMitACD.add(transformMap(campaignIntervalStats));
     }
 
     @Override
     public void onCampaignDailyStats(SSupMitAcdClient ssupMitAcdClient, CampaignDailyStats campaignDailyStats) {
-        listMessageMitACD.add(campaignDailyStats);
+        listMessageMitACD.add(transformMap(campaignDailyStats));
     }
 
     @Override
     public void onSplitIntervalStats(SSupMitAcdClient sSupMitAcdClient, SplitIntervalStats splitIntervalStats) {
-        listMessageMitACD.add(splitIntervalStats);
+        listMessageMitACD.add(transformMap(splitIntervalStats));
     }
 
     @Override
     public void onSplitDailyStats(SSupMitAcdClient ssupMitAcdClient, SplitDailyStats SplitDailyStats) {
-        listMessageMitACD.add(SplitDailyStats);
+        listMessageMitACD.add(transformMap(SplitDailyStats));
     }
 
     @Override
     public void onAgentIntervalStats(SSupMitAcdClient ssupMitAcdClient, AgentIntervalStats agentIntervalStats) {
-        listMessageMitACD.add(agentIntervalStats);
+        listMessageMitACD.add(transformMap(agentIntervalStats));
     }
 
     @Override
     public void onAgentDailyStats(SSupMitAcdClient ssupMitAcdClient, AgentDailyStats agentDailyStats) {
-        listMessageMitACD.add(agentDailyStats);
+        listMessageMitACD.add(transformMap(agentDailyStats));
     }
 
     @Override
     public void onInteractionsStats(SSupMitAcdClient ssupMitAcdClient, InteractionStats interactionStats) {
-        listMessageMitACD.add(interactionStats);
+        listMessageMitACD.add(transformMap(interactionStats));
+    }
+
+    private <T> HashMap transformMap(T obj) {
+        HashMap map = new HashMap();
+        map.put(obj.getClass().getSimpleName(), obj);
+        return map;
     }
 }

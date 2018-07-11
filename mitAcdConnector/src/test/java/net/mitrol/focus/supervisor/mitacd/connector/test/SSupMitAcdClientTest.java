@@ -96,7 +96,7 @@ public class SSupMitAcdClientTest {
         }
 
         SSupMitAcdClientListener1 ssupMitAcdClientListener = new SSupMitAcdClientListener1();
-        SSupMitAcdClient ssupMitAcdClient = new SSupMitAcdClient(ssupMitAcdClientListener, new MitAcdConnectionInfo("192.168.41.212", 10403), Duration.ofMillis(500));
+        SSupMitAcdClient ssupMitAcdClient = new SSupMitAcdClient(ssupMitAcdClientListener, new MitAcdConnectionInfo("100.1.0.12", 10403), Duration.ofMillis(500));
         ssupMitAcdClientListener.setSSupMitAcdClient(ssupMitAcdClient);
         ssupMitAcdClient.connect();
 
