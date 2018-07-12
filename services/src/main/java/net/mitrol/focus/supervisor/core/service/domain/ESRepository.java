@@ -3,6 +3,7 @@ package net.mitrol.focus.supervisor.core.service.domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
+import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -155,7 +157,7 @@ public class ESRepository {
             searchRequest.indices(index);
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
             return getObjects(searchResponse, valueType);
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
         }
     }
@@ -180,7 +182,7 @@ public class ESRepository {
             searchRequest.indices(index);
             SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
             return getObjects(searchResponse, valueType);
-        } catch (IOException e) {
+        } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
         }
     }
@@ -238,7 +240,7 @@ public class ESRepository {
         }
     }
 
-    private static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws IOException {
+    private static <T> List<T> getObjects(SearchResponse response, Class<T> valueType) throws JSONException {
         List<T> res = Lists.newArrayList();
         for(SearchHit hit:response.getHits()){
             res.add(getObject(hit, valueType));
@@ -246,11 +248,12 @@ public class ESRepository {
         return res;
     }
 
-    private static <T> T getObject(SearchHit hit, Class<T> valueType) throws IOException {
-        return MAPPER.readValue(hit.getSourceAsString(), valueType);
+    private static <T> T getObject(SearchHit hit, Class<T> valueType) throws JSONException {
+        return JsonMapper.getInstance().getObjectFromString(hit.getSourceAsString(), valueType);
+
     }
 
-    private static <T> T getObject(GetResponse response, Class<T> valueType) throws IOException {
-        return MAPPER.readValue(response.getSourceAsString(), valueType);
+    private static <T> T getObject(GetResponse response, Class<T> valueType) throws JSONException {
+        return JsonMapper.getInstance().getObjectFromString(response.getSourceAsString(), valueType);
     }
 }
