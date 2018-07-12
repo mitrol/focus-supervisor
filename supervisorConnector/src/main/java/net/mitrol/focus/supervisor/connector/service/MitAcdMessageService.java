@@ -1,5 +1,6 @@
 package net.mitrol.focus.supervisor.connector.service;
 
+import net.mitrol.focus.supervisor.connector.dto.*;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.models.*;
 import net.mitrol.utils.DateTimeUtils;
@@ -54,31 +55,24 @@ public class MitAcdMessageService {
                 JSONObject obj = jsonArray.getJSONObject(i);
                 if (obj.has("CampaignDailyStats")) {
                     CampaignDailyStats campaignDailyStats = JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("CampaignDailyStats"), CampaignDailyStats.class);
-                    //campaignDailyStats.setDate(getDateNowValue());
                     generateCampaignDailyStats(campaignDailyStats);
                 } else if (obj.has("CampaignIntervalStats")) {
                     CampaignIntervalStats campaignIntervalStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("CampaignIntervalStats"), CampaignIntervalStats.class);
-                    //campaignIntervalStats.setDate(getDateNowValue());
                     generateCampaignIntervalStats(campaignIntervalStats);
                 } else if (obj.has("SplitIntervalStats")) {
                     SplitIntervalStats splitIntervalStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("SplitIntervalStats"), SplitIntervalStats.class);
-                    //splitIntervalStats.setDate(getDateNowValue());
                     generateSplitIntervalStats(splitIntervalStats);
                 } else if (obj.has("SplitDailyStats")) {
                     SplitDailyStats splitDailyStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("SplitDailyStats"), SplitDailyStats.class);
-                    //splitDailyStats.setDate(getDateNowValue());
                     generateSplitDailyStats(splitDailyStats);
                 } else if (obj.has("AgentIntervalStats")) {
                     AgentIntervalStats agentIntervalStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("AgentIntervalStats"), AgentIntervalStats.class);
-                    //agentIntervalStats.setDate(getDateNowValue());
                     generateAgentIntervalStats(agentIntervalStats);
                 } else if (obj.has("AgentDailyStats")) {
                     AgentDailyStats agentDailyStats=  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("AgentDailyStats"), AgentDailyStats.class);
-                    //agentDailyStats.setDate(getDateNowValue());
                     generateAgentDailyStats(agentDailyStats);
                 } else if (obj.has("InteractionStats")) {
                     InteractionStats interactionStats =  JsonMapper.getInstance().getObjectFromJSON((JSONObject) obj.get("InteractionStats"), InteractionStats.class);
-                    //interactionStats.setDate(getDateNowValue());
                     generateInteractionStats(interactionStats);
                 }
             }
@@ -88,31 +82,52 @@ public class MitAcdMessageService {
     }
 
     public void generateCampaignDailyStats(CampaignDailyStats campaignDailyStats) {
-        esService.buildDocumentIndex(campaignDailyStats, getIndexDateValue(index_campaign_daily), index_type, "");
+        CampaignDailyStatsDTO campaignDailyStatsDTO = new CampaignDailyStatsDTO();
+        campaignDailyStatsDTO.setDate(getDateNowValue());
+        campaignDailyStatsDTO.setCampaignDailyStats(campaignDailyStats);
+        esService.buildDocumentIndex(campaignDailyStatsDTO, getIndexDateValue(index_campaign_daily), index_type, "");
     }
 
-    public void generateSplitDailyStats(SplitDailyStats SplitDailyStats) {
-        esService.buildDocumentIndex(SplitDailyStats, getIndexDateValue(index_split_daily), index_type, "");
+    public void generateSplitDailyStats(SplitDailyStats splitDailyStats) {
+        SplitDailyStatsDTO splitDailyStatsDTO = new SplitDailyStatsDTO();
+        splitDailyStatsDTO.setDate(getDateNowValue());
+        splitDailyStatsDTO.setSplitDailyStats(splitDailyStats);
+        esService.buildDocumentIndex(splitDailyStatsDTO, getIndexDateValue(index_split_daily), index_type, "");
     }
 
     public void generateSplitIntervalStats(SplitIntervalStats splitIntervalStats) {
-        esService.buildDocumentIndex(splitIntervalStats, getIndexDateValue(index_split_interval), index_type, "");
+        SplitIntervalStatsDTO splitIntervalStatsDTO = new SplitIntervalStatsDTO();
+        splitIntervalStatsDTO.setDate(getDateNowValue());
+        splitIntervalStatsDTO.setSplitIntervalStats(splitIntervalStats);
+        esService.buildDocumentIndex(splitIntervalStatsDTO, getIndexDateValue(index_split_interval), index_type, "");
     }
 
     public void generateCampaignIntervalStats(CampaignIntervalStats campaignIntervalStats) {
-        esService.buildDocumentIndex(campaignIntervalStats, getIndexDateValue(index_campaign_interval), index_type, "");
+        CampaignIntervalStatsDTO campaignIntervalStatsDTO = new CampaignIntervalStatsDTO();
+        campaignIntervalStatsDTO.setDate(getDateNowValue());
+        campaignIntervalStatsDTO.setCampaignIntervalStats(campaignIntervalStats);
+        esService.buildDocumentIndex(campaignIntervalStatsDTO, getIndexDateValue(index_campaign_interval), index_type, "");
     }
 
     public void generateAgentIntervalStats(AgentIntervalStats agentIntervalStats) {
-        esService.buildDocumentIndex(agentIntervalStats, getIndexDateValue(index_agent_interval), index_type, "");
+        AgentIntervalStatsDTO agentIntervalStatsDTO = new AgentIntervalStatsDTO();
+        agentIntervalStatsDTO.setDate(getDateNowValue());
+        agentIntervalStatsDTO.setAgentIntervalStats(agentIntervalStats);
+        esService.buildDocumentIndex(agentIntervalStatsDTO, getIndexDateValue(index_agent_interval), index_type, "");
     }
 
     public void generateAgentDailyStats(AgentDailyStats agentDailyStats) {
-        esService.buildDocumentIndex(agentDailyStats, getIndexDateValue(index_agent_daily), index_type, "");
+        AgentDailyStatsDTO agentDailyStatsDTO = new AgentDailyStatsDTO();
+        agentDailyStatsDTO.setDate(getDateNowValue());
+        agentDailyStatsDTO.setAgentDailyStats(agentDailyStats);
+        esService.buildDocumentIndex(agentDailyStatsDTO, getIndexDateValue(index_agent_daily), index_type, "");
     }
 
     public void generateInteractionStats(InteractionStats interactionStats) {
-        esService.buildDocumentIndex(interactionStats, getIndexDateValue(index_interaction), index_type, "");
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue(index_interaction), index_type, "");
     }
 
     private String getIndexDateValue (String indexName){
