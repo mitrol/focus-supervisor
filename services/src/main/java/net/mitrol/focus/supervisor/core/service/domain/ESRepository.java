@@ -15,6 +15,8 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.MultiSearchRequest;
+import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -24,6 +26,14 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStatsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ParsedValueCount;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
+import org.elasticsearch.search.aggregations.support.ValueType;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.json.JSONException;
@@ -31,17 +41,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Component
-public class ESRepository {
+public abstract class ESRepository {
 
-    private static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    protected static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
-    private RestHighLevelClient restHighLevelClient;
+    protected RestHighLevelClient restHighLevelClient;
 
     /**
      * Create an index document in Elasticsesarch
@@ -187,6 +198,46 @@ public class ESRepository {
         }
     }
 
+    /*
+    * AndAggregation
+    * */
+    public <T> List<T> searchDataByQueryAndAggregation(String index, String type, Class<T> valueType, SearchSourceBuilder searchSourceBuilder) {
+        if(index == null || type == null) {
+            return null;
+        }
+        try {
+            SearchRequest searchRequest = new SearchRequest();
+            searchRequest.source(searchSourceBuilder);
+            searchRequest.indices(index);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
+            return getObjectsAggregation(searchResponse, valueType);
+        } catch (IOException | JSONException e) {
+            throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
+        }
+    }
+
+    /*
+    * multipleSearchDataByQueryAndAggregation
+    * */
+    public <T> List<T> multipleSearchDataByQueryAndAggregation(String index, String type, Class<T> valueType, List<SearchSourceBuilder> searchSourceBuilders) {
+        if(index == null || type == null) {
+            return null;
+        }
+        try {
+            MultiSearchRequest request = new MultiSearchRequest();
+            for (SearchSourceBuilder searchSourceBuilder : searchSourceBuilders) {
+                SearchRequest searchRequest = new SearchRequest();
+                searchRequest.source(searchSourceBuilder);
+                searchRequest.indices(index);
+                request.add(searchRequest);
+            }
+            MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
+            return getMultipleSearchAggregation(multiSearchResponse, valueType);
+        } catch (IOException | JSONException e) {
+            throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
+        }
+    }
+
     /**
      * Update an index document in Elasticsesarch
      *
@@ -248,9 +299,26 @@ public class ESRepository {
         return res;
     }
 
+    private static <T> List<T> getObjectsAggregation(SearchResponse response, Class<T> valueType) throws JSONException {
+        List<T> res = Lists.newArrayList();
+        for(Aggregation aggregation : response.getAggregations()){
+            HashMap<String, Long> data = new HashMap();
+            data.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
+            res.add((T) data);
+        }
+        return res;
+    }
+
+    private static <T> List<T> getMultipleSearchAggregation(MultiSearchResponse response, Class<T> valueType) throws JSONException {
+        List<T> res = Lists.newArrayList();
+        for(MultiSearchResponse.Item item : response.getResponses()){
+            res.add((T) getObjectsAggregation(item.getResponse(), null));
+        }
+        return res;
+    }
+
     private static <T> T getObject(SearchHit hit, Class<T> valueType) throws JSONException {
         return JsonMapper.getInstance().getObjectFromString(hit.getSourceAsString(), valueType);
-
     }
 
     private static <T> T getObject(GetResponse response, Class<T> valueType) throws JSONException {

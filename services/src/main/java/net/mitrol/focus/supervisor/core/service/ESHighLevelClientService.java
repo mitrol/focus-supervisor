@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import net.mitrol.focus.supervisor.core.service.domain.ESRepository;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,14 @@ public class ESHighLevelClientService {
 
     public <T> List<T> searchDataByQuery(String index, String type, Class<T> valueType, AbstractQueryBuilder matchQueryBuilder) {
         return esRepository.searchDataByQuery(index, type, valueType, matchQueryBuilder);
+    }
+
+    public <T> List<T> searchDataByQueryAndAggregation(String index, String type, Class<T> valueType, SearchSourceBuilder searchSourceBuilder) {
+        return esRepository.searchDataByQueryAndAggregation(index, type, valueType, searchSourceBuilder);
+    }
+
+    public <T> List<T> multipleSearchDataByQueryAndAggregation(String index, String type, Class<T> valueType, List<SearchSourceBuilder> searchSourceBuilders) {
+        return esRepository.multipleSearchDataByQueryAndAggregation(index, type, valueType, searchSourceBuilders);
     }
 
     public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){

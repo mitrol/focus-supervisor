@@ -1,13 +1,21 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
+import net.mitrol.focus.supervisor.core.service.domain.ESWidgetInteractionStatsRepository;
 import net.mitrol.focus.supervisor.models.AgentState;
+import net.mitrol.focus.supervisor.models.InteractionState;
+import net.mitrol.focus.supervisor.models.InteractionStats;
+import net.mitrol.focus.supervisor.service.test.model.DTO.InteractionStatsDTO;
 import net.mitrol.focus.supervisor.service.test.model.Direccion;
 import net.mitrol.focus.supervisor.service.test.model.User;
 import net.mitrol.focus.supervisor.service.test.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.utils.DateTimeUtils;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,9 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={ TestConfig.class })
@@ -30,6 +36,9 @@ public class ElasticsearchTest{
 
     @Autowired
     private ESHighLevelClientService esService;
+
+    @Autowired
+    private ESWidgetInteractionStatsRepository esWidgetInteractionStatsRepository;
 
     private String index;
     private String type;
@@ -161,15 +170,15 @@ public class ElasticsearchTest{
     @Ignore
     public void createVendedorWithDireccionAndDate() {
         Direccion direccion = new Direccion();
-        direccion.setId_direccion("dir1");
-        direccion.setCalle("cordoba");
-        direccion.setCodigoPostal("3500");
-        direccion.setLocalidad("Resistencia");
-        direccion.setNumero(1887);
+        direccion.setId_direccion("dir2");
+        direccion.setCalle("frondizi");
+        direccion.setCodigoPostal("3600");
+        direccion.setLocalidad("Corriente");
+        direccion.setNumero(1832);
         Vendedor vendedor = new Vendedor();
-        vendedor.setId_vendedor("vendedor657");
-        vendedor.setName("martin");
-        vendedor.setLastname("veuthey");
+        vendedor.setId_vendedor("vendedor123");
+        vendedor.setName("mrcelo");
+        vendedor.setLastname("cruz");
         vendedor.setDireccion(direccion);
         vendedor.setDate(DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT));
 
@@ -231,5 +240,207 @@ public class ElasticsearchTest{
         RangeQueryBuilder a = QueryBuilders.rangeQuery("date.keyword").gte("10/07/2018 00:50:29").lte("10/07/2018 01:26:34");
         List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, a);
         Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveInteractionStatsToTestInElasticPREVIEWSTATE() {
+        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2)
+                , new Integer(5), new Integer(10), new Integer(1), new Integer(2),
+                new Integer(2), InteractionState.PREVIEW, Duration.ofSeconds(2500),
+                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                new Integer(1), Boolean.TRUE, 1);
+
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveInteractionStatsToTestInElasticTALKINGSTATE() {
+        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
+                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
+                new Integer(2), InteractionState.TALKING, Duration.ofSeconds(2500),
+                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                new Integer(1), Boolean.TRUE, 1);
+
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveInteractionStatsToTestInElasticDIALSTATE() {
+        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
+                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
+                new Integer(2), InteractionState.DIALING_DIALER, Duration.ofSeconds(2500),
+                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                new Integer(1), Boolean.TRUE, 1);
+
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveInteractionStatsToTestInElasticRINGSTATE() {
+        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
+                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
+                new Integer(2), InteractionState.RINGING, Duration.ofSeconds(2500),
+                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                new Integer(1), Boolean.TRUE, 1);
+
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveInteractionStatsToTestInElasticHOLDSTATE() {
+        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
+                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
+                new Integer(2), InteractionState.HOLD, Duration.ofSeconds(2500),
+                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                new Integer(1), Boolean.TRUE, 1);
+
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveInteractionStatsToTestInElasticACWSTATE() {
+        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(77),
+                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
+                new Integer(2), InteractionState.AFTER_CALL_WORK, Duration.ofSeconds(2500),
+                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                new Integer(1), Boolean.TRUE, 1);
+
+        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
+        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setInteractionStats(interactionStats);
+        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
+    }
+
+    private String getIndexDateValue (String indexName){
+        String today = DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_FORMAT);
+        return indexName + "_" + today.replaceAll("/", "-");
+    }
+
+    private String getDateNowValue() {
+        return DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchInteraction() {
+        AbstractQueryBuilder a = QueryBuilders.matchAllQuery();
+        List<InteractionStatsDTO> result = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, a);
+        Assert.assertNotNull(result);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByQueries() {
+        QueryStringQueryBuilder queryVendedor = QueryBuilders.queryStringQuery("SELECT * FROM vendedor_index");
+        List<Vendedor> resultVendedor = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, queryVendedor);
+        Assert.assertNotNull(resultVendedor);
+
+        QueryStringQueryBuilder queryInteractionStats = QueryBuilders.queryStringQuery("SELECT * FROM interactionstats_12-07-2018");
+        List<InteractionStatsDTO> resultInteractionStats = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, queryInteractionStats);
+        Assert.assertNotNull(resultInteractionStats);
+
+        QueryStringQueryBuilder queryInteractionStatsFilter = QueryBuilders.queryStringQuery("SELECT * FROM interactionstats_12-07-2018 as WHERE as.interactionStats.state = \"talking\" ");
+        List<InteractionStatsDTO> resultInteractionStatsFilter = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, queryInteractionStatsFilter);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByQueriesANDWhere() {
+        QueryStringQueryBuilder queryInteractionStatsFilter = QueryBuilders.queryStringQuery("SELECT * FROM interactionstats_12-07-2018 WHERE interactionStats.state= 'TALKING'");//interactionStats.state= 'TALKING'");//interactionStats.state = \"TALKING\" ");
+        List<InteractionStatsDTO> resultInteractionStatsFilter = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, queryInteractionStatsFilter);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByQueriesVendedorANDWhere() {
+        QueryStringQueryBuilder queryInteractionStatsFilter = QueryBuilders.queryStringQuery("SELECT * FROM vendedor_index WHERE direccion.localidad: \"Corriente\"");//interactionStats.state= 'TALKING'");//interactionStats.state = \"TALKING\" ");
+        List<Vendedor> resultInteractionStatsFilter = esService.searchDataByQuery("vendedor_index", type, Vendedor.class, queryInteractionStatsFilter);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByAggregation() {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        AbstractQueryBuilder abstractQueryBuilder = QueryBuilders.matchAllQuery();
+        ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count("Talking").field("interactionStats.state.keyword");
+        searchSourceBuilder.query(abstractQueryBuilder).aggregation(aggregationBuildersTotal);
+
+        List<Object> resultInteractionStatsFilter = esService.searchDataByQueryAndAggregation("interactionstats_13-07-2018", type, Object.class, searchSourceBuilder);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchByAggregationAndQuery() {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        AbstractQueryBuilder abstractQueryBuilder = QueryBuilders.matchQuery("interactionStats.state.keyword", "TALKING");
+        ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count("Talking").field("interactionStats.state.keyword");
+        searchSourceBuilder.query(abstractQueryBuilder).aggregation(aggregationBuildersTotal);
+
+        List<Object> resultInteractionStatsFilter = esService.searchDataByQueryAndAggregation("interactionstats_13-07-2018", type, Object.class, searchSourceBuilder);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    /*
+    * List<SearchSourceBuilder> searchSourceBuilders
+    * */
+    @Test
+    @Ignore
+    public void shouldBeSearchMultipleFirstWidget() {
+        List<SearchSourceBuilder> searchSourceBuilders = new ArrayList<>();
+
+        /*
+        *   Search by TALKING
+        * */
+        SearchSourceBuilder searchBuilderTALKING = new SearchSourceBuilder();
+        AbstractQueryBuilder abstractQueryBuilder = QueryBuilders.matchQuery("interactionStats.state.keyword", "TALKING");
+        ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count("Talking").field("interactionStats.state.keyword");
+        searchBuilderTALKING.query(abstractQueryBuilder).aggregation(aggregationBuildersTotal);
+
+        /*
+         *   Search by RINGING
+         * */
+        SearchSourceBuilder searchBuilderRINGING = new SearchSourceBuilder();
+        AbstractQueryBuilder abstractQueryBuilderRINGING = QueryBuilders.matchQuery("interactionStats.state.keyword", "RINGING");
+        ValueCountAggregationBuilder aggregationBuildersRINGING = AggregationBuilders.count("Ringing").field("interactionStats.state.keyword");
+        searchBuilderRINGING.query(abstractQueryBuilderRINGING).aggregation(aggregationBuildersRINGING);
+
+
+        searchSourceBuilders.add(searchBuilderTALKING);
+        searchSourceBuilders.add(searchBuilderRINGING);
+
+        List<Object> resultInteractionStatsFilter = esService.multipleSearchDataByQueryAndAggregation("interactionstats_13-07-2018", type, Object.class, searchSourceBuilders);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchMultipleWidget() {
+        List<HashMap> resultInteractionStatsFilter = esWidgetInteractionStatsRepository.findInteractionStatsByCampaign("interactionstats_13-07-2018", "sd");
+        Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }
