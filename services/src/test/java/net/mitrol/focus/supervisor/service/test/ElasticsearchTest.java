@@ -155,6 +155,16 @@ public class ElasticsearchTest{
         Assert.assertNotNull(result);
     }
 
+    @Test
+    @Ignore
+    public void shouldBeSearchByTwoFields() {
+        BoolQueryBuilder query = QueryBuilders.boolQuery()
+                .filter(QueryBuilders.matchQuery("direccion.codigoPostal", "3700"))
+                .filter(QueryBuilders.matchQuery("direccion.localidad", "Corrientes"));
+        List<Vendedor> result = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, query);
+        Assert.assertNotNull(result);
+    }
+
     /*
     * Test to working search for like as LIKE "%etc%"
     * */
