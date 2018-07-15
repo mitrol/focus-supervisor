@@ -12,7 +12,6 @@ import net.mitrol.focus.supervisor.service.test.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.utils.DateTimeUtils;
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -450,7 +449,7 @@ public class ElasticsearchTest{
     @Test
     @Ignore
     public void shouldBeSearchMultipleWidget() {
-        List<HashMap> resultInteractionStatsFilter = esWidgetInteractionStatsRepository.findInteractionStatsByCampaign("interactionstats_13-07-2018", "sd");
+        List<HashMap> resultInteractionStatsFilter = esWidgetInteractionStatsRepository.findInteractionStatsByCampaign("13-07-2018", "10");
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }

@@ -6,7 +6,7 @@ import net.mitrol.focus.supervisor.models.InteractionState;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.index.query.AbstractQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -14,6 +14,7 @@ import org.elasticsearch.search.aggregations.metrics.valuecount.ParsedValueCount
 import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -23,8 +24,18 @@ import java.util.List;
 @Component
 public class ESWidgetInteractionStatsRepository extends ESRepository {
 
-    public List<HashMap> findInteractionStatsByCampaign(String index, String campaignId) {
-        if(index == null) {
+    private static final String SEPARATOR = "_";
+
+    @Value("${index.interaction.stats}")
+    private String index_interaction;
+
+    /**
+    * @param date format dd-mm-YYYY
+    * @param campaignId to search and filter by id campaign
+    * TODO Add range date to search, gte and lte.
+    **/
+    public List<HashMap> findInteractionStatsByCampaign(String date, String campaignId) {
+        if(date == null) {
             return null;
         }
         try {
@@ -33,74 +44,32 @@ public class ESWidgetInteractionStatsRepository extends ESRepository {
             /*
              *   Search by TALKING
              * */
-            SearchRequest searchRequestTALKING = new SearchRequest();
-            searchRequestTALKING.indices(index);
-            SearchSourceBuilder searchBuilderTALKING = new SearchSourceBuilder();
-            AbstractQueryBuilder abstractQueryBuilder = QueryBuilders.matchQuery("interactionStats.state.keyword", InteractionState.TALKING.name());
-            ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count(InteractionState.TALKING.name()).field("interactionStats.state.keyword");
-            searchBuilderTALKING.query(abstractQueryBuilder).aggregation(aggregationBuildersTotal);
-            searchRequestTALKING.source(searchBuilderTALKING);
-            request.add(searchRequestTALKING);
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.TALKING.name()));
 
             /*
              *   Search by RINGING
              * */
-            SearchRequest searchRequestRINGING = new SearchRequest();
-            searchRequestTALKING.indices(index);
-            SearchSourceBuilder searchBuilderRINGING = new SearchSourceBuilder();
-            AbstractQueryBuilder abstractQueryBuilderRINGING = QueryBuilders.matchQuery("interactionStats.state.keyword", InteractionState.RINGING.name());
-            ValueCountAggregationBuilder aggregationBuildersRINGING = AggregationBuilders.count(InteractionState.RINGING.name()).field("interactionStats.state.keyword");
-            searchBuilderRINGING.query(abstractQueryBuilderRINGING).aggregation(aggregationBuildersRINGING);
-            searchRequestRINGING.source(searchBuilderRINGING);
-            request.add(searchRequestRINGING);
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.RINGING.name()));
 
             /*
              *   Search by PREVIEW
              * */
-            SearchRequest searchRequestPREVIEW = new SearchRequest();
-            searchRequestTALKING.indices(index);
-            SearchSourceBuilder searchBuilderPREVIEW = new SearchSourceBuilder();
-            AbstractQueryBuilder abstractQueryBuilderPREVIEW = QueryBuilders.matchQuery("interactionStats.state.keyword", InteractionState.PREVIEW.name());
-            ValueCountAggregationBuilder aggregationBuildersPREVIEW = AggregationBuilders.count(InteractionState.PREVIEW.name()).field("interactionStats.state.keyword");
-            searchBuilderPREVIEW.query(abstractQueryBuilderPREVIEW).aggregation(aggregationBuildersPREVIEW);
-            searchRequestPREVIEW.source(searchBuilderPREVIEW);
-            request.add(searchRequestPREVIEW);
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.PREVIEW.name()));
 
             /*
              *   Search by DIAL
              * */
-            SearchRequest searchRequestDIAL = new SearchRequest();
-            searchRequestTALKING.indices(index);
-            SearchSourceBuilder searchBuilderDIAL = new SearchSourceBuilder();
-            AbstractQueryBuilder abstractQueryBuilderDIAL = QueryBuilders.matchQuery("interactionStats.state.keyword", InteractionState.DIALING_DIALER.name());
-            ValueCountAggregationBuilder aggregationBuildersDIAL = AggregationBuilders.count(InteractionState.DIALING_DIALER.name()).field("interactionStats.state.keyword");
-            searchBuilderDIAL.query(abstractQueryBuilderDIAL).aggregation(aggregationBuildersDIAL);
-            searchRequestDIAL.source(searchBuilderDIAL);
-            request.add(searchRequestDIAL);
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.DIALING_DIALER.name()));
 
             /*
              *   Search by HOLD
              * */
-            SearchRequest searchRequestHOLD = new SearchRequest();
-            searchRequestTALKING.indices(index);
-            SearchSourceBuilder searchBuilderHOLD = new SearchSourceBuilder();
-            AbstractQueryBuilder abstractQueryBuilderHOLD = QueryBuilders.matchQuery("interactionStats.state.keyword", InteractionState.HOLD.name());
-            ValueCountAggregationBuilder aggregationBuildersHOLD = AggregationBuilders.count(InteractionState.HOLD.name()).field("interactionStats.state.keyword");
-            searchBuilderHOLD.query(abstractQueryBuilderHOLD).aggregation(aggregationBuildersHOLD);
-            searchRequestHOLD.source(searchBuilderHOLD);
-            request.add(searchRequestHOLD);
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.HOLD.name()));
 
             /*
              *   Search by ACW
              * */
-            SearchRequest searchRequestACW = new SearchRequest();
-            searchRequestTALKING.indices(index);
-            SearchSourceBuilder searchBuilderACW = new SearchSourceBuilder();
-            AbstractQueryBuilder abstractQueryBuilderACW = QueryBuilders.matchQuery("interactionStats.state.keyword", InteractionState.AFTER_CALL_WORK.name());
-            ValueCountAggregationBuilder aggregationBuildersACW = AggregationBuilders.count(InteractionState.AFTER_CALL_WORK.name()).field("interactionStats.state.keyword");
-            searchBuilderACW.query(abstractQueryBuilderACW).aggregation(aggregationBuildersACW);
-            searchRequestACW.source(searchBuilderACW);
-            request.add(searchRequestACW);
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.AFTER_CALL_WORK.name()));
 
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);
@@ -119,5 +88,20 @@ public class ESWidgetInteractionStatsRepository extends ESRepository {
             }
         }
         return res;
+    }
+
+    private SearchRequest makeSearchFilterByRangeCampaignIdInteractionState(String index, String campaignId, String state) {
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.indices(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQueryBuilder query = QueryBuilders.boolQuery()
+                .filter(QueryBuilders.rangeQuery("date.keyword").gte("13/07/2018 12:58").lte("13/07/2018 12:59"))
+                .filter(QueryBuilders.matchQuery("interactionStats.state.keyword", state))
+                .filter(QueryBuilders.matchQuery("interactionStats.campaignId", campaignId));
+        ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count(state).field("interactionStats.state.keyword");
+        searchSourceBuilder.query(query).aggregation(aggregationBuildersTotal);
+        searchRequest.source(searchSourceBuilder);
+
+        return searchRequest;
     }
 }
