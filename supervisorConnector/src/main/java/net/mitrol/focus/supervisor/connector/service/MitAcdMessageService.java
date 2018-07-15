@@ -1,9 +1,9 @@
 package net.mitrol.focus.supervisor.connector.service;
 
+import net.mitrol.focus.supervisor.common.util.ESUtil;
 import net.mitrol.focus.supervisor.connector.dto.*;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.models.*;
-import net.mitrol.utils.DateTimeUtils;
 import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
@@ -83,59 +83,50 @@ public class MitAcdMessageService {
 
     public void generateCampaignDailyStats(CampaignDailyStats campaignDailyStats) {
         CampaignDailyStatsDTO campaignDailyStatsDTO = new CampaignDailyStatsDTO();
-        campaignDailyStatsDTO.setDate(getDateNowValue());
+        campaignDailyStatsDTO.setDate(ESUtil.getESDateNowValue());
         campaignDailyStatsDTO.setCampaignDailyStats(campaignDailyStats);
-        esService.buildDocumentIndex(campaignDailyStatsDTO, getIndexDateValue(index_campaign_daily), index_type, "");
+        esService.buildDocumentIndex(campaignDailyStatsDTO, ESUtil.getESIndexNameDateValue(index_campaign_daily), index_type, "");
     }
 
     public void generateSplitDailyStats(SplitDailyStats splitDailyStats) {
         SplitDailyStatsDTO splitDailyStatsDTO = new SplitDailyStatsDTO();
-        splitDailyStatsDTO.setDate(getDateNowValue());
+        splitDailyStatsDTO.setDate(ESUtil.getESDateNowValue());
         splitDailyStatsDTO.setSplitDailyStats(splitDailyStats);
-        esService.buildDocumentIndex(splitDailyStatsDTO, getIndexDateValue(index_split_daily), index_type, "");
+        esService.buildDocumentIndex(splitDailyStatsDTO, ESUtil.getESIndexNameDateValue(index_split_daily), index_type, "");
     }
 
     public void generateSplitIntervalStats(SplitIntervalStats splitIntervalStats) {
         SplitIntervalStatsDTO splitIntervalStatsDTO = new SplitIntervalStatsDTO();
-        splitIntervalStatsDTO.setDate(getDateNowValue());
+        splitIntervalStatsDTO.setDate(ESUtil.getESDateNowValue());
         splitIntervalStatsDTO.setSplitIntervalStats(splitIntervalStats);
-        esService.buildDocumentIndex(splitIntervalStatsDTO, getIndexDateValue(index_split_interval), index_type, "");
+        esService.buildDocumentIndex(splitIntervalStatsDTO, ESUtil.getESIndexNameDateValue(index_split_interval), index_type, "");
     }
 
     public void generateCampaignIntervalStats(CampaignIntervalStats campaignIntervalStats) {
         CampaignIntervalStatsDTO campaignIntervalStatsDTO = new CampaignIntervalStatsDTO();
-        campaignIntervalStatsDTO.setDate(getDateNowValue());
+        campaignIntervalStatsDTO.setDate(ESUtil.getESDateNowValue());
         campaignIntervalStatsDTO.setCampaignIntervalStats(campaignIntervalStats);
-        esService.buildDocumentIndex(campaignIntervalStatsDTO, getIndexDateValue(index_campaign_interval), index_type, "");
+        esService.buildDocumentIndex(campaignIntervalStatsDTO, ESUtil.getESIndexNameDateValue(index_campaign_interval), index_type, "");
     }
 
     public void generateAgentIntervalStats(AgentIntervalStats agentIntervalStats) {
         AgentIntervalStatsDTO agentIntervalStatsDTO = new AgentIntervalStatsDTO();
-        agentIntervalStatsDTO.setDate(getDateNowValue());
+        agentIntervalStatsDTO.setDate(ESUtil.getESDateNowValue());
         agentIntervalStatsDTO.setAgentIntervalStats(agentIntervalStats);
-        esService.buildDocumentIndex(agentIntervalStatsDTO, getIndexDateValue(index_agent_interval), index_type, "");
+        esService.buildDocumentIndex(agentIntervalStatsDTO, ESUtil.getESIndexNameDateValue(index_agent_interval), index_type, "");
     }
 
     public void generateAgentDailyStats(AgentDailyStats agentDailyStats) {
         AgentDailyStatsDTO agentDailyStatsDTO = new AgentDailyStatsDTO();
-        agentDailyStatsDTO.setDate(getDateNowValue());
+        agentDailyStatsDTO.setDate(ESUtil.getESDateNowValue());
         agentDailyStatsDTO.setAgentDailyStats(agentDailyStats);
-        esService.buildDocumentIndex(agentDailyStatsDTO, getIndexDateValue(index_agent_daily), index_type, "");
+        esService.buildDocumentIndex(agentDailyStatsDTO, ESUtil.getESIndexNameDateValue(index_agent_daily), index_type, "");
     }
 
     public void generateInteractionStats(InteractionStats interactionStats) {
         InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
+        interactionStatsDTO.setDate(ESUtil.getESDateNowValue());
         interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue(index_interaction), index_type, "");
-    }
-
-    private String getIndexDateValue (String indexName){
-        String today = DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_FORMAT);
-        return indexName + "_" + today.replaceAll("/", "-");
-    }
-
-    private String getDateNowValue() {
-        return DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT);
+        esService.buildDocumentIndex(interactionStatsDTO, ESUtil.getESIndexNameDateValue(index_interaction), index_type, "");
     }
 }
