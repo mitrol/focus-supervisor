@@ -450,7 +450,7 @@ public class ElasticsearchTest{
     @Test
     @Ignore
     public void shouldBeSearchMultipleWidget() {
-        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStatsByCampaign("interactionstats_13-07-2018", "sd");
+        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStatsByCampaign("13-07-2018", "10");
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }
