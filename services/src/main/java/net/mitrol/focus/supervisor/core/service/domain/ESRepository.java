@@ -33,13 +33,14 @@ import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Repository
 public abstract class ESRepository {
 
     protected static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);

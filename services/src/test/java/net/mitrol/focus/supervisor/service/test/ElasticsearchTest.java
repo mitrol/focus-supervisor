@@ -1,7 +1,8 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
-import net.mitrol.focus.supervisor.core.service.domain.ESWidgetInteractionStatsRepository;
+import net.mitrol.focus.supervisor.core.service.ESInteractionStatsService;
+import net.mitrol.focus.supervisor.core.service.domain.ESInteractionStatsRepository;
 import net.mitrol.focus.supervisor.models.AgentState;
 import net.mitrol.focus.supervisor.models.InteractionState;
 import net.mitrol.focus.supervisor.models.InteractionStats;
@@ -12,7 +13,6 @@ import net.mitrol.focus.supervisor.service.test.model.Vendedor;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.utils.DateTimeUtils;
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -38,7 +38,7 @@ public class ElasticsearchTest{
     private ESHighLevelClientService esService;
 
     @Autowired
-    private ESWidgetInteractionStatsRepository esWidgetInteractionStatsRepository;
+    private ESInteractionStatsService esInteractionStatsService;
 
     private String index;
     private String type;
@@ -450,7 +450,7 @@ public class ElasticsearchTest{
     @Test
     @Ignore
     public void shouldBeSearchMultipleWidget() {
-        List<HashMap> resultInteractionStatsFilter = esWidgetInteractionStatsRepository.findInteractionStatsByCampaign("interactionstats_13-07-2018", "sd");
+        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStatsByCampaign("interactionstats_13-07-2018", "sd");
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }
