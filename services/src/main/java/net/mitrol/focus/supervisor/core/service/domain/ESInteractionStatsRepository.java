@@ -24,7 +24,13 @@ import java.util.List;
 @Repository
 public class ESInteractionStatsRepository extends ESRepository {
 
-    private static final String SEPARATOR = "_";
+    private static final String SEPARATOR = "-";
+
+    /**
+     * This String is used to try search with pattern indexes
+     * Ex: index_interaction + SEPARATOR + SEARCH_ALL_INDEX to set in indices in searchRequest
+     * */
+    private static final String SEARCH_ALL_INDEX = "*";
 
     @Value("${index.interaction.stats}")
     private String index_interaction;
@@ -41,17 +47,17 @@ public class ESInteractionStatsRepository extends ESRepository {
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by TALKING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.TALKING.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.TALKING.name()));
             /*Search by RINGING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.RINGING.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.RINGING.name()));
             /*Search by PREVIEW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.PREVIEW.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.PREVIEW.name()));
             /*Search by DIAL*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.DIALING_DIALER.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.DIALING_DIALER.name()));
             /*Search by HOLD*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.HOLD.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.HOLD.name()));
             /*Search by ACW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + date, campaignId, InteractionState.AFTER_CALL_WORK.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.AFTER_CALL_WORK.name()));
 
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);

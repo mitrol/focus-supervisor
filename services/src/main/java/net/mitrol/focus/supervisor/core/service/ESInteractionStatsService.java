@@ -15,7 +15,6 @@ public class ESInteractionStatsService {
     ESInteractionStatsRepository stateRepository;
 
     public List<HashMap> countInteractionStatsByCampaign(String index, String campaignId) {
-        Validate.notNull(index, "index name must be not null");
         Validate.notNull(campaignId,  "campaignId must be not null");
         return stateRepository.countInteractionStatsByCampaign(index, campaignId);
     }
