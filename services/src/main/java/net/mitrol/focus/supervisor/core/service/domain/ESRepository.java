@@ -32,7 +32,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -96,6 +95,37 @@ public abstract class ESRepository {
             return response.getId();
         } catch ( ElasticsearchException  | IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
+        }
+    }
+
+    /**
+     * Update an index document in Elasticsesarch
+     *
+     * @param data document to insert
+     * @param index
+     * @param type document
+     * @param id document
+     * @return id created
+     */
+    public void upsertDocumentIndexAsync(Object data , String index, String type, String id) {
+        UpdateRequest updateRequest = new UpdateRequest(index, type, id).docAsUpsert(true);
+        try {
+            byte[] json = MAPPER.writeValueAsBytes(data);
+            updateRequest.doc(json, XContentType.JSON);
+            restHighLevelClient.updateAsync(updateRequest, new ActionListener<UpdateResponse>() {
+                @Override
+                public void onResponse(UpdateResponse updateResponse) {
+                    log.debug("Index upsert in Elasticsearch: " + updateResponse.getId());
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    throw new MitrolSupervisorError("Unable to upsert an index in Elasticsearch", e);
+
+                }
+            });
+        } catch (IOException e){
+            throw new MitrolSupervisorError("Unable to do an upsert in Elasticsearch", e);
         }
     }
 
@@ -230,26 +260,6 @@ public abstract class ESRepository {
             return getMultipleSearchAggregation(multiSearchResponse, valueType);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
-        }
-    }
-
-    /**
-     * Update an index document in Elasticsesarch
-     *
-     * @param data document to insert
-     * @param index
-     * @param type document
-     * @param id document
-     * @return data source updated
-     */
-    public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id) {
-        UpdateRequest updateRequest = new UpdateRequest(index, type, id).fetchSource(true);// Fetch Object after its update
-        try {
-            updateRequest.doc(data, XContentType.JSON);
-            UpdateResponse updateResponse = restHighLevelClient.update(updateRequest);
-            return updateResponse.getGetResult().sourceAsMap();
-        } catch (IOException e){
-            throw new MitrolSupervisorError("Unable to do an update in Elasticsearch", e);
         }
     }
 
