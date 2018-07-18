@@ -3,6 +3,7 @@ package net.mitrol.focus.supervisor.core.service.domain;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.focus.supervisor.models.InteractionState;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -40,24 +41,28 @@ public class ESInteractionStatsRepository extends ESRepository {
      * @param campaignId to search and filter by id campaign
      * TODO Add range date to search, gte and lte.
      **/
-    public List<HashMap> countInteractionStatsByCampaign(String date, String campaignId) {
-        if(date == null) {
-            return null;
+    public List<HashMap> countInteractionStatsByCampaign(String date, String campaignId, String companyId, String groupId,
+                                                         String agentId, String batchId, boolean searchAllIndex) {
+        StringBuilder indexBuild = new StringBuilder(index_interaction + SEPARATOR + date);
+        if (searchAllIndex) {
+            indexBuild.append(SEARCH_ALL_INDEX);
         }
+        String index = indexBuild.toString();
+
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by TALKING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.TALKING.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.TALKING.name(), companyId, groupId, agentId, batchId));
             /*Search by RINGING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.RINGING.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.RINGING.name(), companyId, groupId, agentId, batchId));
             /*Search by PREVIEW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.PREVIEW.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.PREVIEW.name(), companyId, groupId, agentId, batchId));
             /*Search by DIAL*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.DIALING_DIALER.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.DIALING_DIALER.name(), companyId, groupId, agentId, batchId));
             /*Search by HOLD*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.HOLD.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.HOLD.name(), companyId, groupId, agentId, batchId));
             /*Search by ACW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index_interaction + SEPARATOR + SEARCH_ALL_INDEX, campaignId, InteractionState.AFTER_CALL_WORK.name()));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.AFTER_CALL_WORK.name(), companyId, groupId, agentId, batchId));
 
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);
@@ -69,23 +74,40 @@ public class ESInteractionStatsRepository extends ESRepository {
     private List<HashMap> getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
         List<HashMap> res = Lists.newArrayList();
         for(MultiSearchResponse.Item item : response.getResponses()){
-            for(Aggregation aggregation : item.getResponse().getAggregations()) {
-                HashMap<String, Long> data = new HashMap();
-                data.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
-                res.add(data);
+            if (null != item.getResponse() || null == item.getFailure()) {
+                for(Aggregation aggregation : item.getResponse().getAggregations()) {
+                    HashMap<String, Long> data = new HashMap();
+                    data.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
+                    res.add(data);
+                }
             }
         }
         return res;
     }
 
-    private SearchRequest makeSearchFilterByRangeCampaignIdInteractionState(String index, String campaignId, String state) {
+    private SearchRequest makeSearchFilterByRangeCampaignIdInteractionState(String index, String campaignId, String state, String companyId,
+                                                                            String groupId, String agentId, String batchId) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        BoolQueryBuilder query = QueryBuilders.boolQuery()
-                .filter(QueryBuilders.rangeQuery("date.keyword").gte("13/07/2018 12:58").lte("13/07/2018 12:59"))
-                .filter(QueryBuilders.matchQuery("interactionStats.state.keyword", state))
-                .filter(QueryBuilders.matchQuery("interactionStats.campaignId", campaignId));
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
+        if (!StringUtils.isEmpty(campaignId)) {
+            query.filter(QueryBuilders.matchQuery("interactionStats.campaignId", campaignId));
+        }
+        if (!StringUtils.isEmpty(groupId)) {
+            query.filter(QueryBuilders.matchQuery("interactionStats.groupId", groupId));
+        }
+        if (!StringUtils.isEmpty(companyId)) {
+            query.filter(QueryBuilders.matchQuery("interactionStats.companyId", companyId));
+        }
+        if (!StringUtils.isEmpty(agentId)) {
+            query.filter(QueryBuilders.matchQuery("interactionStats.agentId", agentId));
+        }
+        if (!StringUtils.isEmpty(batchId)) {
+            query.filter(QueryBuilders.matchQuery("interactionStats.batchId", batchId));
+        }
+
+        query.filter(QueryBuilders.matchQuery("interactionStats.state.keyword", state));
         ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count(state).field("interactionStats.state.keyword");
         searchSourceBuilder.query(query).aggregation(aggregationBuildersTotal);
         searchRequest.source(searchSourceBuilder);

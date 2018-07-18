@@ -14,9 +14,10 @@ public class ESInteractionStatsService {
     @Autowired
     ESInteractionStatsRepository stateRepository;
 
-    public List<HashMap> countInteractionStatsByCampaign(String index, String campaignId) {
+    public List<HashMap> countInteractionStatsByCampaign(String index, String campaignId, String companyId, String groupId,
+                                                         String agentId, String batchId, boolean searchAllIndex) {
         Validate.notNull(campaignId,  "campaignId must be not null");
-        return stateRepository.countInteractionStatsByCampaign(index, campaignId);
+        return stateRepository.countInteractionStatsByCampaign(index, campaignId, companyId, groupId, agentId, batchId, searchAllIndex);
     }
 
 }
