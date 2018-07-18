@@ -30,6 +30,10 @@ public class ESHighLevelClientService {
         return esRepository.buildDocumentIndex(object, index, type, id);
     }
 
+    public void upsertDocumentIndexAsync(Object object, String index, String type, String id) {
+        esRepository.upsertDocumentIndexAsync(object, index, type, id);
+    }
+
     public Map<String, Object> searchDataByParam(String index, String type, String id) {
         return esRepository.searchDataByParam(index, type, id);
     }
@@ -48,10 +52,6 @@ public class ESHighLevelClientService {
 
     public <T> List<T> multipleSearchDataByQueryAndAggregation(String index, String type, Class<T> valueType, List<SearchSourceBuilder> searchSourceBuilders) {
         return esRepository.multipleSearchDataByQueryAndAggregation(index, type, valueType, searchSourceBuilders);
-    }
-
-    public Map<String, Object> updateDataByParam(Map<String, Object> data, String index, String type, String id){
-        return esRepository.updateDataByParam(data, index, type, id);
     }
 
     public void deleteDataByParam(String index, String type, String id) {
