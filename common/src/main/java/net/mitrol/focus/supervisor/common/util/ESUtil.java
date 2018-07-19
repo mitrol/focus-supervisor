@@ -12,7 +12,7 @@ import java.time.Instant;
 public class ESUtil {
 
     public static String getESIndexNameDateValue (String name){
-        String now = DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_FORMAT);
+        String now = DateTimeUtils.getStringFromInstant(Instant.now(), "yyyy/MM/dd"/*DateTimeUtils.MITROL_DATE_FORMAT*/);
         return name + "-" + now.replaceAll("/", ".");
     }
 

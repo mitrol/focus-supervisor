@@ -2,7 +2,6 @@ package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.core.service.ESInteractionStatsService;
-import net.mitrol.focus.supervisor.core.service.domain.ESInteractionStatsRepository;
 import net.mitrol.focus.supervisor.models.AgentState;
 import net.mitrol.focus.supervisor.models.InteractionState;
 import net.mitrol.focus.supervisor.models.InteractionStats;
@@ -448,10 +447,9 @@ public class ElasticsearchTest{
     }
 
     @Test
-    @Ignore
     public void shouldBeSearchMultipleWidget() {
-        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStatsByCampaign("13-07-2018", "10", "", null,
-                                                                                                        null, null, false);
+        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("", "10", "", null,
+                                                                                                        null, null, true);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }

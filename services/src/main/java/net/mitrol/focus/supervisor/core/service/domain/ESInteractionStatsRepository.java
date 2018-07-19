@@ -36,13 +36,13 @@ public class ESInteractionStatsRepository extends ESRepository {
     @Value("${index.interaction.stats}")
     private String index_interaction;
 
-    /**
-     * @param date format dd-mm-YYYY
+    /** batchId por splitId
+     * @param date format YYYY-mm-dd
      * @param campaignId to search and filter by id campaign
      * TODO Add range date to search, gte and lte.
      **/
-    public List<HashMap> countInteractionStatsByCampaign(String date, String campaignId, String companyId, String groupId,
-                                                         String agentId, String batchId, boolean searchAllIndex) {
+    public List<HashMap> countInteractionStats(String date, String campaignId, String companyId, String groupId,
+                                               String agentId, String splitId, boolean searchAllIndex) {
         StringBuilder indexBuild = new StringBuilder(index_interaction + SEPARATOR + date);
         if (searchAllIndex) {
             indexBuild.append(SEARCH_ALL_INDEX);
@@ -52,17 +52,17 @@ public class ESInteractionStatsRepository extends ESRepository {
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by TALKING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.TALKING.name(), companyId, groupId, agentId, batchId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.TALKING.name(), companyId, groupId, agentId, splitId));
             /*Search by RINGING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.RINGING.name(), companyId, groupId, agentId, batchId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.RINGING.name(), companyId, groupId, agentId, splitId));
             /*Search by PREVIEW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.PREVIEW.name(), companyId, groupId, agentId, batchId));
-            /*Search by DIAL*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.DIALING_DIALER.name(), companyId, groupId, agentId, batchId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.PREVIEW.name(), companyId, groupId, agentId, splitId));
+            /*Search DIAL by Agente*/
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.DIALING_AGENT.name(), companyId, groupId, agentId, splitId));
             /*Search by HOLD*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.HOLD.name(), companyId, groupId, agentId, batchId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.HOLD.name(), companyId, groupId, agentId, splitId));
             /*Search by ACW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.AFTER_CALL_WORK.name(), companyId, groupId, agentId, batchId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.AFTER_CALL_WORK.name(), companyId, groupId, agentId, splitId));
 
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);
@@ -86,7 +86,7 @@ public class ESInteractionStatsRepository extends ESRepository {
     }
 
     private SearchRequest makeSearchFilterByRangeCampaignIdInteractionState(String index, String campaignId, String state, String companyId,
-                                                                            String groupId, String agentId, String batchId) {
+                                                                            String splitId, String agentId, String batchId) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -94,8 +94,8 @@ public class ESInteractionStatsRepository extends ESRepository {
         if (!StringUtils.isEmpty(campaignId)) {
             query.filter(QueryBuilders.matchQuery("interactionStats.campaignId", campaignId));
         }
-        if (!StringUtils.isEmpty(groupId)) {
-            query.filter(QueryBuilders.matchQuery("interactionStats.groupId", groupId));
+        if (!StringUtils.isEmpty(splitId)) {
+            query.filter(QueryBuilders.matchQuery("interactionStats.groupId", splitId));
         }
         if (!StringUtils.isEmpty(companyId)) {
             query.filter(QueryBuilders.matchQuery("interactionStats.companyId", companyId));
