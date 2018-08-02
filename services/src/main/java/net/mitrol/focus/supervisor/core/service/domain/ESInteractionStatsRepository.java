@@ -1,8 +1,8 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
 import com.google.common.collect.Lists;
+import net.mitrol.ct.api.enums.InteractionState;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
-import net.mitrol.focus.supervisor.models.InteractionState;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
@@ -52,17 +52,17 @@ public class ESInteractionStatsRepository extends ESRepository {
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by TALKING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.TALKING.name(), companyId, groupId, agentId, splitId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Talking.name(), companyId, groupId, agentId, splitId));
             /*Search by RINGING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.RINGING.name(), companyId, groupId, agentId, splitId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Ringing.name(), companyId, groupId, agentId, splitId));
             /*Search by PREVIEW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.PREVIEW.name(), companyId, groupId, agentId, splitId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Preview.name(), companyId, groupId, agentId, splitId));
             /*Search DIAL by Agente*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.DIALING_AGENT.name(), companyId, groupId, agentId, splitId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.DialingAgente.name(), companyId, groupId, agentId, splitId));
             /*Search by HOLD*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.HOLD.name(), companyId, groupId, agentId, splitId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Hold.name(), companyId, groupId, agentId, splitId));
             /*Search by ACW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.AFTER_CALL_WORK.name(), companyId, groupId, agentId, splitId));
+            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.AfterCallWork.name(), companyId, groupId, agentId, splitId));
 
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);

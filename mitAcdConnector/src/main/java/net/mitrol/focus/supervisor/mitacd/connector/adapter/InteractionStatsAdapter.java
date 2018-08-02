@@ -1,7 +1,7 @@
 package net.mitrol.focus.supervisor.mitacd.connector.adapter;
 
+import net.mitrol.ct.api.enums.InteractionState;
 import net.mitrol.focus.supervisor.mitacd.connector.util.MitAcdUtils;
-import net.mitrol.focus.supervisor.models.InteractionState;
 import net.mitrol.focus.supervisor.models.InteractionStats;
 import net.mitrol.utils.entities.SockMessage;
 

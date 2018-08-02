@@ -1,9 +1,9 @@
 package net.mitrol.focus.supervisor.service.test;
 
+import net.mitrol.ct.api.enums.AgentState;
+import net.mitrol.ct.api.enums.InteractionState;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.core.service.ESInteractionStatsService;
-import net.mitrol.focus.supervisor.models.AgentState;
-import net.mitrol.focus.supervisor.models.InteractionState;
 import net.mitrol.focus.supervisor.models.InteractionStats;
 import net.mitrol.focus.supervisor.service.test.model.DTO.InteractionStatsDTO;
 import net.mitrol.focus.supervisor.service.test.model.Direccion;
@@ -223,7 +223,7 @@ public class ElasticsearchTest{
         vendedor.setDate(DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT));
 
         Map<AgentState, Duration> agentStateDurations = new HashMap<>();
-        agentStateDurations.put(AgentState.NOT_READY, Duration.ofHours(1));
+        agentStateDurations.put(AgentState.NotReady, Duration.ofHours(1));
         vendedor.setAgentStateDurations(agentStateDurations);
 
         String id_created = esService.buildDocumentIndex(vendedor, vendedor_index, type, "");
@@ -256,7 +256,7 @@ public class ElasticsearchTest{
     public void shouldBeSaveInteractionStatsToTestInElasticPREVIEWSTATE() {
         InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2)
                 , new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.PREVIEW, Duration.ofSeconds(2500),
+                new Integer(2), InteractionState.Preview, Duration.ofSeconds(2500),
                  "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 new Integer(1), Boolean.TRUE, 1);
 
@@ -271,7 +271,7 @@ public class ElasticsearchTest{
     public void shouldBeSaveInteractionStatsToTestInElasticTALKINGSTATE() {
         InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
                 new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.TALKING, Duration.ofSeconds(2500),
+                new Integer(2), InteractionState.Talking, Duration.ofSeconds(2500),
                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 new Integer(1), Boolean.TRUE, 1);
 
@@ -286,7 +286,7 @@ public class ElasticsearchTest{
     public void shouldBeSaveInteractionStatsToTestInElasticDIALSTATE() {
         InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
                 new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.DIALING_DIALER, Duration.ofSeconds(2500),
+                new Integer(2), InteractionState.DialingDiscador, Duration.ofSeconds(2500),
                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 new Integer(1), Boolean.TRUE, 1);
 
@@ -301,7 +301,7 @@ public class ElasticsearchTest{
     public void shouldBeSaveInteractionStatsToTestInElasticRINGSTATE() {
         InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
                 new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.RINGING, Duration.ofSeconds(2500),
+                new Integer(2), InteractionState.Ringing, Duration.ofSeconds(2500),
                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 new Integer(1), Boolean.TRUE, 1);
 
@@ -316,7 +316,7 @@ public class ElasticsearchTest{
     public void shouldBeSaveInteractionStatsToTestInElasticHOLDSTATE() {
         InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
                 new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.HOLD, Duration.ofSeconds(2500),
+                new Integer(2), InteractionState.Hold, Duration.ofSeconds(2500),
                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 new Integer(1), Boolean.TRUE, 1);
 
@@ -331,7 +331,7 @@ public class ElasticsearchTest{
     public void shouldBeSaveInteractionStatsToTestInElasticACWSTATE() {
         InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(77),
                 new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.AFTER_CALL_WORK, Duration.ofSeconds(2500),
+                new Integer(2), InteractionState.AfterCallWork, Duration.ofSeconds(2500),
                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 new Integer(1), Boolean.TRUE, 1);
 

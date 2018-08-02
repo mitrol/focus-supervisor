@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import net.mitrol.focus.supervisor.models.AgentState;
+import net.mitrol.ct.api.enums.AgentState;
 import net.mitrol.focus.supervisor.service.test.model.jacksonn.VendedorDeserializer;
 
 import java.io.Serializable;
