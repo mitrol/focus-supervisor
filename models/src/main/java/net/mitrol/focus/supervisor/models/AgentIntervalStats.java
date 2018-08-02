@@ -1,5 +1,7 @@
 package net.mitrol.focus.supervisor.models;
 
+import net.mitrol.ct.api.enums.AgentState;
+
 import java.time.Duration;
 
 public class AgentIntervalStats {

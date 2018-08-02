@@ -1,5 +1,7 @@
 package net.mitrol.focus.supervisor.models;
 
+import net.mitrol.ct.api.enums.AgentState;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,25 +37,25 @@ public class AgentAccumulator {
                              Integer otherResolutions, Integer successfulResolutions, Integer unsuccessfulResolutions, Integer ineffectiveResolutions, Integer neutralResolutions) {
 
         agentStateDurations = new HashMap<>();
-        agentStateDurations.put(AgentState.UNSTAFFED, unstaffed);
-        agentStateDurations.put(AgentState.AVAIL, avail);
-        agentStateDurations.put(AgentState.PREVIEW, preview);
-        agentStateDurations.put(AgentState.DIAL, dial);
-        agentStateDurations.put(AgentState.RING, ring);
-        agentStateDurations.put(AgentState.CONNECT, connect);
-        agentStateDurations.put(AgentState.HOLD, hold);
-        agentStateDurations.put(AgentState.AFTER_CALL_WORK, afterCallWork);
-        agentStateDurations.put(AgentState.NOT_READY, notReady);
-        agentStateDurations.put(AgentState.BREAK_0, break0);
-        agentStateDurations.put(AgentState.BREAK_1, break1);
-        agentStateDurations.put(AgentState.BREAK_2, break2);
-        agentStateDurations.put(AgentState.BREAK_3, break3);
-        agentStateDurations.put(AgentState.BREAK_4, break4);
-        agentStateDurations.put(AgentState.BREAK_5, break5);
-        agentStateDurations.put(AgentState.BREAK_6, break6);
-        agentStateDurations.put(AgentState.BREAK_7, break7);
-        agentStateDurations.put(AgentState.BREAK_8, break8);
-        agentStateDurations.put(AgentState.BREAK_9, break9);
+        agentStateDurations.put(AgentState.Unstaffed, unstaffed);
+        agentStateDurations.put(AgentState.Avail, avail);
+        agentStateDurations.put(AgentState.Preview, preview);
+        agentStateDurations.put(AgentState.Dial, dial);
+        agentStateDurations.put(AgentState.Ring, ring);
+        agentStateDurations.put(AgentState.Connect, connect);
+        agentStateDurations.put(AgentState.Hold, hold);
+        agentStateDurations.put(AgentState.AfterCallWork, afterCallWork);
+        agentStateDurations.put(AgentState.NotReady, notReady);
+        agentStateDurations.put(AgentState.Break0, break0);
+        agentStateDurations.put(AgentState.Break1, break1);
+        agentStateDurations.put(AgentState.Break2, break2);
+        agentStateDurations.put(AgentState.Break3, break3);
+        agentStateDurations.put(AgentState.Break4, break4);
+        agentStateDurations.put(AgentState.Break5, break5);
+        agentStateDurations.put(AgentState.Break6, break6);
+        agentStateDurations.put(AgentState.Break7, break7);
+        agentStateDurations.put(AgentState.Break8, break8);
+        agentStateDurations.put(AgentState.Break9, break9);
         agentStateDurations = Collections.unmodifiableMap(agentStateDurations);
 
         this.login = login;

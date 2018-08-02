@@ -1,5 +1,7 @@
 package net.mitrol.focus.supervisor.models;
 
+import net.mitrol.ct.api.enums.InteractionState;
+
 import java.time.Duration;
 
 public class InteractionStats {

@@ -1,5 +1,8 @@
 package net.mitrol.focus.supervisor.models;
 
+import net.mitrol.ct.api.enums.AgentState;
+import net.mitrol.ct.api.enums.InteractionState;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,39 +34,39 @@ public class CampaignTimeAccumulator {
             Integer otherResolutions, Integer successfulResolutions, Integer unsuccessfulResolutions, Integer ineffectiveResolutions, Integer neutralResolutions) {
 
         agentStateDurations = new HashMap<>();
-        agentStateDurations.put(AgentState.UNSTAFFED, agentUnstaffed);
-        agentStateDurations.put(AgentState.AVAIL, agnetAvail);
-        agentStateDurations.put(AgentState.PREVIEW, agentPreview);
-        agentStateDurations.put(AgentState.DIAL, agentDial);
-        agentStateDurations.put(AgentState.RING, agentRing);
-        agentStateDurations.put(AgentState.CONNECT, agentConnect);
-        agentStateDurations.put(AgentState.HOLD, agentHold);
-        agentStateDurations.put(AgentState.AFTER_CALL_WORK, agentAfterCallWork);
-        agentStateDurations.put(AgentState.NOT_READY, agentNotReady);
-        agentStateDurations.put(AgentState.BREAK_0, agentBreak0);
-        agentStateDurations.put(AgentState.BREAK_1, agentBreak1);
-        agentStateDurations.put(AgentState.BREAK_2, agentBreak2);
-        agentStateDurations.put(AgentState.BREAK_3, agentBreak3);
-        agentStateDurations.put(AgentState.BREAK_4, agentBreak4);
-        agentStateDurations.put(AgentState.BREAK_5, agentBreak5);
-        agentStateDurations.put(AgentState.BREAK_6, agentBreak6);
-        agentStateDurations.put(AgentState.BREAK_7, agentBreak7);
-        agentStateDurations.put(AgentState.BREAK_8, agentBreak8);
-        agentStateDurations.put(AgentState.BREAK_9, agentBreak9);
+        agentStateDurations.put(AgentState.Unstaffed, agentUnstaffed);
+        agentStateDurations.put(AgentState.Avail, agnetAvail);
+        agentStateDurations.put(AgentState.Preview, agentPreview);
+        agentStateDurations.put(AgentState.Dial, agentDial);
+        agentStateDurations.put(AgentState.Ring, agentRing);
+        agentStateDurations.put(AgentState.Connect, agentConnect);
+        agentStateDurations.put(AgentState.Hold, agentHold);
+        agentStateDurations.put(AgentState.AfterCallWork, agentAfterCallWork);
+        agentStateDurations.put(AgentState.NotReady, agentNotReady);
+        agentStateDurations.put(AgentState.Break0, agentBreak0);
+        agentStateDurations.put(AgentState.Break1, agentBreak1);
+        agentStateDurations.put(AgentState.Break2, agentBreak2);
+        agentStateDurations.put(AgentState.Break3, agentBreak3);
+        agentStateDurations.put(AgentState.Break4, agentBreak4);
+        agentStateDurations.put(AgentState.Break5, agentBreak5);
+        agentStateDurations.put(AgentState.Break6, agentBreak6);
+        agentStateDurations.put(AgentState.Break7, agentBreak7);
+        agentStateDurations.put(AgentState.Break8, agentBreak8);
+        agentStateDurations.put(AgentState.Break9, agentBreak9);
         agentStateDurations = Collections.unmodifiableMap(agentStateDurations);
 
         interactionStateDuration = new HashMap<>();
-        interactionStateDuration.put(InteractionState.PENDING, interactionPending);
-        interactionStateDuration.put(InteractionState.DIALING_DIALER, interactionDialerDialing);
-        interactionStateDuration.put(InteractionState.ANSWERED, interactionAnswered);
-        interactionStateDuration.put(InteractionState.PREVIEW, interactionPreview);
-        interactionStateDuration.put(InteractionState.DIALING_AGENT, interactionDialerAgent);
-        interactionStateDuration.put(InteractionState.RINGING, interactionRinging);
-        interactionStateDuration.put(InteractionState.TALKING, interactionTalking);
-        interactionStateDuration.put(InteractionState.HOLD, interactionHold);
-        interactionStateDuration.put(InteractionState.AFTER_CALL_WORK, interactionAfterCallWork);
-        interactionStateDuration.put(InteractionState.QUEUED, interactionQueued);
-        interactionStateDuration.put(InteractionState.TRANSFERRED, interactionTransferred);
+        interactionStateDuration.put(InteractionState.Pending, interactionPending);
+        interactionStateDuration.put(InteractionState.DialingDiscador, interactionDialerDialing);
+        interactionStateDuration.put(InteractionState.Answered, interactionAnswered);
+        interactionStateDuration.put(InteractionState.Preview, interactionPreview);
+        interactionStateDuration.put(InteractionState.DialingAgente, interactionDialerAgent);
+        interactionStateDuration.put(InteractionState.Ringing, interactionRinging);
+        interactionStateDuration.put(InteractionState.Talking, interactionTalking);
+        interactionStateDuration.put(InteractionState.Hold, interactionHold);
+        interactionStateDuration.put(InteractionState.AfterCallWork, interactionAfterCallWork);
+        interactionStateDuration.put(InteractionState.EnCola, interactionQueued);
+        interactionStateDuration.put(InteractionState.Transferida, interactionTransferred);
         interactionStateDuration = Collections.unmodifiableMap(interactionStateDuration);
 
         this.login = login;

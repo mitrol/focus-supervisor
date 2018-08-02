@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.models.webhooks;
 
-import net.mitrol.focus.supervisor.models.AgentState;
+import net.mitrol.ct.api.enums.AgentState;
 
 import java.util.Date;
 
