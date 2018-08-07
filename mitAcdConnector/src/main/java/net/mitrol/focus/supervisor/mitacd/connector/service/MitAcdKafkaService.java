@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class MitAcdKafkaService {
 
+    private final KafkaSender kafkaSender;
     @Value("${kafka.topics}")
     private String kafka_topic;
-
-    private final KafkaSender kafkaSender;
 
     @Autowired
     public MitAcdKafkaService(KafkaSender kafkaSender) {

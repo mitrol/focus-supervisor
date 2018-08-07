@@ -15,7 +15,7 @@ public class WebhookController {
     private WebhookService webhookService;
 
     @RequestMapping(method = RequestMethod.POST)
-    public void webhookMitAcd(@RequestBody String data) {
-        webhookService.buildWebhookData(data);
+    public void receiveEvent(@RequestBody String data) {
+        webhookService.processEvent(data);
     }
 }

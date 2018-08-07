@@ -1,15 +1,12 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.ct.api.enums.AgentState;
-import net.mitrol.ct.api.enums.InteractionState;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.core.service.ESInteractionStatsService;
-import net.mitrol.focus.supervisor.models.InteractionStats;
-import net.mitrol.focus.supervisor.service.test.model.DTO.InteractionStatsDTO;
+import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.focus.supervisor.service.test.model.Direccion;
 import net.mitrol.focus.supervisor.service.test.model.User;
 import net.mitrol.focus.supervisor.service.test.model.Vendedor;
-import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.utils.DateTimeUtils;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -27,11 +24,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={ TestConfig.class })
-public class ElasticsearchTest{
+@ContextConfiguration(classes = {TestConfig.class})
+public class ElasticsearchTest {
 
     @Autowired
     private ESHighLevelClientService esService;
@@ -165,8 +165,8 @@ public class ElasticsearchTest{
     }
 
     /*
-    * Test to working search for like as LIKE "%etc%"
-    * */
+     * Test to working search for like as LIKE "%etc%"
+     * */
     @Test
     @Ignore
     public void shouldBeSearchByMatchPhrases() {
@@ -253,137 +253,6 @@ public class ElasticsearchTest{
 
     @Test
     @Ignore
-    public void shouldBeSaveInteractionStatsToTestInElasticPREVIEWSTATE() {
-        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2)
-                , new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.Preview, Duration.ofSeconds(2500),
-                 "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
-                new Integer(1), Boolean.TRUE, 1);
-
-        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
-        interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSaveInteractionStatsToTestInElasticTALKINGSTATE() {
-        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
-                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.Talking, Duration.ofSeconds(2500),
-                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
-                new Integer(1), Boolean.TRUE, 1);
-
-        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
-        interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSaveInteractionStatsToTestInElasticDIALSTATE() {
-        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
-                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.DialingDiscador, Duration.ofSeconds(2500),
-                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
-                new Integer(1), Boolean.TRUE, 1);
-
-        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
-        interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSaveInteractionStatsToTestInElasticRINGSTATE() {
-        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
-                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.Ringing, Duration.ofSeconds(2500),
-                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
-                new Integer(1), Boolean.TRUE, 1);
-
-        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
-        interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSaveInteractionStatsToTestInElasticHOLDSTATE() {
-        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(2),
-                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.Hold, Duration.ofSeconds(2500),
-                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
-                new Integer(1), Boolean.TRUE, 1);
-
-        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
-        interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSaveInteractionStatsToTestInElasticACWSTATE() {
-        InteractionStats interactionStats = new InteractionStats(new Integer(25), new Integer(77),
-                new Integer(5), new Integer(10), new Integer(1), new Integer(2),
-                new Integer(2), InteractionState.AfterCallWork, Duration.ofSeconds(2500),
-                "DALE", "2", new Integer(23), new Integer(1), Boolean.TRUE, Boolean.TRUE, Duration.ofSeconds(4000), Duration.ofSeconds(9000), Duration.ofSeconds(3500), Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
-                new Integer(1), Boolean.TRUE, 1);
-
-        InteractionStatsDTO interactionStatsDTO = new InteractionStatsDTO();
-        interactionStatsDTO.setDate(getDateNowValue());
-        interactionStatsDTO.setInteractionStats(interactionStats);
-        esService.buildDocumentIndex(interactionStatsDTO, getIndexDateValue("interactionstats"), type, "");
-    }
-
-    private String getIndexDateValue (String indexName){
-        String today = DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_FORMAT);
-        return indexName + "_" + today.replaceAll("/", "-");
-    }
-
-    private String getDateNowValue() {
-        return DateTimeUtils.getStringFromInstant(Instant.now(), DateTimeUtils.MITROL_DATE_HOUR_FORMAT);
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSearchInteraction() {
-        AbstractQueryBuilder a = QueryBuilders.matchAllQuery();
-        List<InteractionStatsDTO> result = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, a);
-        Assert.assertNotNull(result);
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSearchByQueries() {
-        QueryStringQueryBuilder queryVendedor = QueryBuilders.queryStringQuery("SELECT * FROM vendedor_index");
-        List<Vendedor> resultVendedor = esService.searchDataByQuery(vendedor_index, type, Vendedor.class, queryVendedor);
-        Assert.assertNotNull(resultVendedor);
-
-        QueryStringQueryBuilder queryInteractionStats = QueryBuilders.queryStringQuery("SELECT * FROM interactionstats_12-07-2018");
-        List<InteractionStatsDTO> resultInteractionStats = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, queryInteractionStats);
-        Assert.assertNotNull(resultInteractionStats);
-
-        QueryStringQueryBuilder queryInteractionStatsFilter = QueryBuilders.queryStringQuery("SELECT * FROM interactionstats_12-07-2018 as WHERE as.interactionStats.state = \"talking\" ");
-        List<InteractionStatsDTO> resultInteractionStatsFilter = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, queryInteractionStatsFilter);
-        Assert.assertNotNull(resultInteractionStatsFilter);
-    }
-
-    @Test
-    @Ignore
-    public void shouldBeSearchByQueriesANDWhere() {
-        QueryStringQueryBuilder queryInteractionStatsFilter = QueryBuilders.queryStringQuery("SELECT * FROM interactionstats_12-07-2018 WHERE interactionStats.state= 'TALKING'");//interactionStats.state= 'TALKING'");//interactionStats.state = \"TALKING\" ");
-        List<InteractionStatsDTO> resultInteractionStatsFilter = esService.searchDataByQuery("interactionstats_12-07-2018", type, InteractionStatsDTO.class, queryInteractionStatsFilter);
-        Assert.assertNotNull(resultInteractionStatsFilter);
-    }
-
-    @Test
-    @Ignore
     public void shouldBeSearchByQueriesVendedorANDWhere() {
         QueryStringQueryBuilder queryInteractionStatsFilter = QueryBuilders.queryStringQuery("SELECT * FROM vendedor_index WHERE direccion.localidad: \"Corriente\"");//interactionStats.state= 'TALKING'");//interactionStats.state = \"TALKING\" ");
         List<Vendedor> resultInteractionStatsFilter = esService.searchDataByQuery("vendedor_index", type, Vendedor.class, queryInteractionStatsFilter);
@@ -415,16 +284,16 @@ public class ElasticsearchTest{
     }
 
     /*
-    * List<SearchSourceBuilder> searchSourceBuilders
-    * */
+     * List<SearchSourceBuilder> searchSourceBuilders
+     * */
     @Test
     @Ignore
     public void shouldBeSearchMultipleFirstWidget() {
         List<SearchSourceBuilder> searchSourceBuilders = new ArrayList<>();
 
         /*
-        *   Search by TALKING
-        * */
+         *   Search by TALKING
+         * */
         SearchSourceBuilder searchBuilderTALKING = new SearchSourceBuilder();
         AbstractQueryBuilder abstractQueryBuilder = QueryBuilders.matchQuery("interactionStats.state.keyword", "TALKING");
         ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count("Talking").field("interactionStats.state.keyword");
@@ -449,7 +318,7 @@ public class ElasticsearchTest{
     @Test
     public void shouldBeSearchMultipleWidget() {
         List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("", "10", "", null,
-                                                                                                        null, null, true);
+                null, null, true);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }
