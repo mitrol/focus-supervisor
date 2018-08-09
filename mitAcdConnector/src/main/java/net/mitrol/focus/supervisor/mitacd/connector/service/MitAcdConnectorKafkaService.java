@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-public class MitAcdKafkaService {
+public class MitAcdConnectorKafkaService {
 
     private final KafkaSender kafkaSender;
     @Value("${kafka.topics}")
     private String kafka_topic;
 
     @Autowired
-    public MitAcdKafkaService(KafkaSender kafkaSender) {
+    public MitAcdConnectorKafkaService(KafkaSender kafkaSender) {
         this.kafkaSender = kafkaSender;
     }
 
