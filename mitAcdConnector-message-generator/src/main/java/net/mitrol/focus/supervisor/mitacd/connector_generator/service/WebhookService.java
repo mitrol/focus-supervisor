@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.mitrol.ct.api.enums.AgentState;
 import net.mitrol.ct.api.enums.Channel;
 import net.mitrol.ct.api.enums.InteractionState;
+import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
 import net.mitrol.mitct.mitacd.event.AgentEvent;
 import net.mitrol.mitct.mitacd.event.InteractionEvent;
 import net.mitrol.mitct.mitacd.event.MitAcdEvent;
@@ -41,6 +42,13 @@ public class WebhookService {
                 objectMapper.writeValueAsString(
                         new InteractionEvent(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()), interactionId, 1, InteractionState.Talking, 1, 1, 1, null, null, null, null, Channel.Llamada, null, null))));
     }
+
+    public void sendAgentCampaignEvent() throws JsonProcessingException {
+        sendEvent(new MitAcdEvent(AgentCampaignRelationEvent.TYPE,
+                objectMapper.writeValueAsString(
+                        new AgentCampaignRelationEvent(new Date(), 1, 1, true))));
+    }
+
 
     private void sendEvent(MitAcdEvent event) throws JsonProcessingException {
         mitAcdConnectorService.postEvent(

@@ -22,4 +22,8 @@ public class MitAcdConnectorMessageGeneratorController {
         webhookService.sendInteractionEvent();
     }
 
+    @RequestMapping(method = RequestMethod.POST, path = "/campaign-agent-relations")
+    public void sendAgentCampaignEvent() throws JsonProcessingException {
+        webhookService.sendAgentCampaignEvent();
+    }
 }
