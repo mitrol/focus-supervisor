@@ -4,6 +4,7 @@ import net.mitrol.kafka.KafkaReceiver;
 import net.mitrol.kafka.KafkaReceiverListener;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,7 @@ public class SupervisorKafkaService {
                 logger.debug("processMessage " + source + " " + topic + " " + value);
                 try {
                     msgService.kafkaMsgProcess(value);
-                } catch (IOException e) {
+                } catch (JSONException e) {
                     logger.error(e, "processMessage " + source + " " + topic + " " + value);
                 }
             }

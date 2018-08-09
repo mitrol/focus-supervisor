@@ -1,14 +1,15 @@
 package net.mitrol.focus.supervisor.connector.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.mitrol.focus.supervisor.common.util.ESUtil;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
 import net.mitrol.mitct.mitacd.event.AgentEvent;
 import net.mitrol.mitct.mitacd.event.InteractionEvent;
 import net.mitrol.mitct.mitacd.event.MitAcdEvent;
+import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,27 +29,25 @@ public class MitAcdMessageService {
     private String index_interaction;
     @Value("${index.agent.interaction.relation}")
     private String index_agent_campaign_relation;
+
     @Autowired
     private ESHighLevelClientService esService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    protected final void kafkaMsgProcess(String message) throws JSONException {
 
-    protected final void kafkaMsgProcess(String message) throws IOException {
-
-        MitAcdEvent mitAcdEvent = objectMapper.readValue(message, MitAcdEvent.class);
+        MitAcdEvent mitAcdEvent = JsonMapper.getInstance().getObjectFromString(message, MitAcdEvent.class);
         String type = mitAcdEvent.getType();
         String payload = mitAcdEvent.getPayload();
 
         switch (type) {
             case AgentEvent.TYPE:
-                processAgentEvent(objectMapper.readValue(payload, AgentEvent.class));
+                processAgentEvent(JsonMapper.getInstance().getObjectFromString(payload, AgentEvent.class));
                 break;
             case InteractionEvent.TYPE:
-                processInteractionEvent(objectMapper.readValue(payload, InteractionEvent.class));
+                processInteractionEvent(JsonMapper.getInstance().getObjectFromString(payload, InteractionEvent.class));
                 break;
             case AgentCampaignRelationEvent.TYPE:
-                processAgentCampaignRelationEvent(objectMapper.readValue(payload, AgentCampaignRelationEvent.class));
+                processAgentCampaignRelationEvent(JsonMapper.getInstance().getObjectFromString(payload, AgentCampaignRelationEvent.class));
                 break;
         }
     }
