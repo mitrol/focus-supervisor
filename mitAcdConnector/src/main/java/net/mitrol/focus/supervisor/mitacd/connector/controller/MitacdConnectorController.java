@@ -1,6 +1,7 @@
 package net.mitrol.focus.supervisor.mitacd.connector.controller;
 
 import net.mitrol.focus.supervisor.mitacd.connector.service.MitacdConnectorMessageService;
+import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
 import net.mitrol.mitct.mitacd.event.AgentEvent;
 import net.mitrol.mitct.mitacd.event.InteractionEvent;
 import net.mitrol.mitct.mitacd.event.MitAcdEvent;
@@ -29,6 +30,11 @@ public class MitacdConnectorController {
     @RequestMapping(method = RequestMethod.POST, path = "/interactions")
     public void sendInteractionEvent(@RequestBody InteractionEvent interactionEvent) {
         msgService.processEvent(getStringFromObjectType(interactionEvent, InteractionEvent.TYPE));
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = "/agent-campaing-relation")
+    public void sendAgentCampaignRelationEvent(@RequestBody AgentCampaignRelationEvent agentCampaignRelationEvent) {
+        msgService.processEvent(getStringFromObjectType(agentCampaignRelationEvent, AgentCampaignRelationEvent.TYPE));
     }
 
     private String getStringFromObjectType (Object obj, String type){

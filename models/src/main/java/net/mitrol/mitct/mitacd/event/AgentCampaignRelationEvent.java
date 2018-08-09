@@ -9,16 +9,16 @@ public class AgentCampaignRelationEvent {
     private Date timestamp;
     private int userId;
     private int campaignId;
-    private boolean assignation;
+    private boolean isAssigned;
 
     public AgentCampaignRelationEvent() {
     }
 
-    public AgentCampaignRelationEvent(Date timestamp, int userId, int campaignId, boolean assignation) {
+    public AgentCampaignRelationEvent(Date timestamp, int userId, int campaignId, boolean isAssigned) {
         this.timestamp = timestamp;
         this.userId = userId;
         this.campaignId = campaignId;
-        this.assignation = assignation;
+        this.isAssigned = isAssigned;
     }
 
     public Date getTimestamp() {
@@ -45,11 +45,11 @@ public class AgentCampaignRelationEvent {
         this.campaignId = campaignId;
     }
 
-    public boolean isAssignation() {
-        return assignation;
+    public boolean isAssigned() {
+        return isAssigned;
     }
 
-    public void setAssignation(boolean assignation) {
-        this.assignation = assignation;
+    public void setAssigned(boolean assigned) {
+        this.isAssigned = assigned;
     }
 }
