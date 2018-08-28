@@ -1,5 +1,6 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
@@ -9,6 +10,8 @@ import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -96,6 +99,31 @@ public abstract class ESRepository {
         } catch ( ElasticsearchException  | IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
         }
+    }
+
+    public void buildDocumentIndex(String index, String type, List<Object> objs) {
+        BulkRequest request = new BulkRequest();
+        objs.forEach(obj-> {
+            try {
+                byte[] json = MAPPER.writeValueAsBytes(obj);
+                request.add(new IndexRequest(index, type).source(json, XContentType.JSON));
+            } catch (JsonProcessingException e) {
+                log.error(e);
+            }
+        });
+        restHighLevelClient.bulkAsync(request, new ActionListener<BulkResponse>() {
+            @Override
+            public void onResponse(BulkResponse bulkItemResponses) {
+                log.debug("bulk item response: " + bulkItemResponses.status().name() + " "
+                        + bulkItemResponses.status().getStatus());
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                throw new MitrolSupervisorError("Unable to do a bulk creating indexs in Elasticsearch", e);
+            }
+        });
     }
 
     /**

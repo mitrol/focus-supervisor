@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class MitAcdMessageService {
@@ -27,11 +29,15 @@ public class MitAcdMessageService {
     private String index_agent;
     @Value("${index.interaction}")
     private String index_interaction;
-    @Value("${index.agent.interaction.relation}")
+    @Value("${index_agent_campaign_relation}")
     private String index_agent_campaign_relation;
+    @Value("${bulk_size}")
+    private Integer bulk_size;
 
     @Autowired
     private ESHighLevelClientService esService;
+
+    List events = new ArrayList<Object>();
 
     protected final void kafkaMsgProcess(String message) throws JSONException {
 
@@ -53,15 +59,29 @@ public class MitAcdMessageService {
     }
 
     private void processAgentEvent(AgentEvent agentEvent) {
-        esService.buildDocumentIndex(agentEvent, ESUtil.getESIndexNameDateValue(index_agent), index_type, "");
+        if (events.size() < bulk_size){
+            events.add(agentEvent);
+        } else {
+            esService.buildDocumentIndex(ESUtil.getESIndexNameDateValue(index_agent), index_type, events);
+            events.clear();
+        }
     }
 
     private void processInteractionEvent(InteractionEvent interactionEvent) {
-        esService.buildDocumentIndex(interactionEvent, ESUtil.getESIndexNameDateValue(index_interaction), index_type, "");
+        if (events.size() < bulk_size){
+            events.add(interactionEvent);
+        } else {
+            esService.buildDocumentIndex(ESUtil.getESIndexNameDateValue(index_interaction), index_type, events);
+            events.clear();
+        }
     }
 
     private void processAgentCampaignRelationEvent(AgentCampaignRelationEvent agentCampaignRelationEvent) {
-        esService.buildDocumentIndex(agentCampaignRelationEvent, ESUtil.getESIndexNameDateValue(index_interaction), index_type, "");
+        if (events.size() < bulk_size){
+            events.add(agentCampaignRelationEvent);
+        } else {
+            esService.buildDocumentIndex(ESUtil.getESIndexNameDateValue(index_agent_campaign_relation), index_type, events);
+            events.clear();
+        }
     }
-
 }
