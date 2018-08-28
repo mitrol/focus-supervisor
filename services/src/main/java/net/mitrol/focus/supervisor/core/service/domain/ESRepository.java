@@ -111,19 +111,11 @@ public abstract class ESRepository {
                 log.error(e);
             }
         });
-        restHighLevelClient.bulkAsync(request, new ActionListener<BulkResponse>() {
-            @Override
-            public void onResponse(BulkResponse bulkItemResponses) {
-                log.debug("bulk item response: " + bulkItemResponses.status().name() + " "
-                        + bulkItemResponses.status().getStatus());
-
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                throw new MitrolSupervisorError("Unable to do a bulk creating indexs in Elasticsearch", e);
-            }
-        });
+        try {
+            restHighLevelClient.bulk(request);
+        } catch (IOException e) {
+            throw new MitrolSupervisorError("Unable to do a bulk in Elasticsearch", e);
+        }
     }
 
     /**
