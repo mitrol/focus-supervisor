@@ -2,7 +2,10 @@ package net.mitrol.focus.supervisor.connector.util;
 
 import java.util.List;
 
-public class MessageEventFilter {
+/**
+ * @author ladassus
+ */
+public class EventMessageFilter {
 
     private List<Long> campaignId;
     private Long groupId;

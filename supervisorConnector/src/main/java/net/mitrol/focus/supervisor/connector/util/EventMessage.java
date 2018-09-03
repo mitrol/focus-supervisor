@@ -1,13 +1,16 @@
 package net.mitrol.focus.supervisor.connector.util;
 
-public class MessageEvent {
+/**
+ * @author ladassus
+ */
+public class EventMessage {
 
     private Long id;
     private String eventType;
     private Long refreshInterval;
     private String widgetType;
     private Long agentId;
-    private MessageEventFilter filter;
+    private EventMessageFilter filter;
 
     public Long getId() {
         return id;
@@ -49,11 +52,11 @@ public class MessageEvent {
         this.agentId = agentId;
     }
 
-    public MessageEventFilter getFilter() {
+    public EventMessageFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(MessageEventFilter filter) {
+    public void setFilter(EventMessageFilter filter) {
         this.filter = filter;
     }
 }
