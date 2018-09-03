@@ -9,12 +9,12 @@ import net.mitrol.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.apache.commons.lang3.Validate;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,15 +23,15 @@ public class MitAcdMessageService {
 
     private MitrolLogger logger = MitrolLoggerImpl.getLogger(MitAcdMessageService.class);
 
-    @Value("${index.type}")
+    @Value("${index.type:_doc}")
     private String index_type;
-    @Value("${index.agent}")
+    @Value("${index.agent:agent}")
     private String index_agent;
-    @Value("${index.interaction}")
+    @Value("${index.interaction:interaction}")
     private String index_interaction;
-    @Value("${index_agent_campaign_relation}")
+    @Value("${index_agent_campaign_relation:agentCampaignRelation}")
     private String index_agent_campaign_relation;
-    @Value("${bulk_size}")
+    @Value("${bulk_size:10000}")
     private Integer bulk_size;
 
     @Autowired
@@ -39,8 +39,8 @@ public class MitAcdMessageService {
 
     List events = new ArrayList<Object>();
 
-    protected final void kafkaMsgProcess(String message) throws JSONException {
-
+    protected final void mitAcdMessageProcess(String message) throws JSONException {
+        Validate.notNull(message, "MitAcd message cannot be null");
         MitAcdEvent mitAcdEvent = JsonMapper.getInstance().getObjectFromString(message, MitAcdEvent.class);
         String type = mitAcdEvent.getType();
         String payload = mitAcdEvent.getPayload();

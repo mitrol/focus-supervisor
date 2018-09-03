@@ -33,7 +33,7 @@ public class ESInteractionStatsRepository extends ESRepository {
      * */
     private static final String SEARCH_ALL_INDEX = "*";
 
-    @Value("${index.interaction.stats}")
+    @Value("${index.interaction.stats:interactionstats}")
     private String index_interaction;
 
     /** batchId por splitId
