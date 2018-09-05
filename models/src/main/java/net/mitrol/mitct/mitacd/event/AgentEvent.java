@@ -1,13 +1,9 @@
 package net.mitrol.mitct.mitacd.event;
 
-import net.mitrol.ct.api.enums.AgentState;
-
 import java.util.Date;
 
 /**
- * Sucede cuando un agente cambia de estado,
- * o cuando un agente se asigna a una campaña
- * o cuando a un agente (supervisor) le cambian los grupos supervisados
+ * Sucede cuando un agente cambia de estado
  */
 public class AgentEvent {
 

@@ -29,7 +29,7 @@ public class WebhookService {
     public void sendAgentEvent() throws JsonProcessingException {
         sendEvent(new MitAcdEvent(AgentEvent.TYPE,
                 objectMapper.writeValueAsString(
-                        new AgentEvent(new Date(), 1, 1, AgentState.Avail))));
+                        new AgentEvent(new Date(), 1, 1, net.mitrol.mitct.mitacd.event.AgentState.Avail))));
     }
 
     public void sendInteractionEvent() throws JsonProcessingException {

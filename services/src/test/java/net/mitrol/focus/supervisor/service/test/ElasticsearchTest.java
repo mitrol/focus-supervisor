@@ -316,9 +316,25 @@ public class ElasticsearchTest {
     }
 
     @Test
+    @Ignore
     public void shouldBeSearchMultipleWidget() {
-        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("", "10", "", null,
+        Map resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("", "10", "", null,
                 null, null, true);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchMultipleWidgetPreview() {
+        Map resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("2018.08.27", "", "", null,
+                null, null, false);
+        Assert.assertNotNull(resultInteractionStatsFilter);
+    }
+
+    @Test
+    @Ignore
+    public void shouldBeSearchAgentStateWidgetPreview() {
+        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countAgentState("2018.08.27", "", "", null, false);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }

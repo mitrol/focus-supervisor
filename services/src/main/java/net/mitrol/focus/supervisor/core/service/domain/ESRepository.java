@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -43,13 +42,13 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public abstract class ESRepository {
+public class ESRepository {
 
-    protected static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);
-    protected static final ObjectMapper MAPPER = new ObjectMapper();
+    private static MitrolLogger log = MitrolLoggerImpl.getLogger(ESRepository.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
-    protected RestHighLevelClient restHighLevelClient;
+    private RestHighLevelClient restHighLevelClient;
 
     /**
      * Create an index document in Elasticsesarch

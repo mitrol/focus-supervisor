@@ -1,29 +1,35 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
 import com.google.common.collect.Lists;
-import net.mitrol.ct.api.enums.InteractionState;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.action.search.MultiSearchRequest;
-import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ParsedValueCount;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCountAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedLongTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.tophits.ParsedTopHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
-public class ESInteractionStatsRepository extends ESRepository {
+public class ESInteractionStatsRepository {
 
     private static final String SEPARATOR = "-";
 
@@ -36,80 +42,97 @@ public class ESInteractionStatsRepository extends ESRepository {
     @Value("${index.interaction.stats:interactionstats}")
     private String index_interaction;
 
-    /** batchId por splitId
-     * @param date format YYYY-mm-dd
+    @Value("${index.agent.status.changed}")
+    private String index_agent_status;
+
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
+
+    /**
+     * @param date format YYYY.mm.dd
      * @param campaignId to search and filter by id campaign
      * TODO Add range date to search, gte and lte.
      **/
-    public List<HashMap> countInteractionStats(String date, String campaignId, String companyId, String groupId,
-                                               String agentId, String splitId, boolean searchAllIndex) {
-        StringBuilder indexBuild = new StringBuilder(index_interaction + SEPARATOR + date);
+    public Map countInteractionStats(String date, String campaignId, String companyId, String groupId,
+                                     String agentId, String splitId, boolean searchAllIndex) {
+        StringBuilder indexBuild = new StringBuilder("agent" + SEPARATOR + date);
         if (searchAllIndex) {
             indexBuild.append(SEARCH_ALL_INDEX);
         }
         String index = indexBuild.toString();
 
         try {
-            MultiSearchRequest request = new MultiSearchRequest();
-            /*Search by TALKING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Talking.name(), companyId, groupId, agentId, splitId));
-            /*Search by RINGING*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Ringing.name(), companyId, groupId, agentId, splitId));
-            /*Search by PREVIEW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Preview.name(), companyId, groupId, agentId, splitId));
-            /*Search DIAL by Agente*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.DialingAgente.name(), companyId, groupId, agentId, splitId));
-            /*Search by HOLD*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.Hold.name(), companyId, groupId, agentId, splitId));
-            /*Search by ACW*/
-            request.add(makeSearchFilterByRangeCampaignIdInteractionState(index, campaignId, InteractionState.AfterCallWork.name(), companyId, groupId, agentId, splitId));
-
-            MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
-            return getMultipleSearchAggregation(multiSearchResponse);
+            SearchResponse searchResponse = restHighLevelClient.search(makeSearchFilterByInteractionState(index, campaignId, companyId, groupId, agentId, splitId));
+            return getSearchAggregation(searchResponse);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
         }
     }
 
-    private List<HashMap> getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
-        List<HashMap> res = Lists.newArrayList();
-        for(MultiSearchResponse.Item item : response.getResponses()){
-            if (null != item.getResponse() || null == item.getFailure()) {
-                for(Aggregation aggregation : item.getResponse().getAggregations()) {
-                    HashMap<String, Long> data = new HashMap();
-                    data.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
-                    res.add(data);
+    private Map getSearchAggregation(SearchResponse response) throws JSONException {
+        List<String> names = Lists.newArrayList();
+        List<String> breaks = Lists.newArrayList();
+
+        for(Aggregation aggregation : response.getAggregations()) {
+            List<? extends Terms.Bucket> parses = ((ParsedLongTerms) aggregation).getBuckets();
+            for (Terms.Bucket parse : parses) {
+                ParsedTopHits parsedTopHits = ((ParsedLongTerms.ParsedBucket) parse).getAggregations().get("group_docs");
+                SearchHits searchHits = parsedTopHits.getHits();
+                SearchHit[] searchHitsArray = searchHits.getHits();
+                for (SearchHit searchHit : searchHitsArray) {
+                    String status = searchHit.getFields().get("state.keyword").getValues().get(0).toString();
+                    if (status.contains("Break")) {
+                        breaks.add(status);
+                    } else {
+                        names.add(status);
+                    }
                 }
             }
         }
+
+        Map<String, Long> res = names.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        res.put("Break", Long.valueOf(breaks.size()));
+
         return res;
     }
 
-    private SearchRequest makeSearchFilterByRangeCampaignIdInteractionState(String index, String campaignId, String state, String companyId,
-                                                                            String splitId, String agentId, String batchId) {
+    private SearchRequest makeSearchFilterByInteractionState(String index, String campaignId, String companyId,
+                                                             String groupId, String agentId, String splitId) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(campaignId)) {
-            query.filter(QueryBuilders.matchQuery("interactionStats.campaignId", campaignId));
+            query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
-        if (!StringUtils.isEmpty(splitId)) {
-            query.filter(QueryBuilders.matchQuery("interactionStats.groupId", splitId));
+        if (!StringUtils.isEmpty(groupId)) {
+            query.filter(QueryBuilders.matchQuery("groupId", groupId));
         }
         if (!StringUtils.isEmpty(companyId)) {
-            query.filter(QueryBuilders.matchQuery("interactionStats.companyId", companyId));
+            query.filter(QueryBuilders.matchQuery("companyId", companyId));
         }
         if (!StringUtils.isEmpty(agentId)) {
-            query.filter(QueryBuilders.matchQuery("interactionStats.agentId", agentId));
+            query.filter(QueryBuilders.matchQuery("userId", agentId));
         }
-        if (!StringUtils.isEmpty(batchId)) {
-            query.filter(QueryBuilders.matchQuery("interactionStats.batchId", batchId));
+        if (!StringUtils.isEmpty(splitId)) {
+            query.filter(QueryBuilders.matchQuery("splitId", splitId));
         }
 
-        query.filter(QueryBuilders.matchQuery("interactionStats.state.keyword", state));
-        ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count(state).field("interactionStats.state.keyword");
-        searchSourceBuilder.query(query).aggregation(aggregationBuildersTotal);
+        AggregationBuilder aggTotal = AggregationBuilders.terms("group")
+                .field("userId")
+                .size(2100000000);// Size Max I think is 70000
+        List<String> fields = Arrays.asList("state.keyword");
+        AggregationBuilder subAggregation = AggregationBuilders.
+                topHits("group_docs").
+                explain(true).
+                size(1).
+                fieldDataFields(fields).
+                sort("timestamp", SortOrder.DESC).
+                fetchSource(true).
+                storedField("state");
+        searchSourceBuilder.query(query).aggregation(aggTotal.subAggregation(subAggregation));
+        searchSourceBuilder.size(0);
         searchRequest.source(searchSourceBuilder);
 
         return searchRequest;

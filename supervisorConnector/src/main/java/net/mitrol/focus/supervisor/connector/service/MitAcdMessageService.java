@@ -4,6 +4,7 @@ import net.mitrol.focus.supervisor.common.util.ESUtil;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
 import net.mitrol.mitct.mitacd.event.AgentEvent;
+import net.mitrol.mitct.mitacd.event.AgentState;
 import net.mitrol.mitct.mitacd.event.InteractionEvent;
 import net.mitrol.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.json.JsonMapper;
@@ -15,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class MitAcdMessageService {
@@ -84,4 +87,26 @@ public class MitAcdMessageService {
             events.clear();
         }
     }
+
+    /**
+     * Only for dummy and create bulk
+     * */
+    /*private void processAgentEvent(AgentEvent agentEvent) {
+        Date date = new Date();
+        for (int i = 0; i < 1100000 ; i++) {
+            int id = ThreadLocalRandom.current().nextInt(1,  50);
+            AgentEvent agentEvent1 = new AgentEvent();
+            agentEvent1.setTimestamp(date);
+            agentEvent1.setUserId(id);
+            agentEvent1.setGroupId(agentEvent.getGroupId());
+            int stateID = ThreadLocalRandom.current().nextInt(1,  9);
+            agentEvent1.setState(AgentState.getFromCode(stateID));
+            if (events.size() < bulk_size){
+                events.add(agentEvent1);
+            } else {
+                esService.buildDocumentIndex(ESUtil.getESIndexNameDateValue(index_agent), index_type, events);
+                events.clear();
+            }
+        }
+    }*/
 }

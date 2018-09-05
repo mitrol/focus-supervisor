@@ -7,6 +7,7 @@ import net.mitrol.mitct.mitacd.event.InteractionEvent;
 import net.mitrol.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
  * @author ladassus
  */
 @RestController
-@RequestMapping("/")
+@RequestMapping("/mitacd")
 public class MitacdConnectorController {
 
     @Autowired
     private MitacdConnectorMessageService msgService;
 
-    @RequestMapping(method = RequestMethod.POST, path = "/agents")
+    @RequestMapping(method = RequestMethod.POST, path = "/agents", produces = "application/json")
     public void sendAgentEvent(@RequestBody AgentEvent agentEvent) {
         msgService.processEvent(getStringFromObjectType(agentEvent, AgentEvent.TYPE));
     }
