@@ -1,4 +1,4 @@
-package net.mitrol.focus.supervisor.connector.util;
+package net.mitrol.focus.supervisor.common.util;
 
 /**
  * @author ladassus

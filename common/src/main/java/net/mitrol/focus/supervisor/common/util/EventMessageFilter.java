@@ -1,4 +1,4 @@
-package net.mitrol.focus.supervisor.connector.util;
+package net.mitrol.focus.supervisor.common.util;
 
 import java.util.List;
 
