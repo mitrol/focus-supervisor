@@ -10,6 +10,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.metrics.valuecount.ParsedValueCount;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,11 +37,8 @@ public class ESAgentStateRepository {
      * */
     private static final String SEARCH_ALL_INDEX = "*";
 
-    @Value("${index.agent.status.changed}")
+    @Value("${index_agent}")
     private String index_agent_status;
-
-    @Value("${index_interaction}")
-    private String index_interaction;
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
@@ -59,25 +58,25 @@ public class ESAgentStateRepository {
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by Avail*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Avail.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Avail.name(), companyId, agentId, null, null));
             /*Search by Preview*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Preview.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Preview.name(), companyId, agentId, null, null));
             /*Search by Dial by Agente*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Dial.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Dial.name(), companyId, agentId, null, null));
             /*Search Ring*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Ring.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Ring.name(), companyId, agentId, null, null));
             /*Search by Connect*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Connect.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Connect.name(), companyId, agentId, null, null));
             /*Search by Hold*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Hold.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Hold.name(), companyId, agentId, null, null));
             /*Search by AfterCallWork*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.AfterCallWork.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.AfterCallWork.name(), companyId, agentId, null, null));
             /*Search by NotReady*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.NotReady.name(), companyId, agentId));
+            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.NotReady.name(), companyId, agentId, null, null));
             /*Search by Auxiliar BREAK_0 To Other BEAK_n*/
-            request.add(searchByAuxiliar(index, campaignId, companyId, agentId));
+            request.add(searchByAuxiliar(index, campaignId, companyId, agentId, null, null));
             /*Search by Other*/
-            //request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.HOLD.name(), companyId, agentId));
+            //request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.HOLD.name(), companyId, agentId, null, null));
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);
         } catch (IOException | JSONException e) {
@@ -97,19 +96,30 @@ public class ESAgentStateRepository {
         }
         return res;
     }
-    private SearchRequest makeSearchFilterAgentStatus(String index, String campaignId, String state, String companyId, String agentId) {
+    private SearchRequest makeSearchFilterAgentStatus(String index, String campaignId, String state, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(campaignId)) {
+            /**
+             * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
+             * */
+            query.should(QueryBuilders.termsQuery("userId", Collections.emptyList()));
             query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
         if (!StringUtils.isEmpty(companyId)) {
             query.filter(QueryBuilders.matchQuery("companyId", companyId));
         }
         if (!StringUtils.isEmpty(agentId)) {
-            query.filter(QueryBuilders.matchQuery("agentId", agentId));
+            query.filter(QueryBuilders.matchQuery("userId", agentId));
+        }
+        if (null != from && null != to) {
+            /**
+             * Este rango hay que probar todavia
+             * */
+            RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("timestamp").gte(from).lte(to);
+            query.filter(rangeQueryBuilder);
         }
         query.filter(QueryBuilders.matchQuery("state.keyword", state));
         ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count(state).field("state.keyword");
@@ -118,19 +128,30 @@ public class ESAgentStateRepository {
         return searchRequest;
     }
 
-    private SearchRequest searchByAuxiliar(String index, String campaignId, String companyId, String agentId) {
+    private SearchRequest searchByAuxiliar(String index, String campaignId, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(campaignId)) {
+            /**
+             * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
+             * */
+            query.should(QueryBuilders.termsQuery("userId", Collections.emptyList()));
             query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
         if (!StringUtils.isEmpty(companyId)) {
             query.filter(QueryBuilders.matchQuery("companyId", companyId));
         }
         if (!StringUtils.isEmpty(agentId)) {
-            query.filter(QueryBuilders.matchQuery("agentId", agentId));
+            query.filter(QueryBuilders.matchQuery("userId", agentId));
+        }
+        if (null != from && null != to) {
+            /**
+             * Este rango hay que probar todavia
+             * */
+            RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("timestamp").gte(from).lte(to);
+            query.filter(rangeQueryBuilder);
         }
         query.filter(QueryBuilders.termsQuery("state.keyword", AgentState.Break0.name(), AgentState.Break1.name(), AgentState.Break2.name(), AgentState.Break3.name(), AgentState.Break4.name(), AgentState.Break5.name(),
                 AgentState.Break6.name(), AgentState.Break7.name(), AgentState.Break8.name(), AgentState.Break9.name()));
