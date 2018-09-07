@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.connector.service;
 
-import net.mitrol.focus.supervisor.common.util.EventMessage;
+import net.mitrol.focus.supervisor.common.event.EventMessage;
 import net.mitrol.focus.supervisor.connector.util.EventMessageJob;
 import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
