@@ -2,7 +2,7 @@ package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.ct.api.enums.AgentState;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
-import net.mitrol.focus.supervisor.core.service.ESInteractionStatsService;
+import net.mitrol.focus.supervisor.core.service.ESGenericService;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.focus.supervisor.service.test.model.Direccion;
 import net.mitrol.focus.supervisor.service.test.model.User;
@@ -37,7 +37,7 @@ public class ElasticsearchTest {
     private ESHighLevelClientService esService;
 
     @Autowired
-    private ESInteractionStatsService esInteractionStatsService;
+    private ESGenericService ESGenericService;
 
     private String index;
     private String type;
@@ -318,7 +318,7 @@ public class ElasticsearchTest {
     @Test
     @Ignore
     public void shouldBeSearchMultipleWidget() {
-        Map resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("", "10", "", null,
+        Map resultInteractionStatsFilter = ESGenericService.countInteractionStats("", "10", "", null,
                 null, null, true);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
@@ -326,7 +326,7 @@ public class ElasticsearchTest {
     @Test
     @Ignore
     public void shouldBeSearchMultipleWidgetPreview() {
-        Map resultInteractionStatsFilter = esInteractionStatsService.countInteractionStats("2018.08.27", "", "", null,
+        Map resultInteractionStatsFilter = ESGenericService.countInteractionStats("2018.08.27", "", "", null,
                 null, null, false);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
@@ -334,7 +334,7 @@ public class ElasticsearchTest {
     @Test
     @Ignore
     public void shouldBeSearchAgentStateWidgetPreview() {
-        List<HashMap> resultInteractionStatsFilter = esInteractionStatsService.countAgentState("2018.08.31", "", "", null, false);
+        List<HashMap> resultInteractionStatsFilter = ESGenericService.countAgentState("2018.08.31", null, "", null, false, null, null);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }

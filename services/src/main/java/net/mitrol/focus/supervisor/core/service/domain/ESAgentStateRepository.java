@@ -3,6 +3,7 @@ package net.mitrol.focus.supervisor.core.service.domain;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.mitct.mitacd.event.AgentState;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,11 +45,11 @@ public class ESAgentStateRepository {
 
     /**
      * @param date       format YYYY.mm.dd
-     * @param campaignId to search and filter by id campaign
+     * @param campaignIds to search and filter by id campaign
      * TODO Add range date to search, gte and lte.
      **/
-    public List<HashMap> countAgentStatus(String date, String campaignId, String companyId,
-                                          String agentId, boolean searchAllIndex) {
+    public List<HashMap> countAgentStatus(String date, List<Integer> campaignIds, String companyId,
+                                          String agentId, boolean searchAllIndex, long from, long to) {
         StringBuilder indexBuild = new StringBuilder(index_agent_status + SEPARATOR + date);
         if (searchAllIndex) {
             indexBuild.append(SEARCH_ALL_INDEX);
@@ -58,31 +58,32 @@ public class ESAgentStateRepository {
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by Avail*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Avail.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Avail.name(), companyId, agentId, from, to));
             /*Search by Preview*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Preview.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Preview.name(), companyId, agentId, from, to));
             /*Search by Dial by Agente*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Dial.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Dial.name(), companyId, agentId, from, to));
             /*Search Ring*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Ring.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Ring.name(), companyId, agentId, from, to));
             /*Search by Connect*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Connect.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Connect.name(), companyId, agentId, from, to));
             /*Search by Hold*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.Hold.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Hold.name(), companyId, agentId, from, to));
             /*Search by AfterCallWork*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.AfterCallWork.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.AfterCallWork.name(), companyId, agentId, from, to));
             /*Search by NotReady*/
-            request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.NotReady.name(), companyId, agentId, null, null));
+            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.NotReady.name(), companyId, agentId, from, to));
             /*Search by Auxiliar BREAK_0 To Other BEAK_n*/
-            request.add(searchByAuxiliar(index, campaignId, companyId, agentId, null, null));
+            request.add(searchByAuxiliar(index, campaignIds, companyId, agentId, from, to));
             /*Search by Other*/
-            //request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.HOLD.name(), companyId, agentId, null, null));
+            //request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.HOLD.name(), companyId, agentId, from, to));
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
             return getMultipleSearchAggregation(multiSearchResponse);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
         }
     }
+
     private List<HashMap> getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
         List<HashMap> res = Lists.newArrayList();
         for (MultiSearchResponse.Item item : response.getResponses()) {
@@ -96,17 +97,24 @@ public class ESAgentStateRepository {
         }
         return res;
     }
-    private SearchRequest makeSearchFilterAgentStatus(String index, String campaignId, String state, String companyId, String agentId, Long from, Long to) {
+
+    /**
+     * @param campaignIds represent userIds referent relation Agent and Campaign
+     * */
+    private SearchRequest makeSearchFilterAgentStatus(String index, List<Integer> campaignIds, String state, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        if (!StringUtils.isEmpty(campaignId)) {
+        if (CollectionUtils.isNotEmpty(campaignIds)) {
             /**
              * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
              * */
-            query.should(QueryBuilders.termsQuery("userId", Collections.emptyList()));
-            query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
+            query.should(QueryBuilders.termsQuery("userId", campaignIds));
+            /**
+             * Esto deberia Eliminarse luego
+             */
+            //query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
         if (!StringUtils.isEmpty(companyId)) {
             query.filter(QueryBuilders.matchQuery("companyId", companyId));
@@ -128,17 +136,20 @@ public class ESAgentStateRepository {
         return searchRequest;
     }
 
-    private SearchRequest searchByAuxiliar(String index, String campaignId, String companyId, String agentId, Long from, Long to) {
+    private SearchRequest searchByAuxiliar(String index, List<Integer> campaignIds, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        if (!StringUtils.isEmpty(campaignId)) {
+        if (CollectionUtils.isNotEmpty(campaignIds)) {
             /**
              * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
              * */
-            query.should(QueryBuilders.termsQuery("userId", Collections.emptyList()));
-            query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
+            query.should(QueryBuilders.termsQuery("userId", campaignIds));
+            /**
+             * Esto deberia Eliminarse luego
+             */
+            //query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
         if (!StringUtils.isEmpty(companyId)) {
             query.filter(QueryBuilders.matchQuery("companyId", companyId));

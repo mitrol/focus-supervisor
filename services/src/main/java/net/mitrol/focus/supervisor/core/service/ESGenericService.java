@@ -7,12 +7,19 @@ import net.mitrol.focus.supervisor.core.service.domain.ESInteractionStatsReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class ESGenericService {
+
+    private static final String DATE_FORMAT = "yyyy.MM.dd";
+    private static final DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+    private static final String DATE_FORMAT_COMPLETE = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private static final SimpleDateFormat dateFormatComplete = new SimpleDateFormat(DATE_FORMAT_COMPLETE);
 
     @Autowired
     ESInteractionStatsRepository stateRepository;
@@ -26,27 +33,27 @@ public class ESGenericService {
             case INTERACTION_STATES:
                 return countInteractionStats(null, null, null, null, null, null, false);
             case AGENT_STATES:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case AUXILIARY_STATES:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case STATES_TIME_COUNTER:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case AUXILIARY_STATES_TIME_COUNTER:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case AGENT_INFORMATION:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case INTERACTIONS_COUNTER:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case INTERACTIONS_DETAILS_COUNTER:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case SKILL_INDICATORS:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case AGENT_INTERACTION_STATES:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case SKILL_INTERACTIONS_COUNTER:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             case AGENT_INTERACTIONS_COUNTER:
-                return countAgentState(null, null, null, null, false);
+                return countAgentState(null, null, null, null, false, null, null);
             default:
                 return null;
         }
@@ -57,9 +64,9 @@ public class ESGenericService {
         return stateRepository.countInteractionStats(index, campaignId, companyId, groupId, agentId, splitId, searchAllIndex);
     }
 
-    public List<HashMap> countAgentState(String index, String campaignId, String companyId,
-                                         String agentId, boolean searchAllIndex) {
-        return esAgentStateRepository.countAgentStatus(index, campaignId, companyId, agentId, searchAllIndex);
+    public List<HashMap> countAgentState(String index, List<Integer> campaignIds, String companyId,
+                                         String agentId, boolean searchAllIndex, Long from, Long to) {
+        return esAgentStateRepository.countAgentStatus(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
     }
 
 }
