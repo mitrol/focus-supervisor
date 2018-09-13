@@ -4,7 +4,6 @@ import net.mitrol.focus.supervisor.common.util.ESUtil;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
 import net.mitrol.mitct.mitacd.event.AgentEvent;
-import net.mitrol.mitct.mitacd.event.AgentState;
 import net.mitrol.mitct.mitacd.event.InteractionEvent;
 import net.mitrol.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.json.JsonMapper;
@@ -16,10 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class MitAcdMessageService {
@@ -42,22 +39,26 @@ public class MitAcdMessageService {
 
     List events = new ArrayList<Object>();
 
-    protected final void mitAcdMessageProcess(String message) throws JSONException {
-        Validate.notNull(message, "MitAcd message cannot be null");
-        MitAcdEvent mitAcdEvent = JsonMapper.getInstance().getObjectFromString(message, MitAcdEvent.class);
+    public void mitAcdMessageProcess(String message) {
+        MitAcdEvent mitAcdEvent = getMitAcdMessageValidated(message);
         String type = mitAcdEvent.getType();
         String payload = mitAcdEvent.getPayload();
-
-        switch (type) {
-            case AgentEvent.TYPE:
-                processAgentEvent(JsonMapper.getInstance().getObjectFromString(payload, AgentEvent.class));
-                break;
-            case InteractionEvent.TYPE:
-                processInteractionEvent(JsonMapper.getInstance().getObjectFromString(payload, InteractionEvent.class));
-                break;
-            case AgentCampaignRelationEvent.TYPE:
-                processAgentCampaignRelationEvent(JsonMapper.getInstance().getObjectFromString(payload, AgentCampaignRelationEvent.class));
-                break;
+        try {
+            switch (type) {
+                case AgentEvent.TYPE:
+                    processAgentEvent(JsonMapper.getInstance().getObjectFromString(payload, AgentEvent.class));
+                    break;
+                case InteractionEvent.TYPE:
+                    processInteractionEvent(JsonMapper.getInstance()
+                            .getObjectFromString(payload, InteractionEvent.class));
+                    break;
+                case AgentCampaignRelationEvent.TYPE:
+                    processAgentCampaignRelationEvent(JsonMapper.getInstance()
+                            .getObjectFromString(payload, AgentCampaignRelationEvent.class));
+                    break;
+            }
+        } catch (JSONException e){
+            logger.error(e);
         }
     }
 
@@ -86,6 +87,20 @@ public class MitAcdMessageService {
             esService.buildDocumentIndex(ESUtil.getESIndexNameDateValue(index_agent_campaign_relation), index_type, events);
             events.clear();
         }
+    }
+
+    private MitAcdEvent getMitAcdMessageValidated (String message){
+        Validate.notNull(message, "MitAcd message string cannot be null");
+        MitAcdEvent mitAcdEvent = null;
+        try {
+            mitAcdEvent = JsonMapper.getInstance().getObjectFromString(message, MitAcdEvent.class);
+        } catch (JSONException e) {
+            logger.error(e);
+        }
+        Validate.notNull(mitAcdEvent, "MitAcd event message json mapper cannot be null");
+        Validate.notEmpty(mitAcdEvent.getType(), "MitAcd event message type cannot be empty");
+        Validate.notEmpty(mitAcdEvent.getPayload(), "MitAcd event message payload cannot be empty");
+        return mitAcdEvent;
     }
 
     /**

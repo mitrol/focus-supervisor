@@ -5,7 +5,6 @@ import net.mitrol.kafka.KafkaReceiverListener;
 import net.mitrol.kafka.KafkaSender;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
-import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +34,7 @@ public class SupervisorKafkaService {
             public void processMessage(String source, String topic, String value) {
                 logger.debug("Kafka mitAcd message to process: "
                         + source + " " + topic + " " + value);
-                try {
-                    mitAcdService.mitAcdMessageProcess(value);
-                } catch (JSONException e) {
-                    logger.error(e, "Kafka mitAcd message to process error: "
-                            + source + " " + topic + " " + value);
-                }
+                mitAcdService.mitAcdMessageProcess(value);
             }
         });
         this.eventReceiver.registerListener("supervisor.event.request", new KafkaReceiverListener<String>() {
@@ -48,12 +42,7 @@ public class SupervisorKafkaService {
             public void processMessage(String source, String topic, String value) {
                 logger.debug("Kafka supervisor event message request to process: "
                         + source + " " + topic + " " + value);
-                try {
-                    eventService.eventMessageProcess(value);
-                } catch (JSONException e) {
-                    logger.error(e, "Kafka Supervisor event message request to process error: "
-                            + source + " " + topic + " " + value);
-                }
+                eventService.eventMessageProcess(value);
             }
         });
     }

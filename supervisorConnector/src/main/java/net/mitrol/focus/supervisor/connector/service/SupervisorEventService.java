@@ -23,24 +23,22 @@ public class SupervisorEventService {
     @Autowired
     private Scheduler scheduler;
 
-    public void eventMessageProcess (String message) throws JSONException {
-        Validate.notNull(message, "Supervisor event message cannot be null");
-        EventMessage event = JsonMapper.getInstance().getObjectFromString(message, EventMessage.class);
-        //TODO: do validate for all fiels on event object
-        switch (event.getEventType()){
-            case "subscribe" :{
+    public void eventMessageProcess (String message) {
+        EventMessage event = getEventMessageValidated(message);
+        switch (event.getEventType().toUpperCase()) {
+            case "SUBSCRIBE": {
                 subscribeEvent(event);
                 break;
             }
-            case "unsubscribe" :{
+            case "UNSUBSCRIBE": {
                 unsubscribeEvent(event);
                 break;
             }
-            case "filterChange" :{
+            case "FILTERCHANGE": {
                 filterChangedEvent(event);
                 break;
             }
-            default:{
+            default: {
                 break;
             }
         }
@@ -82,5 +80,22 @@ public class SupervisorEventService {
     private void filterChangedEvent (EventMessage event){
         unsubscribeEvent(event);
         subscribeEvent(event);
+    }
+
+    private EventMessage getEventMessageValidated (String message){
+        Validate.notNull(message, "Event message string cannot be null");
+        EventMessage event = null;
+        try {
+            event = JsonMapper.getInstance().getObjectFromString(message, EventMessage.class);
+        } catch (JSONException e) {
+            logger.error(e);
+        }
+        Validate.notNull(event, "Event message json mapper cannot be null");
+        Validate.notNull(event.getId(), "Event message id cannot be null");
+        Validate.notNull(event.getRefreshInterval(), "Event message refreshInterval cannot be null");
+        Validate.notNull(event.getAgentId(), "Event message agentId cannot be null");
+        Validate.notEmpty(event.getEventType(), "Event message type cannot be empty");
+        Validate.notEmpty(event.getWidgetType(), "Event message widget type cannot be empty");
+        return event;
     }
 }
