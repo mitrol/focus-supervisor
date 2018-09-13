@@ -30,6 +30,10 @@ public class ESHighLevelClientService {
         return esRepository.buildDocumentIndex(object, index, type, id);
     }
 
+    public void buildDocumentIndex(String index, String type, List<Object> data) {
+        esRepository.buildDocumentIndex(index, type, data);
+    }
+
     public void upsertDocumentIndexAsync(Object object, String index, String type, String id) {
         esRepository.upsertDocumentIndexAsync(object, index, type, id);
     }

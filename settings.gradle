@@ -1,2 +1,4 @@
 rootProject.name = 'focus-supervisor'
 include ":supervisorConnector", ":common", ":models", ":mitAcdConnector", ":services",":supervisor-dummy"
+include 'mitAcdConnector-message-generator'
+
