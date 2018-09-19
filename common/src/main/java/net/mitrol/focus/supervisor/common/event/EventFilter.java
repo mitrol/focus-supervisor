@@ -5,21 +5,21 @@ import java.util.List;
 /**
  * @author ladassus
  */
-public class EventMessageFilter {
+public class EventFilter {
 
-    private List<Long> campaignId;
+    private List<Long> campaignIds;
     private Long groupId;
-    private List<Long> splitId;
-    private List<Long> companyId;
+    private List<Long> splitIds;
+    private List<Long> companyIds;
     private String dateFrom;
     private String dateTo;
 
-    public List<Long> getCampaignId() {
-        return campaignId;
+    public List<Long> getCampaignIds() {
+        return campaignIds;
     }
 
-    public void setCampaignId(List<Long> campaignId) {
-        this.campaignId = campaignId;
+    public void setCampaignIds(List<Long> campaignIds) {
+        this.campaignIds = campaignIds;
     }
 
     public Long getGroupId() {
@@ -30,20 +30,20 @@ public class EventMessageFilter {
         this.groupId = groupId;
     }
 
-    public List<Long> getSplitId() {
-        return splitId;
+    public List<Long> getSplitIds() {
+        return splitIds;
     }
 
-    public void setSplitId(List<Long> splitId) {
-        this.splitId = splitId;
+    public void setSplitIds(List<Long> splitIds) {
+        this.splitIds = splitIds;
     }
 
-    public List<Long> getCompanyId() {
-        return companyId;
+    public List<Long> getCompanyIds() {
+        return companyIds;
     }
 
-    public void setCompanyId(List<Long> companyId) {
-        this.companyId = companyId;
+    public void setCompanyIds(List<Long> companyIds) {
+        this.companyIds = companyIds;
     }
 
     public String getDateFrom() {

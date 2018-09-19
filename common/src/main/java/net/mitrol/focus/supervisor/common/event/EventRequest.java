@@ -3,20 +3,23 @@ package net.mitrol.focus.supervisor.common.event;
 /**
  * @author ladassus
  */
-public class EventMessage {
+public class EventRequest {
 
-    private Long id;
+    private String id;
     private String eventType;
     private Long refreshInterval;
+    private String dashboardId;
+    private String widgetId;
     private String widgetType;
-    private Long agentId;
-    private EventMessageFilter filter;
+    private String agentId;
+    private EventFilter filter;
 
-    public Long getId() {
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -36,6 +39,22 @@ public class EventMessage {
         this.refreshInterval = refreshInterval;
     }
 
+    public String getDashboardId() {
+        return dashboardId;
+    }
+
+    public void setDashboardId(String dashboardId) {
+        this.dashboardId = dashboardId;
+    }
+
+    public String getWidgetId() {
+        return widgetId;
+    }
+
+    public void setWidgetId(String widgetId) {
+        this.widgetId = widgetId;
+    }
+
     public String getWidgetType() {
         return widgetType;
     }
@@ -44,19 +63,19 @@ public class EventMessage {
         this.widgetType = widgetType;
     }
 
-    public Long getAgentId() {
+    public String getAgentId() {
         return agentId;
     }
 
-    public void setAgentId(Long agentId) {
+    public void setAgentId(String agentId) {
         this.agentId = agentId;
     }
 
-    public EventMessageFilter getFilter() {
+    public EventFilter getFilter() {
         return filter;
     }
 
-    public void setFilter(EventMessageFilter filter) {
+    public void setFilter(EventFilter filter) {
         this.filter = filter;
     }
 }
