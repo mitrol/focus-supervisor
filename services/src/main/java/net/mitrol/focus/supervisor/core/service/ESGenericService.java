@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.core.service;
 
-import net.mitrol.focus.supervisor.common.event.EventMessage;
+import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.common.enums.WidgetType;
 import net.mitrol.focus.supervisor.core.service.domain.ESAgentStateRepository;
 import net.mitrol.focus.supervisor.core.service.domain.ESInteractionStatsRepository;
@@ -27,7 +27,7 @@ public class ESGenericService {
     @Autowired
     ESAgentStateRepository esAgentStateRepository;
 
-    public Object getWidgetByMessage(EventMessage eventMessage) {
+    public Object getWidgetByMessage(EventRequest eventMessage) {
         WidgetType type = WidgetType.valueOf(eventMessage.getWidgetType().toUpperCase());
         switch (type) {
             case INTERACTION_STATES:

@@ -1,6 +1,6 @@
 package net.mitrol.supervisor.test;
 
-import net.mitrol.focus.supervisor.common.event.EventMessage;
+import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.utils.json.JsonMapper;
 import org.apache.commons.lang3.Validate;
 import org.json.JSONException;
@@ -16,11 +16,11 @@ public class UtilTest {
 
     }
 
-    private static EventMessage eventMessageValidate (String message){
+    private static EventRequest eventMessageValidate (String message){
         Validate.notNull(message, "Supervisor event message cannot be null");
-        EventMessage event = null;
+        EventRequest event = null;
         try {
-            event = JsonMapper.getInstance().getObjectFromString(message, EventMessage.class);
+            event = JsonMapper.getInstance().getObjectFromString(message, EventRequest.class);
         } catch (JSONException e) {
             return event;
         }

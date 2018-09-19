@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.connector.service;
 
-import net.mitrol.focus.supervisor.common.event.EventMessage;
+import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.connector.util.EventMessageJob;
 import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
@@ -24,7 +24,7 @@ public class SupervisorEventService {
     private Scheduler scheduler;
 
     public void eventMessageProcess (String message) {
-        EventMessage event = getEventMessageValidated(message);
+        EventRequest event = getEventMessageValidated(message);
         switch (event.getEventType().toUpperCase()) {
             case "SUBSCRIBE": {
                 subscribeEvent(event);
@@ -44,7 +44,7 @@ public class SupervisorEventService {
         }
     }
 
-    private synchronized void subscribeEvent (EventMessage event){
+    private synchronized void subscribeEvent (EventRequest event){
         //
         JobDetail job = JobBuilder
                 .newJob(EventMessageJob.class)
@@ -67,7 +67,7 @@ public class SupervisorEventService {
         }
     }
 
-    private synchronized void unsubscribeEvent (EventMessage event){
+    private synchronized void unsubscribeEvent (EventRequest event){
         TriggerKey tkey = new TriggerKey("trigger" + event.getAgentId(), event.getWidgetType());
         try {
             scheduler.unscheduleJob(tkey);
@@ -77,16 +77,16 @@ public class SupervisorEventService {
         }
     }
 
-    private void filterChangedEvent (EventMessage event){
+    private void filterChangedEvent (EventRequest event){
         unsubscribeEvent(event);
         subscribeEvent(event);
     }
 
-    private EventMessage getEventMessageValidated (String message){
+    private EventRequest getEventMessageValidated (String message){
         Validate.notNull(message, "Event message string cannot be null");
-        EventMessage event = null;
+        EventRequest event = null;
         try {
-            event = JsonMapper.getInstance().getObjectFromString(message, EventMessage.class);
+            event = JsonMapper.getInstance().getObjectFromString(message, EventRequest.class);
         } catch (JSONException e) {
             logger.error(e);
         }
