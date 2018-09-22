@@ -2,6 +2,7 @@ package net.mitrol.focus.supervisor.core.service;
 
 import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.common.enums.WidgetType;
+import net.mitrol.focus.supervisor.common.event.EventResponse;
 import net.mitrol.focus.supervisor.core.service.domain.ESAgentStateRepository;
 import net.mitrol.focus.supervisor.core.service.domain.ESInteractionStatsRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,15 @@ public class ESGenericService {
     @Autowired
     ESAgentStateRepository esAgentStateRepository;
 
-    public Object getWidgetByMessage(EventRequest eventMessage) {
+    public EventResponse getEventResponse(EventRequest eventMessage) {
+        EventResponse eventResponse = new EventResponse();
+        eventResponse.setAgentId(eventMessage.getAgentId());
+        eventResponse.setDashboardId(eventMessage.getDashboardId());
+        eventResponse.setEventType(eventMessage.getEventType());
+        eventResponse.setId(eventMessage.getId());
+        eventResponse.setRefreshInterval(eventMessage.getRefreshInterval());
+        eventResponse.setWidgetId(eventMessage.getWidgetId());
+        eventResponse.setWidgetType(eventMessage.getWidgetType());
         WidgetType type = WidgetType.valueOf(eventMessage.getWidgetType().toUpperCase());
         String index = getIndex(eventMessage.getFilter().getDateFrom());
         String dateStarted = eventMessage.getFilter().getDateFrom();
@@ -46,31 +55,43 @@ public class ESGenericService {
 
         switch (type) {
             case INTERACTION_STATES:
-                return countInteractionStats(index, null, null, null, null, null, searchAllIndex);
+                countInteractionStats(index, null, null, null, null, null, searchAllIndex);
+                return eventResponse;
             case AGENT_STATES:
-                return countAgentState(index, eventMessage.getFilter().getCampaignId(), null, String.valueOf(eventMessage.getAgentId()), searchAllIndex, from, to);
+                countAgentState(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to);
+                return eventResponse;
             case AUXILIARY_STATES:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case STATES_TIME_COUNTER:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case AUXILIARY_STATES_TIME_COUNTER:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case AGENT_INFORMATION:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case INTERACTIONS_COUNTER:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case INTERACTIONS_DETAILS_COUNTER:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case SKILL_INDICATORS:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case AGENT_INTERACTION_STATES:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case SKILL_INTERACTIONS_COUNTER:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             case AGENT_INTERACTIONS_COUNTER:
-                return countAgentState(null, null, null, null, false, null, null);
+                countAgentState(null, null, null, null, false, null, null);
+                return eventResponse;
             default:
-                return null;
+                return eventResponse;
         }
     }
 
