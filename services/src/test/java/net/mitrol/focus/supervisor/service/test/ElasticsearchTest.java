@@ -334,7 +334,7 @@ public class ElasticsearchTest {
     @Test
     @Ignore
     public void shouldBeSearchAgentStateWidgetPreview() {
-        List<HashMap> resultInteractionStatsFilter = ESGenericService.countAgentState("2018.08.31", null, "", null, false, null, null);
+        Map resultInteractionStatsFilter = ESGenericService.countAgentState("2018.08.27", null, "", null, false, null, null);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
 }

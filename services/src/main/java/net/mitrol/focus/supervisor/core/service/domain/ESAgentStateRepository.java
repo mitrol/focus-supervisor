@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ESAgentStateRepository {
@@ -37,44 +38,48 @@ public class ESAgentStateRepository {
      * */
     private static final String SEARCH_ALL_INDEX = "*";
 
-    @Value("${index_agent}")
+    @Value("${index.agent:agent}")
     private String index_agent_status;
 
     @Autowired
     private RestHighLevelClient restHighLevelClient;
 
     /**
-     * @param date       format YYYY.mm.dd
+     * @param index format YYYY.mm.dd to search by index in elasticsearch, remember that We are save an index by day
      * @param campaignIds to search and filter by id campaign
-     * TODO Add range date to search, gte and lte.
+     * @param companyId
+     * @param agentId
+     * @param searchAllIndex When is true, the queries are using all index exists
+     * @param from range time in long to search gte and lte
+     * @param to range time in long to search gte and lte
      **/
-    public List<HashMap> countAgentStatus(String date, List<Integer> campaignIds, String companyId,
-                                          String agentId, boolean searchAllIndex, long from, long to) {
-        StringBuilder indexBuild = new StringBuilder(index_agent_status + SEPARATOR + date);
+    public Map countAgentStatus(String index, List<Long> campaignIds, String companyId,
+                                          String agentId, boolean searchAllIndex, Long from, Long to) {
+        StringBuilder indexBuild = new StringBuilder(index_agent_status + SEPARATOR + index);
         if (searchAllIndex) {
             indexBuild.append(SEARCH_ALL_INDEX);
         }
-        String index = indexBuild.toString();
+        String indexes = indexBuild.toString();
         try {
             MultiSearchRequest request = new MultiSearchRequest();
             /*Search by Avail*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Avail.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Avail.name(), companyId, agentId, from, to));
             /*Search by Preview*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Preview.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Preview.name(), companyId, agentId, from, to));
             /*Search by Dial by Agente*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Dial.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Dial.name(), companyId, agentId, from, to));
             /*Search Ring*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Ring.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Ring.name(), companyId, agentId, from, to));
             /*Search by Connect*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Connect.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Connect.name(), companyId, agentId, from, to));
             /*Search by Hold*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.Hold.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Hold.name(), companyId, agentId, from, to));
             /*Search by AfterCallWork*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.AfterCallWork.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.AfterCallWork.name(), companyId, agentId, from, to));
             /*Search by NotReady*/
-            request.add(makeSearchFilterAgentStatus(index, campaignIds, AgentState.NotReady.name(), companyId, agentId, from, to));
+            request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.NotReady.name(), companyId, agentId, from, to));
             /*Search by Auxiliar BREAK_0 To Other BEAK_n*/
-            request.add(searchByAuxiliar(index, campaignIds, companyId, agentId, from, to));
+            request.add(searchByAuxiliar(indexes, campaignIds, companyId, agentId, from, to));
             /*Search by Other*/
             //request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.HOLD.name(), companyId, agentId, from, to));
             MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
@@ -84,14 +89,12 @@ public class ESAgentStateRepository {
         }
     }
 
-    private List<HashMap> getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
-        List<HashMap> res = Lists.newArrayList();
+    private Map getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
+        Map<String, Long> res = new HashMap<>();
         for (MultiSearchResponse.Item item : response.getResponses()) {
             if (null != item.getResponse() || null == item.getFailure()) {
                 for (Aggregation aggregation : item.getResponse().getAggregations()) {
-                    HashMap<String, Long> data = new HashMap();
-                    data.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
-                    res.add(data);
+                    res.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
                 }
             }
         }
@@ -101,7 +104,7 @@ public class ESAgentStateRepository {
     /**
      * @param campaignIds represent userIds referent relation Agent and Campaign
      * */
-    private SearchRequest makeSearchFilterAgentStatus(String index, List<Integer> campaignIds, String state, String companyId, String agentId, Long from, Long to) {
+    private SearchRequest makeSearchFilterAgentStatus(String index, List<Long> campaignIds, String state, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -136,7 +139,7 @@ public class ESAgentStateRepository {
         return searchRequest;
     }
 
-    private SearchRequest searchByAuxiliar(String index, List<Integer> campaignIds, String companyId, String agentId, Long from, Long to) {
+    private SearchRequest searchByAuxiliar(String index, List<Long> campaignIds, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
