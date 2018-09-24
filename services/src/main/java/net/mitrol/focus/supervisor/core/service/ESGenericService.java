@@ -3,6 +3,7 @@ package net.mitrol.focus.supervisor.core.service;
 import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.common.enums.WidgetType;
 import net.mitrol.focus.supervisor.common.event.EventResponse;
+import net.mitrol.focus.supervisor.core.service.domain.ESAgentAuxiliaryRepository;
 import net.mitrol.focus.supervisor.core.service.domain.ESAgentStateRepository;
 import net.mitrol.focus.supervisor.core.service.domain.ESInteractionStatsRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,9 @@ public class ESGenericService {
 
     @Autowired
     ESAgentStateRepository esAgentStateRepository;
+
+    @Autowired
+    ESAgentAuxiliaryRepository esAgentAuxiliaryRepository;
 
     public EventResponse getEventResponse(EventRequest eventMessage) {
         EventResponse eventResponse = new EventResponse();
@@ -103,6 +107,11 @@ public class ESGenericService {
     public Map countAgentState(String index, List<Long> campaignIds, String companyId,
                                          String agentId, boolean searchAllIndex, Long from, Long to) {
         return esAgentStateRepository.countAgentStatus(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
+    }
+
+    public Map countAgentAuxiliary(String index, List<Long> campaignIds, String companyId,
+                               String agentId, boolean searchAllIndex, Long from, Long to) {
+        return esAgentAuxiliaryRepository.countAgentAuxiliary(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
     }
 
     private String getIndex(String dateStarted) {
