@@ -65,7 +65,7 @@ public class ESGenericService {
                 countAgentState(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to);
                 return eventResponse;
             case AUXILIARY_STATES:
-                countAgentState(null, null, null, null, false, null, null);
+                countAgentAuxiliary(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to);
                 return eventResponse;
             case STATES_TIME_COUNTER:
                 countAgentState(null, null, null, null, false, null, null);
