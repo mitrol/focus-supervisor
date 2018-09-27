@@ -19,8 +19,7 @@ import java.io.IOException;
 @Configuration
 @Import({ServiceConfig.class, ElasticSearchConfig.class})
 @ComponentScan("net.mitrol.focus.supervisor.connector.service," +
-               "net.mitrol.focus.supervisor.core.service," +
-               "net.mitrol.focus.supervisor.connector.util")
+               "net.mitrol.focus.supervisor.core.service")
 @PropertySources({@PropertySource("classpath:application.properties")})
 public class SupervisorConfig {
 
