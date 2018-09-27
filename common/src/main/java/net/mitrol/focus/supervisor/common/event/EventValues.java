@@ -2,10 +2,12 @@ package net.mitrol.focus.supervisor.common.event;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.List;
+
 /**
- * @author ladassus
+ * ladassus
  */
-public class EventRequest {
+public class EventValues {
 
     private String id;
     private String eventType;
@@ -14,8 +16,8 @@ public class EventRequest {
     private String widgetId;
     private String widgetType;
     private String agentId;
-    private EventFilter filter;
-
+    private List<Integer> scale;
+    private List<EventDataValue> values;
 
     public String getId() {
         return id;
@@ -73,12 +75,20 @@ public class EventRequest {
         this.agentId = agentId;
     }
 
-    public EventFilter getFilter() {
-        return filter;
+    public List<Integer> getScale() {
+        return scale;
     }
 
-    public void setFilter(EventFilter filter) {
-        this.filter = filter;
+    public void setScale(List<Integer> scale) {
+        this.scale = scale;
+    }
+
+    public List<EventDataValue> getValues() {
+        return values;
+    }
+
+    public void setValues(List<EventDataValue> values) {
+        this.values = values;
     }
 
     @Override

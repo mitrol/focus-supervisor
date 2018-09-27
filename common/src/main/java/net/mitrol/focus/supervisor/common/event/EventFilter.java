@@ -1,5 +1,7 @@
 package net.mitrol.focus.supervisor.common.event;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.util.List;
 
 /**
@@ -60,5 +62,10 @@ public class EventFilter {
 
     public void setDateTo(String dateTo) {
         this.dateTo = dateTo;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }
