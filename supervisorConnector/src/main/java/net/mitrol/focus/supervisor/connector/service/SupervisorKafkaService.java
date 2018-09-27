@@ -19,9 +19,9 @@ public class SupervisorKafkaService {
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SupervisorKafkaService.class);
 
     @Autowired
-    private KafkaReceiver mitAcdReceiver, eventReceiver;
+    private KafkaReceiver kafkaMitAcdReceiver, kafkaEventReceiver;
     @Autowired
-    private KafkaSender eventSender;
+    private KafkaSender kafkaEventSender;
     @Autowired
     private MitAcdMessageService mitAcdService;
     @Autowired
@@ -29,7 +29,7 @@ public class SupervisorKafkaService {
 
     @PostConstruct
     public void init() {
-        this.mitAcdReceiver.registerListener("supervisor", new KafkaReceiverListener<String>() {
+        this.kafkaMitAcdReceiver.registerListener("supervisor", new KafkaReceiverListener<String>() {
             @Override
             public void processMessage(String source, String topic, String value) {
                 logger.debug("Kafka mitAcd message to process: "
@@ -37,10 +37,10 @@ public class SupervisorKafkaService {
                 mitAcdService.mitAcdMessageProcess(value);
             }
         });
-        this.eventReceiver.registerListener("supervisor.event.request", new KafkaReceiverListener<String>() {
+        this.kafkaEventReceiver.registerListener("supervision.event.request", new KafkaReceiverListener<String>() {
             @Override
             public void processMessage(String source, String topic, String value) {
-                logger.debug("Kafka supervisor event message request to process: "
+                logger.info("Kafka supervisor event message request to process: "
                         + source + " " + topic + " " + value);
                 eventService.eventMessageProcess(value);
             }
@@ -49,6 +49,6 @@ public class SupervisorKafkaService {
 
     public void sender(String topic, String message) {
         logger.debug("Supervisor event message response: " + message);
-        this.eventSender.send(topic, message);
+        this.kafkaEventSender.send(topic, message);
     }
 }
