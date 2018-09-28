@@ -6,14 +6,14 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * @author ladassus
  */
 public class EventDataValue {
-    String id;
+    Object id;
     Object value;
 
-    public String getId() {
+    public Object getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Object id) {
         this.id = id;
     }
 
