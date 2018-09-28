@@ -40,7 +40,7 @@ public class SupervisorKafkaService {
         this.kafkaEventReceiver.registerListener("supervision.event.request", new KafkaReceiverListener<String>() {
             @Override
             public void processMessage(String source, String topic, String value) {
-                logger.info("Kafka supervisor event message request to process: "
+                logger.debug("Kafka supervisor event message request to process: "
                         + source + " " + topic + " " + value);
                 eventService.eventMessageProcess(value);
             }

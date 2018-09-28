@@ -1,5 +1,6 @@
 package net.mitrol.focus.supervisor.connector.util;
 
+import net.mitrol.focus.supervisor.common.enums.WidgetType;
 import net.mitrol.focus.supervisor.common.event.EventDataValue;
 import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.common.event.EventResponse;
@@ -61,23 +62,67 @@ public class SupervisorEventJob implements Job {
             widget.setDashboardId(eventRequest.getDashboardId());
             List<Integer> scale = Arrays.asList(0, 2, 4, 6, 8, 10);
             widget.setScale(scale);
-            widget.setValues(getDataValue());
+            WidgetType widgetType = WidgetType.valueOf(eventRequest.getWidgetType().toUpperCase());
+            switch (widgetType) {
+                case INTERACTION_STATES:{
+                    int[] ids = {0,1,2,3,4,5,6};
+                    widget.setValues(getValues(ids));
+                    break;
+                }
+                case AGENT_STATES:{
+                    int[] ids = {0,1,2,3,4,5,6,7,8,9,10};
+                    widget.setValues(getValues(ids));
+                    break;
+                }
+                case AUXILIARY_STATES:{
+                    break;
+                }
+                case STATES_TIME_COUNTER:{
+                    break;
+                }
+                case AUXILIARY_STATES_TIME_COUNTER:{
+                    break;
+                }
+                case AGENT_INFORMATION:{
+                    break;
+                }
+                case INTERACTIONS_COUNTER:{
+                    break;
+                }
+                case INTERACTIONS_DETAILS_COUNTER:{
+                    break;
+                }
+                case SKILL_INDICATORS:{
+                    break;
+                }
+                case AGENT_INTERACTION_STATES:{
+                    break;
+                }
+                case SKILL_INTERACTIONS_COUNTER:{
+                    break;
+                }
+                case AGENT_INTERACTIONS_COUNTER:{
+                    break;
+                }
+                default:
+                    break;
+            }
             eventResponse.setWidgetValues(widget);
             return eventResponse;
         }
+        
+        private static void addIds (int[] ids, List list){
+            for (int arrElement : ids) {
+                EventDataValue dataValue = new EventDataValue();
+                dataValue.setId(arrElement);
+                dataValue.setValue(ThreadLocalRandom.current().nextInt(0, 10));
+                list.add(dataValue);
+            }
+        }
 
-        public static List<EventDataValue> getDataValue (){
+        private static List<EventDataValue> getValues (int[] ids){
             List<EventDataValue> list = new ArrayList<EventDataValue>();
-            int preview = ThreadLocalRandom.current().nextInt(0,  10);
-            int dial = ThreadLocalRandom.current().nextInt(0,  10);
-            EventDataValue data1 = new EventDataValue();
-            data1.setId("Preview");
-            data1.setValue(preview + "");
-            EventDataValue data2 = new EventDataValue();
-            data2.setId("Dial");
-            data2.setValue(dial + "");
-            list.add(data1);
-            list.add(data2);
+            addIds(ids, list);
             return list;
         }
     }
