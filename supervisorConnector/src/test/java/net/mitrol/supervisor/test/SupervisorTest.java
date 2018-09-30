@@ -1,8 +1,11 @@
 package net.mitrol.supervisor.test;
 
+import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.connector.service.SupervisorEventService;
 import net.mitrol.kafka.KafkaContext;
 import net.mitrol.supervisor.test.config.TestConfig;
+import net.mitrol.utils.json.JsonMapper;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -32,9 +35,9 @@ public class SupervisorTest {
 
     @Test
     @Ignore
-    public void test1() throws InterruptedException {
-
-        eventService.eventMessageProcess(eventMessage);
+    public void test1() throws InterruptedException, JSONException {
+        EventRequest event = JsonMapper.getInstance().getObjectFromString(eventMessage, EventRequest.class);
+        eventService.processEvent(event);
         while (true){
 
         }

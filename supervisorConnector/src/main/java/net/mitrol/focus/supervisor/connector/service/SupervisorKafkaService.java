@@ -1,10 +1,14 @@
 package net.mitrol.focus.supervisor.connector.service;
 
+import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.kafka.KafkaReceiver;
 import net.mitrol.kafka.KafkaReceiverListener;
 import net.mitrol.kafka.KafkaSender;
+import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.apache.commons.lang3.Validate;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,7 +51,13 @@ public class SupervisorKafkaService {
             public void processMessage(String source, String topic, String value) {
                 logger.debug("Kafka supervisor event message request to process: "
                         + source + " " + topic + " " + value);
-                eventService.eventMessageProcess(value);
+                Validate.notNull(value, "Kafka value to consume cannot be null");
+                try {
+                    EventRequest event = JsonMapper.getInstance().getObjectFromString(value, EventRequest.class);
+                    eventService.processEvent(event);
+                } catch (JSONException e) {
+                    logger.error(e);
+                }
             }
         });
     }
