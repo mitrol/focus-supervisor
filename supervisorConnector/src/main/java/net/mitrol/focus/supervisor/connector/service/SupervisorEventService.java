@@ -10,6 +10,8 @@ import org.apache.commons.lang3.Validate;
 import org.json.JSONException;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,6 +27,10 @@ public class SupervisorEventService {
 
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SupervisorEventService.class);
 
+    @Value("${kafka.topic.supervision.event.request}")
+    private String topic_supervision_request_name;
+    @Value("${quartz.job.schedule.trigger.endAt:30}")
+    private Long triggerEndTime;
     @Autowired
     private Scheduler scheduler;
     @Autowired
@@ -56,18 +62,18 @@ public class SupervisorEventService {
         //
         JobDetail job = JobBuilder
                 .newJob(SupervisorEventJob.class)
-                .withIdentity("job" + event.getId())
+                .withIdentity("job" + event.getId(), event.getWidgetType())
                 .build();
         job.getJobDataMap().put("event", event);
         // TODO: job.getJobDataMap().put("esService", esService);
         job.getJobDataMap().put("kafkaService", kafkaService);
+        job.getJobDataMap().put("kafkaTopicName", topic_supervision_request_name);
         //
         Trigger trigger = TriggerBuilder
                 .newTrigger()
-                .withIdentity("trigger" + event.getId(), event.getId())
-                .withSchedule(
-                        CronScheduleBuilder.cronSchedule("0/" + event.getRefreshInterval() + " * * * * ?"))
-                .endAt(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
+                .withIdentity("trigger" + event.getId(), event.getWidgetType())
+                .withSchedule(CronScheduleBuilder.cronSchedule("0/" + event.getRefreshInterval() + " * * * * ?"))
+                .endAt(Date.from(Instant.now().plus(triggerEndTime, ChronoUnit.MINUTES)))
                 .build();
         //
         try {
@@ -79,7 +85,7 @@ public class SupervisorEventService {
     }
 
     private synchronized void unsubscribeEvent (EventRequest event){
-        TriggerKey tkey = new TriggerKey("trigger" + event.getId(), event.getId());
+        TriggerKey tkey = new TriggerKey("trigger" + event.getId(), event.getWidgetType());
         try {
             scheduler.unscheduleJob(tkey);
             logger.debug("Unscheduled job for message event: " + event.toString());

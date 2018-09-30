@@ -37,6 +37,7 @@ public class SupervisorEventJob implements Job {
         // Getting Services from Job Data Map
         // TODO: ESGenericService esService = (ESGenericService) data.get("esService");
         SupervisorKafkaService kafkaService = (SupervisorKafkaService) data.get("kafkaService");
+        String kafkaTopicName = (String) data.get("kafkaTopicName");
 
         // Getting query from Elasticsearch
         // TODO:EventResponse eventResponse = esService.getEventResponse(eventRequest);
@@ -48,7 +49,7 @@ public class SupervisorEventJob implements Job {
             logger.debug("Event Message Response: Job key -> " + jobKey + " Message to send -> " + strResponse);
 
             // Sending message response to kafka
-            kafkaService.sender("supervision.event.response", strResponse);
+            kafkaService.sender(kafkaTopicName, strResponse);
         }
     }
 
