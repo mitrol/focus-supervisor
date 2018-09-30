@@ -31,7 +31,7 @@ public class SupervisorTest {
     }
 
     @Test
-    @Ignore
+    //@Ignore
     public void test1() throws InterruptedException {
 
         eventService.eventMessageProcess(eventMessage);

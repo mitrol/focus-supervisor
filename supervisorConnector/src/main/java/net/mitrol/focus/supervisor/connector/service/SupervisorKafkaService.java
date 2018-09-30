@@ -6,6 +6,7 @@ import net.mitrol.kafka.KafkaSender;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -18,6 +19,10 @@ public class SupervisorKafkaService {
 
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SupervisorKafkaService.class);
 
+    @Value("${kafka.topic.supervision.event.response}")
+    private String topic_supervision_response_name;
+    @Value("${kafka.topic.supervision.mitacd}")
+    private String topic_supervision_mitacd_name;
     @Autowired
     private KafkaReceiver kafkaMitAcdReceiver, kafkaEventReceiver;
     @Autowired
@@ -29,7 +34,7 @@ public class SupervisorKafkaService {
 
     @PostConstruct
     public void init() {
-        this.kafkaMitAcdReceiver.registerListener("supervisor", new KafkaReceiverListener<String>() {
+        this.kafkaMitAcdReceiver.registerListener(topic_supervision_mitacd_name, new KafkaReceiverListener<String>() {
             @Override
             public void processMessage(String source, String topic, String value) {
                 logger.debug("Kafka mitAcd message to process: "
@@ -37,7 +42,7 @@ public class SupervisorKafkaService {
                 mitAcdService.mitAcdMessageProcess(value);
             }
         });
-        this.kafkaEventReceiver.registerListener("supervision.event.request", new KafkaReceiverListener<String>() {
+        this.kafkaEventReceiver.registerListener(topic_supervision_response_name, new KafkaReceiverListener<String>() {
             @Override
             public void processMessage(String source, String topic, String value) {
                 logger.debug("Kafka supervisor event message request to process: "
