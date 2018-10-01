@@ -30,6 +30,8 @@ public class SupervisorEventService implements SupervisorEvent{
     private String topic_supervision_request_name;
     @Value("${quartz.job.schedule.trigger.endAt:30}")
     private Long triggerEndTime;
+    @Value("${quartz.job.schedule.trigger.interval:2}")
+    private Long refreshInterval;
     @Autowired
     private Scheduler scheduler;
     @Autowired
@@ -64,9 +66,9 @@ public class SupervisorEventService implements SupervisorEvent{
     public void subscribeEvent (EventRequest event){
         //
         Validate.notNull(event, "Event cannot be null");
-        Validate.notNull(event.getId(), "Event id cannot be null");
-        Validate.notNull(event.getRefreshInterval(), "Event refreshInterval cannot be null");
+        Validate.notEmpty(event.getId(), "Event id cannot be empty");
         Validate.notEmpty(event.getWidgetType(), "Event widget type cannot be empty");
+        Validate.notEmpty(event.getAgentId(), "Event agent id cannot be empty");
         //
         unsubscribeEvent(event);
         JobDetail job = JobBuilder
@@ -81,7 +83,7 @@ public class SupervisorEventService implements SupervisorEvent{
         Trigger trigger = TriggerBuilder
                 .newTrigger()
                 .withIdentity(TRIGGER_PREFIX + event.getId(), event.getWidgetType())
-                .withSchedule(CronScheduleBuilder.cronSchedule("0/" + event.getRefreshInterval() + " * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0/" + refreshInterval + " * * * * ?"))
                 .endAt(Date.from(Instant.now().plus(triggerEndTime, ChronoUnit.MINUTES)))
                 .build();
         //
@@ -97,7 +99,7 @@ public class SupervisorEventService implements SupervisorEvent{
     public void unsubscribeEvent (EventRequest event){
         //
         Validate.notNull(event, "Event cannot be null");
-        Validate.notNull(event.getId(), "Event id cannot be null");
+        Validate.notEmpty(event.getId(), "Event id cannot be empty");
         Validate.notEmpty(event.getWidgetType(), "Event widget type cannot be empty");
         //
         JobKey jobKey= new JobKey(JOB_PREFIX + event.getId(), event.getWidgetType());
