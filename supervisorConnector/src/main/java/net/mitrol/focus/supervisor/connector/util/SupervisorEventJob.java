@@ -11,7 +11,6 @@ import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.quartz.*;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,10 +23,6 @@ public class SupervisorEventJob implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        // Getting Job Details
-        JobKey jobKey = context.getJobDetail().getKey();
-        logger.debug("SimpleJob says: " + jobKey + " executing at " + Instant.now());
-
         // Getting Job Data Map
         JobDataMap data = context.getJobDetail().getJobDataMap();
 
@@ -46,8 +41,6 @@ public class SupervisorEventJob implements Job {
         if (eventResponse !=null) {
             // Building string message to response
             String strResponse = JsonMapper.getInstance().getStringJsonFromObject(eventResponse);
-            logger.debug("Event Message Response: Job key -> " + jobKey + " Message to send -> " + strResponse);
-
             // Sending message response to kafka
             kafkaService.sender(kafkaTopicName, strResponse);
         }

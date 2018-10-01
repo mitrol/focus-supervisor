@@ -48,12 +48,11 @@ public class SupervisorKafkaService {
         });
         this.kafkaEventReceiver.registerListener(topic_supervision_response_name, new KafkaReceiverListener<String>() {
             @Override
-            public void processMessage(String source, String topic, String value) {
-                logger.debug("Kafka supervisor event message request to process: "
-                        + source + " " + topic + " " + value);
-                Validate.notNull(value, "Kafka value to consume cannot be null");
+            public void processMessage(String source, String topic, String message) {
+                logger.info("Receiving message from kafka topic -> " + topic + " message -> " + message);
+                Validate.notNull(message, "Kafka value to consume cannot be null");
                 try {
-                    EventRequest event = JsonMapper.getInstance().getObjectFromString(value, EventRequest.class);
+                    EventRequest event = JsonMapper.getInstance().getObjectFromString(message, EventRequest.class);
                     eventService.processEvent(event);
                 } catch (JSONException e) {
                     logger.error(e);
@@ -63,7 +62,7 @@ public class SupervisorKafkaService {
     }
 
     public void sender(String topic, String message) {
-        logger.debug("Supervisor event message response: " + message);
+        logger.info("Sending message to kafka topic -> " + topic + " message -> " + message);
         this.kafkaEventSender.send(topic, message);
     }
 }

@@ -89,7 +89,6 @@ public class SupervisorEventService implements SupervisorEvent{
         //
         try {
             scheduler.scheduleJob(job, trigger);
-            logger.debug("Scheduled job for message event: " + event.toString());
         } catch (SchedulerException e) {
             logger.error(e, "Error scheduling job for message event: " + event.toString());
         }
@@ -109,7 +108,6 @@ public class SupervisorEventService implements SupervisorEvent{
                 scheduler.pauseTrigger(triggerKey);
                 scheduler.unscheduleJob(triggerKey);
                 scheduler.deleteJob(jobKey);
-                logger.debug("Removed job for event request: " + event.toString());
             }
         } catch (SchedulerException e) {
             logger.error(e, "Error unscheduling job for message event: " + event.toString());
