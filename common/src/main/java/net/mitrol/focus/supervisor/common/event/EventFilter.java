@@ -10,9 +10,10 @@ import java.util.List;
 public class EventFilter {
 
     private List<Long> campaignIds;
-    private Long groupId;
+    private List<Long> groupId;
     private List<Long> splitIds;
     private List<Long> companyIds;
+    private List<Long> agentIds;
     private String dateFrom;
     private String dateTo;
 
@@ -22,14 +23,6 @@ public class EventFilter {
 
     public void setCampaignIds(List<Long> campaignIds) {
         this.campaignIds = campaignIds;
-    }
-
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
     }
 
     public List<Long> getSplitIds() {
@@ -58,6 +51,22 @@ public class EventFilter {
 
     public String getDateTo() {
         return dateTo;
+    }
+
+    public List<Long> getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(List<Long> groupId) {
+        this.groupId = groupId;
+    }
+
+    public List<Long> getAgentIds() {
+        return agentIds;
+    }
+
+    public void setAgentIds(List<Long> agentIds) {
+        this.agentIds = agentIds;
     }
 
     public void setDateTo(String dateTo) {
