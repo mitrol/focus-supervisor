@@ -19,9 +19,7 @@ import java.io.IOException;
 @Configuration
 @Import({ServiceConfig.class, ElasticSearchConfig.class})
 @ComponentScan("net.mitrol.focus.supervisor.connector.service," +
-               "net.mitrol.focus.supervisor.core.service," +
-               "net.mitrol.focus.supervisor.connector.util")
-@PropertySources({@PropertySource("classpath:application.properties")})
+               "net.mitrol.focus.supervisor.core.service")
 public class SupervisorConfig {
 
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SupervisorEventService.class);
