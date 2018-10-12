@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author ladassus
@@ -30,8 +31,8 @@ public class ESHighLevelClientService {
         return esRepository.buildDocumentIndex(object, index, type, id);
     }
 
-    public void buildDocumentIndex(String index, String type, List<Object> data) {
-        esRepository.buildDocumentIndex(index, type, data);
+    public void bulkSetOfDocuments(Map<String, Set<Object>> docs) {
+        esRepository.bulkSetOfDocuments(docs);
     }
 
     public void upsertDocumentIndexAsync(Object object, String index, String type, String id) {
