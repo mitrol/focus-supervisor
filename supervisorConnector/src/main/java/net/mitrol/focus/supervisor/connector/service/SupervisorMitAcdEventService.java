@@ -52,8 +52,7 @@ public class SupervisorMitAcdEventService implements SupervisorMitAcdEvent {
 
     @PostConstruct
     public void init() {
-        this.scheduler.scheduleWithFixedDelay(() -> {bulk(null,null,null,true);},
-                0, this.bulkDelay, TimeUnit.SECONDS);
+        this.scheduler.scheduleWithFixedDelay(() -> {bulk(true);}, 0, this.bulkDelay, TimeUnit.SECONDS);
     }
 
     @Override
@@ -64,15 +63,15 @@ public class SupervisorMitAcdEventService implements SupervisorMitAcdEvent {
         if (type != null) {
             switch (type) {
                 case AgentEvent.TYPE:{
-                    bulk(index_agent, payload, AgentEvent.class, false);
+                    bulk(false, index_agent, payload, AgentEvent.class);
                     break;
                 }
                 case InteractionEvent.TYPE: {
-                    bulk(index_interaction, payload, InteractionEvent.class, false);
+                    bulk(false, index_interaction, payload, InteractionEvent.class);
                     break;
                 }
                 case AgentCampaignRelationEvent.TYPE: {
-                    bulk(index_agent_campaign_relation, payload, AgentCampaignRelationEvent.class, false);
+                    bulk(false, index_agent_campaign_relation, payload, AgentCampaignRelationEvent.class);
                     break;
                 }
                 default:
@@ -81,16 +80,17 @@ public class SupervisorMitAcdEventService implements SupervisorMitAcdEvent {
         }
     }
 
-    private synchronized void bulk(String index, String payload, Class eventClass, boolean toPersist) {
-        if (toPersist){
+    private synchronized void bulk (boolean persist, Object... args){
+        if (persist){
             if (!map.isEmpty()) {
                 esService.bulkSetOfDocuments(map);
                 map.clear();
             }
         } else {
             try {
-                index =  ESUtil.getESIndexNameDateValue(index);
-                Object obj = JsonMapper.getInstance().getObjectFromString(payload, eventClass);
+                Validate.notEmpty(args);
+                String index =  ESUtil.getESIndexNameDateValue((String) args[0]);
+                Object obj = JsonMapper.getInstance().getObjectFromString((String) args[1], (Class) args[2]);
                 Set<Object> objs = (Set) map.get(index);
                 if (objs == null) {
                     objs = new HashSet();
