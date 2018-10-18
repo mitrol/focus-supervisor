@@ -4,6 +4,7 @@ import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.kafka.KafkaReceiver;
 import net.mitrol.kafka.KafkaReceiverListener;
 import net.mitrol.kafka.KafkaSender;
+import net.mitrol.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
@@ -28,22 +29,27 @@ public class SupervisorKafkaService {
     @Value("${kafka.topic.supervision.mitacd}")
     private String topic_supervision_mitacd_name;
     @Autowired
-    private KafkaReceiver kafkaMitAcdReceiver, kafkaEventReceiver;
+    private KafkaReceiver kafkaMitAcdEventReceiver, kafkaEventReceiver;
     @Autowired
     private KafkaSender kafkaEventSender;
     @Autowired
-    private MitAcdMessageService mitAcdService;
+    private SupervisorMitAcdEventService mitAcdEventService;
     @Autowired
     private SupervisorEventService eventService;
 
     @PostConstruct
     public void init() {
-        this.kafkaMitAcdReceiver.registerListener(topic_supervision_mitacd_name, new KafkaReceiverListener<String>() {
+        this.kafkaMitAcdEventReceiver.registerListener(topic_supervision_mitacd_name, new KafkaReceiverListener<String>() {
             @Override
-            public void processMessage(String source, String topic, String value) {
-                logger.debug("Kafka mitAcd message to process: "
-                        + source + " " + topic + " " + value);
-                mitAcdService.mitAcdMessageProcess(value);
+            public void processMessage(String source, String topic, String message) {
+                logger.info("Receiving message from kafka topic -> " + topic + " message -> " + message);
+                Validate.notNull(message, "Kafka value to consume cannot be null");
+                try {
+                    MitAcdEvent event = JsonMapper.getInstance().getObjectFromString(message, MitAcdEvent.class);
+                    mitAcdEventService.processEvent(event);
+                } catch (JSONException e) {
+                    logger.error(e);
+                }
             }
         });
         this.kafkaEventReceiver.registerListener(topic_supervision_response_name, new KafkaReceiverListener<String>() {

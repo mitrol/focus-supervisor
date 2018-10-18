@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Repository
 public class ESRepository {
@@ -51,7 +52,7 @@ public class ESRepository {
     private RestHighLevelClient restHighLevelClient;
 
     /**
-     * Create an index document in Elasticsesarch
+     * Create an index document in Elasticsearch
      *
      * @param data document to insert
      * @param index
@@ -75,7 +76,7 @@ public class ESRepository {
     }
 
     /**
-     * Create an index document in Elasticsesarch
+     * Create an index document in Elasticsearch
      *
      * @param data document to insert relation from Entity object complex
      * @param index document
@@ -100,15 +101,17 @@ public class ESRepository {
         }
     }
 
-    public void buildDocumentIndex(String index, String type, List<Object> objs) {
+    public void bulkSetOfDocuments(Map<String, Set<Object>> docs) {
         BulkRequest request = new BulkRequest();
-        objs.forEach(obj-> {
-            try {
-                byte[] json = MAPPER.writeValueAsBytes(obj);
-                request.add(new IndexRequest(index, type).source(json, XContentType.JSON));
-            } catch (JsonProcessingException e) {
-                log.error(e);
-            }
+        docs.forEach((index, objs) -> {
+            objs.forEach(obj-> {
+                try {
+                    byte[] json = MAPPER.writeValueAsBytes(obj);
+                    request.add(new IndexRequest(index, "_doc").source(json, XContentType.JSON));
+                } catch (JsonProcessingException e) {
+                    log.error(e);
+                }
+            });
         });
         try {
             restHighLevelClient.bulk(request);
@@ -118,7 +121,7 @@ public class ESRepository {
     }
 
     /**
-     * Update an index document in Elasticsesarch
+     * Update an index document in Elasticsearch
      *
      * @param data document to insert
      * @param index
@@ -149,7 +152,7 @@ public class ESRepository {
     }
 
     /**
-     * Create an index document asynchronously in Elasticsesarch
+     * Create an index document asynchronously in Elasticsearch
      *
      * @param data document to insert
      * @param index

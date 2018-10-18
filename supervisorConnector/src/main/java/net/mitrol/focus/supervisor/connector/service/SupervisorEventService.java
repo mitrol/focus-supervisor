@@ -46,15 +46,15 @@ public class SupervisorEventService implements SupervisorEvent{
         if (eventType != null) {
             switch (eventType) {
                 case SUBSCRIBE: {
-                    subscribeEvent(event);
+                    this.subscribeEvent(event);
                     break;
                 }
                 case UNSUBSCRIBE: {
-                    unsubscribeEvent(event);
+                    this.unsubscribeEvent(event);
                     break;
                 }
                 case FILTERCHANGE: {
-                    changeEventFilter(event, null);
+                    this.changeEventFilter(event, null);
                     break;
                 }
                 default: {
@@ -67,7 +67,7 @@ public class SupervisorEventService implements SupervisorEvent{
     @Override
     public void subscribeEvent (EventRequest event){
         Validate.notNull(event, "Event Request cannot be null");
-        unsubscribeEvent(event);
+        this.unsubscribeEvent(event);
         JobDetail job = JobBuilder
                 .newJob(SupervisorEventJob.class)
                 .withIdentity(JOB_PREFIX + event.getId(), event.getWidgetType())
@@ -107,7 +107,7 @@ public class SupervisorEventService implements SupervisorEvent{
 
     @Override
     public void changeEventFilter(EventRequest event, EventFilter filter) {
-        subscribeEvent(event);
+        this.subscribeEvent(event);
     }
 
     @Override
