@@ -1,4 +1,4 @@
-package net.mitrol.supervisor.service;
+package net.mitrol.focus.supervisor.service;
 
 import net.mitrol.kafka.KafkaReceiver;
 import net.mitrol.kafka.KafkaReceiverListener;

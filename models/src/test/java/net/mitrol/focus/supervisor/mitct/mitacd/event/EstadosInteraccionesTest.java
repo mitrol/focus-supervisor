@@ -1,4 +1,4 @@
-package net.mitrol.mitct.mitacd.event;
+package net.mitrol.focus.supervisor.mitct.mitacd.event;
 
 import net.mitrol.ct.api.enums.Channel;
 import net.mitrol.ct.api.enums.InteractionState;

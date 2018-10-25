@@ -1,12 +1,11 @@
-package net.mitrol.supervisor.test;
+package net.mitrol.focus.supervisor.test;
 
 import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.connector.service.SupervisorEventService;
 import net.mitrol.kafka.KafkaContext;
-import net.mitrol.supervisor.test.config.TestConfig;
+import net.mitrol.focus.supervisor.test.config.TestConfig;
 import net.mitrol.utils.json.JsonMapper;
 import org.json.JSONException;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

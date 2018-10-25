@@ -2,10 +2,10 @@ package net.mitrol.focus.supervisor.connector.service;
 
 import net.mitrol.focus.supervisor.common.util.ESUtil;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
-import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
-import net.mitrol.mitct.mitacd.event.AgentEvent;
-import net.mitrol.mitct.mitacd.event.InteractionEvent;
-import net.mitrol.mitct.mitacd.event.MitAcdEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentCampaignRelationEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.InteractionEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.ExecutorBuilder;
 import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
@@ -80,7 +80,7 @@ public class SupervisorMitAcdEventService implements SupervisorMitAcdEvent {
         }
     }
 
-    private synchronized void bulk (boolean persist, Object... args){
+    private synchronized void bulk (boolean persist, Object... args) {
         if (persist){
             if (!map.isEmpty()) {
                 esService.bulkSetOfDocuments(map);

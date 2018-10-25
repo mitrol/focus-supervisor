@@ -1,5 +1,19 @@
+jar {
+    enabled = true
+    manifest {
+        attributes (
+                'Implementation-Title': 'Mitrol Focus-Supervisor services',
+                'Built-By'       : System.properties['user.name'],
+                'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Created-By'     : "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+        )
+    }
+    version '1.0.0'
+}
+
 dependencies{
-    compile 'commons-beanutils:commons-beanutils:1.9.3'
     compile project(':models')
     compile project(':common')
 }

@@ -1,13 +1,12 @@
 package net.mitrol.focus.supervisor.mitacd.connector.controller;
 
 import net.mitrol.focus.supervisor.mitacd.connector.service.MitacdConnectorMessageService;
-import net.mitrol.mitct.mitacd.event.AgentCampaignRelationEvent;
-import net.mitrol.mitct.mitacd.event.AgentEvent;
-import net.mitrol.mitct.mitacd.event.InteractionEvent;
-import net.mitrol.mitct.mitacd.event.MitAcdEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentCampaignRelationEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.InteractionEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.utils.json.JsonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

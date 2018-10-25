@@ -2,7 +2,7 @@ package net.mitrol.focus.supervisor.core.service.domain;
 
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
-import net.mitrol.mitct.mitacd.event.AgentState;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentState;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;

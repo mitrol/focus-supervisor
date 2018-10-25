@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.connector.service;
 
-import net.mitrol.mitct.mitacd.event.MitAcdEvent;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.MitAcdEvent;
 
 /**
  * @author ladassus
