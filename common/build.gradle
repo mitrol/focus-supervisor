@@ -28,12 +28,16 @@ libraries.feign = [
         "com.netflix.feign:feign-gson:${versions.feign}",
 ]
 
+libraries.elasticsearch = [
+        "org.elasticsearch.client:elasticsearch-rest-high-level-client:${versions.elasticsearch}",
+        "org.elasticsearch:elasticsearch:${versions.elasticsearch}"
+]
+
 dependencies {
     compile libraries.feign
+    compile libraries.elasticsearch
     compile("org.apache.commons:commons-lang3:3.7")
     compile("org.apache.commons:commons-collections4:4.2")
     compile("commons-beanutils:commons-beanutils:1.9.3")
-    compile("org.elasticsearch.client:elasticsearch-rest-high-level-client:$versions.elasticsearch")
-    compile("org.elasticsearch:elasticsearch:$versions.elasticsearch")
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
