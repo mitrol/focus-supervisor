@@ -19,7 +19,8 @@ ext {
 }
 
 versions += [
-        feign  : '8.17.0'
+        feign  : '8.17.0',
+        elasticsearch : '6.4.2'
 ]
 
 libraries.feign = [
@@ -29,9 +30,10 @@ libraries.feign = [
 
 dependencies {
     compile libraries.feign
-    compile ("org.apache.commons:commons-lang3:3.7")
-    compile ("org.apache.commons:commons-collections4:4.2")
-    compile ('commons-beanutils:commons-beanutils:1.9.3')
+    compile("org.apache.commons:commons-lang3:3.7")
+    compile("org.apache.commons:commons-collections4:4.2")
+    compile("commons-beanutils:commons-beanutils:1.9.3")
+    compile("org.elasticsearch.client:elasticsearch-rest-high-level-client:$versions.elasticsearch")
+    compile("org.elasticsearch:elasticsearch:$versions.elasticsearch")
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile fileTree(dir: 'libs/elasticsearch', include: ['*.jar'])
 }
