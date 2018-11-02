@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -77,7 +78,7 @@ public class ESAgentStateRepository {
             request.add(searchByAuxiliar(index, campaignIds, companyId, agentId, from, to));
             /*Search by Other*/
             //request.add(makeSearchFilterAgentStatus(index, campaignId, AgentState.HOLD.name(), companyId, agentId, from, to));
-            MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
+            MultiSearchResponse multiSearchResponse = restHighLevelClient.msearch(request, RequestOptions.DEFAULT);
             return getMultipleSearchAggregation(multiSearchResponse);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);

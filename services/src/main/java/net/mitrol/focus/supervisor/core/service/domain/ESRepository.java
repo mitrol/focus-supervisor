@@ -23,6 +23,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.AbstractQueryBuilder;
@@ -68,7 +69,7 @@ public class ESRepository {
             indexRequest = new IndexRequest(index, type, id).source(data);
         }
         try {
-            IndexResponse response = restHighLevelClient.index(indexRequest);
+            IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
             return response.getId();
         } catch (ElasticsearchException |  IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
@@ -94,7 +95,7 @@ public class ESRepository {
                 indexRequest = new IndexRequest(index, type, id).source(json, XContentType.JSON);
             }
 
-            IndexResponse response = restHighLevelClient.index(indexRequest);
+            IndexResponse response = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
             return response.getId();
         } catch ( ElasticsearchException  | IOException e) {
             throw new MitrolSupervisorError("Unable to create an index in Elasticsearch", e);
@@ -114,7 +115,7 @@ public class ESRepository {
             });
         });
         try {
-            restHighLevelClient.bulk(request);
+            restHighLevelClient.bulk(request, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to do a bulk in Elasticsearch", e);
         }
@@ -134,7 +135,7 @@ public class ESRepository {
         try {
             byte[] json = MAPPER.writeValueAsBytes(data);
             updateRequest.doc(json, XContentType.JSON);
-            restHighLevelClient.updateAsync(updateRequest, new ActionListener<UpdateResponse>() {
+            restHighLevelClient.updateAsync(updateRequest, RequestOptions.DEFAULT, new ActionListener<UpdateResponse>() {
                 @Override
                 public void onResponse(UpdateResponse updateResponse) {
                     log.debug("Index upsert in Elasticsearch: " + updateResponse.getId());
@@ -161,7 +162,7 @@ public class ESRepository {
      */
     public void buildIndexByParamAsync(Map<String, Object> data, String index, String type, String id) {
         IndexRequest indexRequest = new IndexRequest(index, type, id).source(data);
-        restHighLevelClient.indexAsync(indexRequest, new ActionListener<IndexResponse>() {
+        restHighLevelClient.indexAsync(indexRequest, RequestOptions.DEFAULT, new ActionListener<IndexResponse>() {
             @Override
             public void onResponse(IndexResponse indexResponse) {
                 log.debug("Index created in Elasticsearch: " + indexResponse.getId());
@@ -188,7 +189,7 @@ public class ESRepository {
         }
         GetRequest getRequest = new GetRequest(index, type, id);
         try {
-            GetResponse getResponse = restHighLevelClient.get(getRequest);
+            GetResponse getResponse = restHighLevelClient.get(getRequest, RequestOptions.DEFAULT);
             return getResponse.getSourceAsMap();
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch", e);
@@ -213,7 +214,7 @@ public class ESRepository {
             searchSourceBuilder.query(QueryBuilders.matchAllQuery());
             searchRequest.source(searchSourceBuilder);
             searchRequest.indices(index);
-            SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
             return getObjects(searchResponse, valueType);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
@@ -238,7 +239,7 @@ public class ESRepository {
             if (null != matchQueryBuilder) searchSourceBuilder.query(matchQueryBuilder);
             searchRequest.source(searchSourceBuilder);
             searchRequest.indices(index);
-            SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
             return getObjects(searchResponse, valueType);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
@@ -256,7 +257,7 @@ public class ESRepository {
             SearchRequest searchRequest = new SearchRequest();
             searchRequest.source(searchSourceBuilder);
             searchRequest.indices(index);
-            SearchResponse searchResponse = restHighLevelClient.search(searchRequest);
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
             return getObjectsAggregation(searchResponse, valueType);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
@@ -278,7 +279,7 @@ public class ESRepository {
                 searchRequest.indices(index);
                 request.add(searchRequest);
             }
-            MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
+            MultiSearchResponse multiSearchResponse = restHighLevelClient.msearch(request, RequestOptions.DEFAULT);
             return getMultipleSearchAggregation(multiSearchResponse, valueType);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
@@ -295,7 +296,7 @@ public class ESRepository {
     public void deleteDataByParam(String index, String type, String id) {
         DeleteRequest deleteRequest = new DeleteRequest(index, type, id);
         try {
-            DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest);
+            DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e){
             throw new MitrolSupervisorError("Unable to remove index in Elasticsearch", e);
         }
@@ -312,7 +313,7 @@ public class ESRepository {
         getRequest.fetchSourceContext(new FetchSourceContext(false)); //Disable fetching _source.
         getRequest.storedFields("_none_"); //Disable fetching stored fields.
         try {
-            return restHighLevelClient.exists(getRequest);
+            return restHighLevelClient.exists(getRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new MitrolSupervisorError("Unable to verify if an index exist in Elasticsearch", e);
         }
