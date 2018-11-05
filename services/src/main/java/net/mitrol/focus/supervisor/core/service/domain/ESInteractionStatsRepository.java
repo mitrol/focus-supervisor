@@ -2,6 +2,8 @@ package net.mitrol.focus.supervisor.core.service.domain;
 
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
+import net.mitrol.focus.supervisor.common.event.EventDataValue;
+import net.mitrol.mitct.mitacd.event.AgentState;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -72,6 +74,8 @@ public class ESInteractionStatsRepository {
     private Map getSearchAggregation(SearchResponse response) throws JSONException {
         List<String> names = Lists.newArrayList();
         List<String> breaks = Lists.newArrayList();
+        List<EventDataValue> values = Lists.newArrayList();
+        List<String> prueba = Lists.newArrayList();
 
         for(Aggregation aggregation : response.getAggregations()) {
             List<? extends Terms.Bucket> parses = ((ParsedLongTerms) aggregation).getBuckets();
@@ -81,6 +85,9 @@ public class ESInteractionStatsRepository {
                 SearchHit[] searchHitsArray = searchHits.getHits();
                 for (SearchHit searchHit : searchHitsArray) {
                     String status = searchHit.getFields().get("state.keyword").getValues().get(0).toString();
+                    EventDataValue eventDataValue = new EventDataValue();
+                    prueba.add(String.valueOf(AgentState.getFromName(status).getCode()));
+                    //eventDataValue.setValue();
                     if (status.contains("Break")) {
                         breaks.add(status);
                     } else {
@@ -91,6 +98,8 @@ public class ESInteractionStatsRepository {
         }
 
         Map<String, Long> res = names.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        Map<String, Long> res2 = prueba.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         res.put("Break", Long.valueOf(breaks.size()));
 
