@@ -19,8 +19,7 @@ ext {
 }
 
 versions += [
-        feign  : '8.17.0',
-        elasticsearch : '6.4.2'
+        feign  : '8.17.0'
 ]
 
 libraries.feign = [
@@ -28,14 +27,8 @@ libraries.feign = [
         "com.netflix.feign:feign-gson:${versions.feign}",
 ]
 
-libraries.elasticsearch = [
-        "org.elasticsearch.client:elasticsearch-rest-high-level-client:${versions.elasticsearch}",
-        "org.elasticsearch:elasticsearch:${versions.elasticsearch}"
-]
-
 dependencies {
     compile libraries.feign
-    compile libraries.elasticsearch
     compile("org.apache.commons:commons-lang3:3.7")
     compile("org.apache.commons:commons-collections4:4.2")
     compile("commons-beanutils:commons-beanutils:1.9.3")
