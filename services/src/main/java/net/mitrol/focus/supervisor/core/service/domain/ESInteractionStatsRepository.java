@@ -3,10 +3,12 @@ package net.mitrol.focus.supervisor.core.service.domain;
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.focus.supervisor.common.event.EventDataValue;
-import net.mitrol.mitct.mitacd.event.AgentState;
+//import net.mitrol.mitct.mitacd.event.AgentState;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentState;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -64,7 +66,7 @@ public class ESInteractionStatsRepository {
         String index = indexBuild.toString();
 
         try {
-            SearchResponse searchResponse = restHighLevelClient.search(makeSearchFilterByInteractionState(index, campaignId, companyId, groupId, agentId, splitId));
+            SearchResponse searchResponse = restHighLevelClient.search(makeSearchFilterByInteractionState(index, campaignId, companyId, groupId, agentId, splitId), RequestOptions.DEFAULT);
             return getSearchAggregation(searchResponse);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);

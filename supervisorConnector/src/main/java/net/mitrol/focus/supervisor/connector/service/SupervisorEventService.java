@@ -1,6 +1,7 @@
 package net.mitrol.focus.supervisor.connector.service;
 
 import net.mitrol.focus.supervisor.common.enums.EventType;
+import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 import net.mitrol.focus.supervisor.common.event.EventFilter;
 import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.connector.util.SupervisorEventJob;
@@ -30,6 +31,8 @@ public class SupervisorEventService implements SupervisorEvent{
     private String topic_supervision_request_name;
     @Value("${quartz.job.schedule.trigger.endAt:30}")
     private Long triggerEndTime;
+    @Value("${quartz.job.schedule.trigger.interval:2}")
+    private Long refreshInterval;
     @Autowired
     private Scheduler scheduler;
     @Autowired
@@ -38,37 +41,33 @@ public class SupervisorEventService implements SupervisorEvent{
 
     @Override
     public void processEvent(EventRequest event) {
-        Validate.notNull(event, "Event cannot be null");
-        Validate.notEmpty(event.getEventType(), "Event type cannot be empty");
+        Validate.notNull(event, "Event Request cannot be null");
         EventType eventType  = EventType.valueOf(event.getEventType().toUpperCase());
-        switch (eventType) {
-            case SUBSCRIBE: {
-                subscribeEvent(event);
-                break;
-            }
-            case UNSUBSCRIBE: {
-                unsubscribeEvent(event);
-                break;
-            }
-            case FILTERCHANGE: {
-                changeEventFilter(event, null);
-                break;
-            }
-            default: {
-                break;
+        if (eventType != null) {
+            switch (eventType) {
+                case SUBSCRIBE: {
+                    this.subscribeEvent(event);
+                    break;
+                }
+                case UNSUBSCRIBE: {
+                    this.unsubscribeEvent(event);
+                    break;
+                }
+                case FILTERCHANGE: {
+                    this.changeEventFilter(event, null);
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
         }
     }
 
     @Override
     public void subscribeEvent (EventRequest event){
-        //
-        Validate.notNull(event, "Event cannot be null");
-        Validate.notNull(event.getId(), "Event id cannot be null");
-        Validate.notNull(event.getRefreshInterval(), "Event refreshInterval cannot be null");
-        Validate.notEmpty(event.getWidgetType(), "Event widget type cannot be empty");
-        //
-        unsubscribeEvent(event);
+        Validate.notNull(event, "Event Request cannot be null");
+        this.unsubscribeEvent(event);
         JobDetail job = JobBuilder
                 .newJob(SupervisorEventJob.class)
                 .withIdentity(JOB_PREFIX + event.getId(), event.getWidgetType())
@@ -77,46 +76,38 @@ public class SupervisorEventService implements SupervisorEvent{
         // TODO: job.getJobDataMap().put("esService", esService);
         job.getJobDataMap().put("kafkaService", kafkaService);
         job.getJobDataMap().put("kafkaTopicName", topic_supervision_request_name);
-        //
         Trigger trigger = TriggerBuilder
                 .newTrigger()
                 .withIdentity(TRIGGER_PREFIX + event.getId(), event.getWidgetType())
-                .withSchedule(CronScheduleBuilder.cronSchedule("0/" + event.getRefreshInterval() + " * * * * ?"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0/" + refreshInterval + " * * * * ?"))
                 .endAt(Date.from(Instant.now().plus(triggerEndTime, ChronoUnit.MINUTES)))
                 .build();
-        //
         try {
             scheduler.scheduleJob(job, trigger);
-            logger.debug("Scheduled job for message event: " + event.toString());
         } catch (SchedulerException e) {
-            logger.error(e, "Error scheduling job for message event: " + event.toString());
+            throw new MitrolSupervisorError("Quartz-Jobs scheduler error", e);
         }
     }
 
     @Override
-    public void unsubscribeEvent (EventRequest event){
-        //
-        Validate.notNull(event, "Event cannot be null");
-        Validate.notNull(event.getId(), "Event id cannot be null");
-        Validate.notEmpty(event.getWidgetType(), "Event widget type cannot be empty");
-        //
+    public void unsubscribeEvent (EventRequest event) {
+        Validate.notNull(event, "Event Request cannot be null");
         JobKey jobKey= new JobKey(JOB_PREFIX + event.getId(), event.getWidgetType());
         TriggerKey triggerKey = new TriggerKey(TRIGGER_PREFIX + event.getId(), event.getWidgetType());
         try {
-            if(scheduler.checkExists(jobKey)){
+            if(scheduler.checkExists(jobKey)) {
                 scheduler.pauseTrigger(triggerKey);
                 scheduler.unscheduleJob(triggerKey);
                 scheduler.deleteJob(jobKey);
-                logger.debug("Removed job for event request: " + event.toString());
             }
         } catch (SchedulerException e) {
-            logger.error(e, "Error unscheduling job for message event: " + event.toString());
+            throw new MitrolSupervisorError("Quartz-Jobs scheduler error", e);
         }
     }
 
     @Override
     public void changeEventFilter(EventRequest event, EventFilter filter) {
-        subscribeEvent(event);
+        this.subscribeEvent(event);
     }
 
     @Override

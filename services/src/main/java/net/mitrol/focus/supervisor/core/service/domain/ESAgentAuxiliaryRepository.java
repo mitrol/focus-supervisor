@@ -1,12 +1,14 @@
 package net.mitrol.focus.supervisor.core.service.domain;
 
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
-import net.mitrol.mitct.mitacd.event.AgentState;
+//import net.mitrol.mitct.mitacd.event.AgentState;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentState;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.MultiSearchRequest;
 import org.elasticsearch.action.search.MultiSearchResponse;
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -52,7 +54,7 @@ public class ESAgentAuxiliaryRepository {
      * @param from range time in long to search gte and lte
      * @param to range time in long to search gte and lte
      **/
-    public Map countAgentAuxiliary(String index, List<Long> campaignIds, String companyId,
+    public Map countAgentAuxiliary(String index, List<String> campaignIds, String companyId,
                                 String agentId, boolean searchAllIndex, Long from, Long to) {
         StringBuilder indexBuild = new StringBuilder(index_agent_status + SEPARATOR + index);
         if (searchAllIndex) {
@@ -82,7 +84,7 @@ public class ESAgentAuxiliaryRepository {
             /*Search by Auxiliary 9*/
             request.add(makeSearchFilterAgentStatus(indexes, campaignIds, AgentState.Break9.name(), companyId, agentId, from, to));
 
-            MultiSearchResponse multiSearchResponse = restHighLevelClient.multiSearch(request);
+            MultiSearchResponse multiSearchResponse = restHighLevelClient.msearch(request, RequestOptions.DEFAULT);
             return getMultipleSearchAggregation(multiSearchResponse);
         } catch (IOException | JSONException e) {
             throw new MitrolSupervisorError("Unable to do a get request in Elasticsearch with index and type", e);
@@ -104,7 +106,7 @@ public class ESAgentAuxiliaryRepository {
     /**
      * @param campaignIds represent userIds referent relation Agent and Campaign
      * */
-    private SearchRequest makeSearchFilterAgentStatus(String index, List<Long> campaignIds, String state, String companyId, String agentId, Long from, Long to) {
+    private SearchRequest makeSearchFilterAgentStatus(String index, List<String> campaignIds, String state, String companyId, String agentId, Long from, Long to) {
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.indices(index);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();

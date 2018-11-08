@@ -109,12 +109,12 @@ public class ESGenericService {
         return stateRepository.countInteractionStats(index, campaignId, companyId, groupId, agentId, splitId, searchAllIndex);
     }
 
-    public Map countAgentState(String index, List<Long> campaignIds, String companyId,
+    public Map countAgentState(String index, List<String> campaignIds, String companyId,
                                          String agentId, boolean searchAllIndex, Long from, Long to) {
         return esAgentStateRepository.countAgentStatus(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
     }
 
-    public Map countAgentAuxiliary(String index, List<Long> campaignIds, String companyId,
+    public Map countAgentAuxiliary(String index, List<String> campaignIds, String companyId,
                                String agentId, boolean searchAllIndex, Long from, Long to) {
         return esAgentAuxiliaryRepository.countAgentAuxiliary(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
     }
