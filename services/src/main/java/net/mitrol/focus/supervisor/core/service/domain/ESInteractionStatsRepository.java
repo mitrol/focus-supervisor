@@ -137,7 +137,8 @@ public class ESInteractionStatsRepository {
         AggregationBuilder subAggregation = AggregationBuilders.
                 topHits("group_docs").
                 explain(true).
-                size(1).storedFields(fields).
+                size(1).//fieldDataFields(fields). Ver si esta bien esto con lo nuevo
+                storedFields(fields).
                 sort("timestamp", SortOrder.DESC).
                 fetchSource(true).
                 storedField("state");
