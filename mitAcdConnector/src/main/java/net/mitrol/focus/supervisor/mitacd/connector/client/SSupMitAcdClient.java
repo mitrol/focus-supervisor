@@ -1,14 +1,18 @@
 package net.mitrol.focus.supervisor.mitacd.connector.client;
 
+import com.google.gson.reflect.TypeToken;
 import net.mitrol.acd.client.entities.MitAcdConnectionInfo;
 import net.mitrol.acd.client.tcp.MitAcdClient;
 import net.mitrol.acd.client.util.SockMessage;
-import net.mitrol.utils.ExecutorBuilder;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.RegisterEvent;
+import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.json.JSONException;
 
+import java.lang.reflect.Type;
 import java.time.Duration;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.Map;
 
 /**
  * @author ladassus
@@ -17,9 +21,9 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
 
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SSupMitAcdClient.class);
 
-    private ScheduledExecutorService scheduler = ExecutorBuilder.buildNewSingleScheduledExecutorService("SSupMitAcdExecutor");
     private SSupMitAcdClientStatus status;
     private Duration queryInterval;
+    private Type type = new TypeToken<Map<String, Object>>(){}.getType();
 
     @SuppressWarnings("WeakerAccess")
     public SSupMitAcdClient(SSupMitAcdClientListener ssupMitAcdClientListener, MitAcdConnectionInfo connectionInfo,
@@ -54,20 +58,25 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
     @Override
     protected void onMitAcdMessageReceived(SockMessage sockMessage) {
         logger.debug(sockMessage.toString());
+        String message = sockMessage.getsMessage();
+        try {
+            Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(message, type);
+            if (map.containsKey(RegisterEvent.TYPE)){;
+                register();
+            }
+        } catch (JSONException e) {
+            logger.error(e);
+        }
     }
 
     @Override
     public void start() throws IllegalStateException {
         super.start();
-
-       /* SockMessage sockMessage = new SockMessage(9990);
-        logger.debug(sockMessage.toString());
-        this.send(sockMessage);*/
     }
 
-   private void fetch() {
-        /*SockMessage sockMessage = new SockMessage(1300);
-        logger.debug(sockMessage.toString());
-        this.send(sockMessage);*/
+    private void register (){
+        SockMessage sockMessage = new SockMessage();
+        sockMessage.setsMessage("{\"register_event_response\":{\"charset\": \"UTF-8\"}}");
+        this.send(sockMessage);
     }
 }
