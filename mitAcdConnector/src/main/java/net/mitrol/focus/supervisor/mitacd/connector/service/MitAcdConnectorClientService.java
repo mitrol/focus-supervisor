@@ -6,6 +6,7 @@ import net.mitrol.focus.supervisor.mitacd.connector.client.SSupMitAcdClient;
 import net.mitrol.focus.supervisor.mitacd.connector.client.SSupMitAcdClientListener;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +22,11 @@ import java.time.Duration;
 @Service
 public class MitAcdConnectorClientService {
 
-    private MitrolLogger logger = MitrolLoggerImpl.getLogger(MitAcdConnectorClientService.class);
+    private static MitrolLogger logger = MitrolLoggerImpl.getLogger(MitAcdConnectorClientService.class);
 
     private MitAcdConnectionInfo connectionInfo;
+    @Autowired
+    private MitAcdConnectorKafkaService kafkaService;
 
     @Autowired
     public MitAcdConnectorClientService(MitAcdConnectionInfo connectionInfo) {
@@ -53,7 +56,6 @@ public class MitAcdConnectorClientService {
     private class MitAcdClientListener implements SSupMitAcdClientListener {
 
         private SSupMitAcdClient ssupMitAcdClient;
-        private Socket socket;
 
         public void connect (Socket socket){
             ssupMitAcdClient = new SSupMitAcdClient(this, connectionInfo, Duration.ofMillis(500));
@@ -72,6 +74,12 @@ public class MitAcdConnectorClientService {
 
         @Override
         public void onClosed(MitAcdClient mitAcdClient, DisconnectedReason disconnectedReason) {
+        }
+
+        @Override
+        public void send(String message) {
+            Validate.notNull(message, "message must be not null");
+            kafkaService.sender(message);
         }
     }
 }

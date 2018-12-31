@@ -21,6 +21,7 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
 
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(SSupMitAcdClient.class);
 
+    private SSupMitAcdClientListener ssupMitAcdClientListener;
     private SSupMitAcdClientStatus status;
     private Duration queryInterval;
     private Type type = new TypeToken<Map<String, Object>>(){}.getType();
@@ -29,7 +30,8 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
     public SSupMitAcdClient(SSupMitAcdClientListener ssupMitAcdClientListener, MitAcdConnectionInfo connectionInfo,
                             Duration queryInterval) {
         super(ssupMitAcdClientListener, connectionInfo);
-        status = new SSupMitAcdClientStatus(connectionInfo, getMitAcdClientState());
+        this.ssupMitAcdClientListener = ssupMitAcdClientListener;
+        this.status = new SSupMitAcdClientStatus(connectionInfo, getMitAcdClientState());
         this.queryInterval = queryInterval;
     }
 
@@ -41,7 +43,7 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
 
     @Override
     public String getGroup() {
-        return "MitACD";
+        return "MitAcd";
     }
 
     @Override
@@ -51,7 +53,7 @@ public class SSupMitAcdClient extends MitAcdClient<SSupMitAcdClientStatus, SSupM
 
     @Override
     public String getDescription() {
-        return "MitACD Kafka Connector";
+        return "MitAcd Kafka Connector";
     }
     // endregion
 
