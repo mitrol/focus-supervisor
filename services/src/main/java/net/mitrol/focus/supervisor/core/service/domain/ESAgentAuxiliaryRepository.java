@@ -2,6 +2,7 @@ package net.mitrol.focus.supervisor.core.service.domain;
 
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
 //import net.mitrol.mitct.mitacd.event.AgentState;
+import net.mitrol.focus.supervisor.common.event.EventDataValue;
 import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentState;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,9 +25,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class ESAgentAuxiliaryRepository {
@@ -54,7 +54,7 @@ public class ESAgentAuxiliaryRepository {
      * @param from range time in long to search gte and lte
      * @param to range time in long to search gte and lte
      **/
-    public Map countAgentAuxiliary(String index, List<String> campaignIds, String companyId,
+    public List<EventDataValue> countAgentAuxiliary(String index, List<String> campaignIds, String companyId,
                                 String agentId, boolean searchAllIndex, Long from, Long to) {
         StringBuilder indexBuild = new StringBuilder(index_agent_status + SEPARATOR + index);
         if (searchAllIndex) {
@@ -91,12 +91,15 @@ public class ESAgentAuxiliaryRepository {
         }
     }
 
-    private Map getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
-        Map<String, Long> res = new HashMap<>();
+    private List<EventDataValue> getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
+        List<EventDataValue> res = new ArrayList<>();
         for (MultiSearchResponse.Item item : response.getResponses()) {
             if (null != item.getResponse() || null == item.getFailure()) {
                 for (Aggregation aggregation : item.getResponse().getAggregations()) {
-                    res.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
+                    EventDataValue event = new EventDataValue();
+                    event.setId(AgentState.getFromName(aggregation.getName()).getCode());
+                    event.setValue(((ParsedValueCount) aggregation).getValue());
+                    res.add(event);
                 }
             }
         }
@@ -115,13 +118,13 @@ public class ESAgentAuxiliaryRepository {
             /**
              * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
              * */
-            query.should(QueryBuilders.termsQuery("userId", campaignIds));
+            query.must(QueryBuilders.termsQuery("userId", campaignIds));
         }
         if (!StringUtils.isEmpty(companyId)) {
-            query.filter(QueryBuilders.matchQuery("companyId", companyId));
+            query.must(QueryBuilders.matchQuery("companyId", companyId));
         }
         if (!StringUtils.isEmpty(agentId)) {
-            query.filter(QueryBuilders.matchQuery("userId", agentId));
+            query.must(QueryBuilders.matchQuery("userId", agentId));
         }
         if (null != from && null != to) {
             /**

@@ -1,5 +1,6 @@
 package net.mitrol.focus.supervisor.core.service;
 
+import net.mitrol.focus.supervisor.common.event.EventDataValue;
 import net.mitrol.focus.supervisor.common.event.EventRequest;
 import net.mitrol.focus.supervisor.common.enums.WidgetType;
 import net.mitrol.focus.supervisor.common.event.EventResponse;
@@ -65,11 +66,11 @@ public class ESGenericService {
                 eventResponse.setWidgetValues(eventValues);
                 return eventResponse;
             case AGENT_STATES:
-                countAgentState(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to);
+                eventValues.setValues(countAgentState(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to));
                 eventResponse.setWidgetValues(eventValues);
                 return eventResponse;
             case AUXILIARY_STATES:
-                countAgentAuxiliary(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to);
+                eventValues.setValues(countAgentAuxiliary(index, eventMessage.getFilter().getCampaignIds(), null, eventMessage.getAgentId(), searchAllIndex, from, to));
                 eventResponse.setWidgetValues(eventValues);
                 return eventResponse;
             case STATES_TIME_COUNTER:
@@ -109,12 +110,12 @@ public class ESGenericService {
         return stateRepository.countInteractionStats(index, campaignId, companyId, groupId, agentId, splitId, searchAllIndex);
     }
 
-    public Map countAgentState(String index, List<String> campaignIds, String companyId,
-                                         String agentId, boolean searchAllIndex, Long from, Long to) {
+    public List<EventDataValue> countAgentState(String index, List<String> campaignIds, String companyId,
+                                                String agentId, boolean searchAllIndex, Long from, Long to) {
         return esAgentStateRepository.countAgentStatus(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
     }
 
-    public Map countAgentAuxiliary(String index, List<String> campaignIds, String companyId,
+    public List<EventDataValue> countAgentAuxiliary(String index, List<String> campaignIds, String companyId,
                                String agentId, boolean searchAllIndex, Long from, Long to) {
         return esAgentAuxiliaryRepository.countAgentAuxiliary(index, campaignIds, companyId, agentId, searchAllIndex, from, to);
     }

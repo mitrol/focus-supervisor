@@ -1,8 +1,10 @@
 package net.mitrol.focus.supervisor.service.test;
 
 import net.mitrol.ct.api.enums.AgentState;
+import net.mitrol.focus.supervisor.common.event.EventDataValue;
 import net.mitrol.focus.supervisor.core.service.ESHighLevelClientService;
 import net.mitrol.focus.supervisor.core.service.ESGenericService;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentEvent;
 import net.mitrol.focus.supervisor.service.test.config.TestConfig;
 import net.mitrol.focus.supervisor.service.test.model.Direccion;
 import net.mitrol.focus.supervisor.service.test.model.User;
@@ -24,10 +26,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestConfig.class})
@@ -334,7 +334,17 @@ public class ElasticsearchTest {
     @Test
     @Ignore
     public void shouldBeSearchAgentStateWidgetPreview() {
-        Map resultInteractionStatsFilter = ESGenericService.countAgentState("2018.08.27", null, "", null, false, null, null);
+        List<EventDataValue> resultInteractionStatsFilter = ESGenericService.countAgentState("2018.12.12", Arrays.asList("2", "10"), "", null, false, null, null);
         Assert.assertNotNull(resultInteractionStatsFilter);
     }
+
+    @Test
+    @Ignore
+    public void shouldBeSaveAgentEvent() {
+        AgentEvent agentEvent = new AgentEvent(Calendar.getInstance().getTime(), ThreadLocalRandom.current().nextInt(1, 10 + 1),
+                ThreadLocalRandom.current().nextInt(1, 10 + 1),
+                net.mitrol.focus.supervisor.mitct.mitacd.event.AgentState.getFromCode(ThreadLocalRandom.current().nextInt(1, 8 + 1)));
+        esService.buildDocumentIndex(agentEvent, "agent-2018.12.12", type, "");
+    }
+
 }

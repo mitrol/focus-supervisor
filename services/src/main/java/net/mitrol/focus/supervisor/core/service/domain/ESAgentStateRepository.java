@@ -2,6 +2,7 @@ package net.mitrol.focus.supervisor.core.service.domain;
 
 import com.google.common.collect.Lists;
 import net.mitrol.focus.supervisor.common.error.MitrolSupervisorError;
+import net.mitrol.focus.supervisor.common.event.EventDataValue;
 import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentState;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,14 +25,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class ESAgentStateRepository {
 
     private static final String SEPARATOR = "-";
+    private static final String AUXILIAR = "Auxiliar";
 
     /**
      * This String is used to try search with pattern indexes
@@ -54,7 +54,7 @@ public class ESAgentStateRepository {
      * @param from range time in long to search gte and lte
      * @param to range time in long to search gte and lte
      **/
-    public Map countAgentStatus(String index, List<String> campaignIds, String companyId,
+    public List<EventDataValue> countAgentStatus(String index, List<String> campaignIds, String companyId,
                                           String agentId, boolean searchAllIndex, Long from, Long to) {
         StringBuilder indexBuild = new StringBuilder(index_agent_status + SEPARATOR + index);
         if (searchAllIndex) {
@@ -90,16 +90,23 @@ public class ESAgentStateRepository {
         }
     }
 
-    private Map getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
-        Map<String, Long> res = new HashMap<>();
+    private List<EventDataValue> getMultipleSearchAggregation(MultiSearchResponse response) throws JSONException {
+        List<EventDataValue> data = new ArrayList<>();
         for (MultiSearchResponse.Item item : response.getResponses()) {
             if (null != item.getResponse() || null == item.getFailure()) {
                 for (Aggregation aggregation : item.getResponse().getAggregations()) {
-                    res.put(aggregation.getName(), ((ParsedValueCount) aggregation).getValue());
+                    EventDataValue event = new EventDataValue();
+                    if (AUXILIAR.equals(aggregation.getName())) {
+                        event.setId(9);
+                    } else {
+                        event.setId(AgentState.getFromName(aggregation.getName()).getCode());
+                    }
+                    event.setValue(((ParsedValueCount) aggregation).getValue());
+                    data.add(event);
                 }
             }
         }
-        return res;
+        return data;
     }
 
     /**
@@ -114,18 +121,23 @@ public class ESAgentStateRepository {
             /**
              * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
              * */
-            query.should(QueryBuilders.termsQuery("userId", campaignIds));
+            query.must(QueryBuilders.termsQuery("userId", campaignIds));
             /**
              * Esto deberia Eliminarse luego
              */
             //query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
         if (!StringUtils.isEmpty(companyId)) {
-            query.filter(QueryBuilders.matchQuery("companyId", companyId));
+            query.must(QueryBuilders.matchQuery("companyId", companyId));
         }
         if (!StringUtils.isEmpty(agentId)) {
-            query.filter(QueryBuilders.matchQuery("userId", agentId));
+            query.must(QueryBuilders.matchQuery("userId", agentId));
         }
+
+        /* Esto es para futuro si tambien hay que filtrar por grupo.
+        query.must(QueryBuilders.termsQuery("groupId", Arrays.asList("10")));
+        */
+
         if (null != from && null != to) {
             /**
              * Este rango hay que probar todavia
@@ -133,7 +145,7 @@ public class ESAgentStateRepository {
             RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("timestamp").gte(from).lte(to);
             query.filter(rangeQueryBuilder);
         }
-        query.filter(QueryBuilders.matchQuery("state.keyword", state));
+        query.must(QueryBuilders.matchQuery("state.keyword", state));
         ValueCountAggregationBuilder aggregationBuildersTotal = AggregationBuilders.count(state).field("state.keyword");
         searchSourceBuilder.query(query).aggregation(aggregationBuildersTotal);
         searchRequest.source(searchSourceBuilder);
@@ -149,17 +161,17 @@ public class ESAgentStateRepository {
             /**
              * En el should deberia venir una coleccion de los userID que se extrajeron antes de AgentCampaingRelation
              * */
-            query.should(QueryBuilders.termsQuery("userId", campaignIds));
+            query.must(QueryBuilders.termsQuery("userId", campaignIds));
             /**
              * Esto deberia Eliminarse luego
              */
             //query.filter(QueryBuilders.matchQuery("campaignId", campaignId));
         }
         if (!StringUtils.isEmpty(companyId)) {
-            query.filter(QueryBuilders.matchQuery("companyId", companyId));
+            query.must(QueryBuilders.matchQuery("companyId", companyId));
         }
         if (!StringUtils.isEmpty(agentId)) {
-            query.filter(QueryBuilders.matchQuery("userId", agentId));
+            query.must(QueryBuilders.matchQuery("userId", agentId));
         }
         if (null != from && null != to) {
             /**
