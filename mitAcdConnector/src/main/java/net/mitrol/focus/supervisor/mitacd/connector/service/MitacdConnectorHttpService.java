@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  * @author ladassus
  */
 @Service
-public class MitacdConnectorMessageService {
+public class MitacdConnectorHttpService {
 
     @Autowired
     private MitAcdConnectorKafkaService kafkaService;
