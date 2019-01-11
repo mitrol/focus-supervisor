@@ -8,6 +8,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+
 /**
  * @author ladassus
  */
@@ -25,7 +26,9 @@ public class MitAcdConnectorTcpService extends MitAcdConnectorServer {
     }
 
     @Override
-    public void onMitAcdMessageReceived(String message) {
+    public void onMitAcdMessageReceived(Object type, Object message) {
+        //TODO
+        logger.info((String) message, "     ", (String) message);
 
     }
 }

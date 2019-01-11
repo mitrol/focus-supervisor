@@ -1,16 +1,25 @@
 package net.mitrol.focus.supervisor.mitacd.connector.tcp;
 
+import com.google.common.reflect.TypeToken;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.RegisterEvent;
 import net.mitrol.utils.ExecutorBuilder;
+import net.mitrol.utils.json.JsonMapper;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
+import org.json.JSONException;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -20,16 +29,15 @@ public abstract class MitAcdConnectorServer {
 
     private static MitrolLogger logger = MitrolLoggerImpl.getLogger(MitAcdConnectorServer.class);
 
-    private ExecutorService executor;
-
-    public void init (int port) {
+    protected void init (int port) {
         ServerSocket server = null;
         Socket socket = null;
-        this.executor =  ExecutorBuilder.buildNewSingleExecutorService("MitAcd");
+        ExecutorService executor =  ExecutorBuilder.buildNewSingleExecutorService("MitAcd");
         try {
             server = new ServerSocket(port);
         } catch (IOException e) {
             logger.error(e);
+            return;
         }
         while (true) {
             try {
@@ -41,14 +49,16 @@ public abstract class MitAcdConnectorServer {
         }
     }
 
-    public abstract void onMitAcdMessageReceived(String message);
+    public abstract void onMitAcdMessageReceived(Object type, Object object);
 
     private class MitAcdClientConn implements Runnable {
         private Socket socket;
         private DataInputStream dataInputStream;
         private DataOutputStream dataOutputStream;
         private ConnectionState state = ConnectionState.Disconnected;
-        String receivedMessage;
+        private String receivedMessage;
+        private Type type = new TypeToken<Map<String, Object>>(){}.getType();
+        private Map.Entry entry;
 
         public MitAcdClientConn (Socket socket){
             this.socket = socket;
@@ -77,13 +87,15 @@ public abstract class MitAcdConnectorServer {
                     try {
                         checkInitDataInputStream();
                         b = dataInputStream.readByte();
-                        //Si recibimos datos del servicio, indicamos que estamos en el estado de Listening.
+                        //if we receive data from the service we are indicating state Listening.
                         state = ConnectionState.Listening;
+                        logger.debug(String.format("MitAcd received byte: %s", b));
                     } catch (IOException e) {
                         close();
                         continue;
                     }
                     receivedBytes++;
+                    logger.debug(String.format("MitAcd received bytes count: %s", receivedBytes));
                     if (receivedBytes < 5) {
                         if (receivedBytes - 1 == 0 && b != 3) {
                             close();
@@ -95,33 +107,59 @@ public abstract class MitAcdConnectorServer {
                             messageLength = new TPKTHeader(headerBytes, 0).getLength();
                             byteBuffer = ByteBuffer.allocate(messageLength - 4);
                         }
+                        logger.debug(String.format("MitAcd received message byte %s/%s", receivedBytes, messageLength));
                         byteBuffer.put(b);
                         if (receivedBytes == messageLength) {
-                            //recibimos el mensaje entero
+                            //we receive the all message.
                             try {
                                 byte[] messageBytes = byteBuffer.array();
+                                logger.debug(String.format("Message received %s", new String(messageBytes, "UTF-8")));
                                 byteBuffer.clear();
                                 byteBuffer = null;
                                 receivedBytes = 0;
 
                                 receivedMessage = (new String(messageBytes, "utf-8")).trim();
                             } catch (IOException e) {
-                                logger.error(e);
+                                logger.error(e, String.format("Error message parser : %s", new String(byteBuffer.array())));
                                 continue;
                             }
+                            logger.debug(String.format("Processing MitAcdMessage %s started", receivedMessage.toString()));
                             try {
-                                onMitAcdMessageReceived(receivedMessage);
-                            } catch (Exception e) {
-                                logger.error(e);
+                                Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(receivedMessage, type);
+                                this.entry = this.getEntry(map, 0);
+                                if (entry.getKey().equals(RegisterEvent.TYPE)) {
+                                    this.send("{\"register_event_response\":{\"charset\": \"UTF-8\"}}\r\n");
+                                } else {
+                                    onMitAcdMessageReceived(entry.getKey(), entry.getValue());
+                                }
+                            } catch (JSONException e1) {
+                                logger.error("Error JSON parser: " + receivedMessage);
                             }
+                            logger.debug(String.format("Processing MitAcdMessage %s finished", receivedMessage.toString()));
                         }
                     }
                 }
+                logger.info("MitAcd socket listening finished");
             }
         }
 
-        private synchronized void send (){
-            //TODO
+        private synchronized void send (String string){
+            logger.debug(String.format("MitAcd socket sending message response %s ", string));
+            if (this.socket != null && this.socket.isConnected()) {
+                try {
+                    Charset encoding = Charset.forName("UTF-8");
+                    byte[] data = string.getBytes(encoding);
+                    int finalDataLength = 4 + data.length;
+                    byte[] tpkHeaderBytes = (new TPKTHeader(finalDataLength)).toNetworkByteArray();
+                    this.checkInitDataOutPutStream();
+                    this.checkInitDataInputStream();
+                    this.dataOutputStream.write(tpkHeaderBytes, 0, tpkHeaderBytes.length);
+                    this.dataOutputStream.write(data, 0, data.length);
+                    this.dataOutputStream.flush();
+                } catch (Exception e){
+                    logger.error(e, String.format("Error MitAcd socket sending message response %s ", string));
+                }
+            }
         }
 
         private void checkInitDataOutPutStream() throws IOException {
@@ -181,6 +219,17 @@ public abstract class MitAcdConnectorServer {
             if (state != ConnectionState.Closed) {
                 state = ConnectionState.Closed;
             }
+        }
+
+        private Map.Entry<String, Object> getEntry(Map map, int i){
+            Set<Map.Entry<String, Object>> entries = map.entrySet();
+            int j = 0;
+            for(Map.Entry<String, Object>entry : entries) {
+                if (j++ == i) {
+                    return entry;
+                }
+            }
+            return null;
         }
     }
 }
