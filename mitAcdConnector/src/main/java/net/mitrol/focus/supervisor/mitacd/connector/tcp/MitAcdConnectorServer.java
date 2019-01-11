@@ -17,7 +17,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +48,7 @@ public abstract class MitAcdConnectorServer {
         }
     }
 
-    public abstract void onMitAcdMessageReceived(Object type, Object object);
+    public abstract void onMitAcdMessageReceived(Object type, Object message);
 
     private class MitAcdClientConn implements Runnable {
         private Socket socket;
@@ -66,8 +65,8 @@ public abstract class MitAcdConnectorServer {
 
         @Override
         public void run() {
-            if (socket.isConnected()) {
-                state = ConnectionState.Connected;
+            if (this.socket.isConnected()) {
+                this.state = ConnectionState.Connected;
                 disposeDataInputStream();
                 disposeDataOutPutStream();
                 try {
@@ -83,12 +82,12 @@ public abstract class MitAcdConnectorServer {
                 ByteBuffer byteBuffer = null;
                 int messageLength = 0;
                 byte b;
-                while (!ConnectionState.Closed.equals(state)) {
+                while (!ConnectionState.Closed.equals(this.state)) {
                     try {
                         checkInitDataInputStream();
-                        b = dataInputStream.readByte();
+                        b = this.dataInputStream.readByte();
                         //if we receive data from the service we are indicating state Listening.
-                        state = ConnectionState.Listening;
+                        this.state = ConnectionState.Listening;
                         logger.debug(String.format("MitAcd received byte: %s", b));
                     } catch (IOException e) {
                         close();
@@ -118,24 +117,24 @@ public abstract class MitAcdConnectorServer {
                                 byteBuffer = null;
                                 receivedBytes = 0;
 
-                                receivedMessage = (new String(messageBytes, "utf-8")).trim();
+                                this.receivedMessage = (new String(messageBytes, "utf-8")).trim();
                             } catch (IOException e) {
                                 logger.error(e, String.format("Error message parser : %s", new String(byteBuffer.array())));
                                 continue;
                             }
-                            logger.debug(String.format("Processing MitAcdMessage %s started", receivedMessage.toString()));
+                            logger.debug(String.format("Processing MitAcdMessage %s started", this.receivedMessage));
                             try {
-                                Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(receivedMessage, type);
+                                Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(this.receivedMessage, this.type);
                                 this.entry = this.getEntry(map, 0);
-                                if (entry.getKey().equals(RegisterEvent.TYPE)) {
+                                if (this.entry.getKey().equals(RegisterEvent.TYPE)) {
                                     this.send("{\"register_event_response\":{\"charset\": \"UTF-8\"}}\r\n");
                                 } else {
-                                    onMitAcdMessageReceived(entry.getKey(), entry.getValue());
+                                    onMitAcdMessageReceived(this.entry.getKey(), this.entry.getValue());
                                 }
                             } catch (JSONException e1) {
-                                logger.error("Error JSON parser: " + receivedMessage);
+                                logger.error(String.format("Error JSON parser: %s" , this.receivedMessage));
                             }
-                            logger.debug(String.format("Processing MitAcdMessage %s finished", receivedMessage.toString()));
+                            logger.debug(String.format("Processing MitAcdMessage %s finished", this.receivedMessage));
                         }
                     }
                 }
@@ -163,32 +162,32 @@ public abstract class MitAcdConnectorServer {
         }
 
         private void checkInitDataOutPutStream() throws IOException {
-            if (dataOutputStream == null && socket != null) {
-                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            if (this.dataOutputStream == null && this.socket != null) {
+                this.dataOutputStream = new DataOutputStream(this.socket.getOutputStream());
             }
         }
 
         private void checkInitDataInputStream() throws IOException {
-            if (dataInputStream == null && socket != null) {
-                dataInputStream = new DataInputStream(socket.getInputStream());
+            if (this.dataInputStream == null && this.socket != null) {
+                this.dataInputStream = new DataInputStream(this.socket.getInputStream());
             }
 
         }
 
         private void closeSocket() {
-            if (socket != null && !socket.isClosed()) {
+            if (this.socket != null && !this.socket.isClosed()) {
                 try {
-                    socket.close();
+                    this.socket.close();
                 } catch (IOException e) {
                     logger.error(e);
                 }
-                socket = null;
+                this.socket = null;
             }
         }
 
         private void disposeDataOutPutStream() {
-            disposeClosable(dataOutputStream);
-            dataOutputStream = null;
+            disposeClosable(this.dataOutputStream);
+            this.dataOutputStream = null;
         }
 
         private void disposeClosable(Closeable closeable) {
@@ -202,13 +201,13 @@ public abstract class MitAcdConnectorServer {
         }
 
         private void disposeDataInputStream() {
-            disposeClosable(dataInputStream);
-            dataInputStream = null;
+            disposeClosable(this.dataInputStream);
+            this.dataInputStream = null;
         }
 
         private void disposeConnection() {
-            disposeClosable(dataInputStream);
-            disposeClosable(dataOutputStream);
+            disposeClosable(this.dataInputStream);
+            disposeClosable(this.dataOutputStream);
             closeSocket();
         }
 
@@ -216,8 +215,8 @@ public abstract class MitAcdConnectorServer {
             disposeConnection();
             disposeDataInputStream();
             disposeDataOutPutStream();
-            if (state != ConnectionState.Closed) {
-                state = ConnectionState.Closed;
+            if (this.state != ConnectionState.Closed) {
+                this.state = ConnectionState.Closed;
             }
         }
 
