@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.mitacd.connector.controller;
 
-import net.mitrol.focus.supervisor.mitacd.connector.service.MitacdConnectorMessageService;
+import net.mitrol.focus.supervisor.mitacd.connector.service.MitacdConnectorHttpService;
 import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentCampaignRelationEvent;
 import net.mitrol.focus.supervisor.mitct.mitacd.event.AgentEvent;
 import net.mitrol.focus.supervisor.mitct.mitacd.event.InteractionEvent;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MitacdConnectorController {
 
     @Autowired
-    private MitacdConnectorMessageService msgService;
+    private MitacdConnectorHttpService msgService;
 
     @RequestMapping(method = RequestMethod.POST, path = "/agents", produces = "application/json")
     public void sendAgentEvent(@RequestBody AgentEvent agentEvent) {

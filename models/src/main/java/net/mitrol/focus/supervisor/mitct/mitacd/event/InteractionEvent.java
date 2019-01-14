@@ -19,7 +19,6 @@ public class InteractionEvent {
     private Integer recordId;
     private Integer recordContactId;
     private Integer messageId;
-    private Integer messagingAccountId;
     private Channel channel; // tipo contacto
     private Integer resolutionId;
     private Integer resolutionCategoryId;
@@ -27,7 +26,7 @@ public class InteractionEvent {
     public InteractionEvent() {
     }
 
-    public InteractionEvent(Date timestamp, String interactionId, Integer segment, InteractionState state, Integer campaignId, Integer userId, Integer groupId, Integer recordId, Integer recordContactId, Integer messageId, Integer messagingAccountId, Channel channel, Integer resolutionId, Integer resolutionCategoryId) {
+    public InteractionEvent(Date timestamp, String interactionId, Integer segment, InteractionState state, Integer campaignId, Integer userId, Integer groupId, Integer recordId, Integer recordContactId, Integer messageId, Channel channel, Integer resolutionId, Integer resolutionCategoryId) {
         this.timestamp = timestamp;
         this.interactionId = interactionId;
         this.segment = segment;
@@ -38,7 +37,6 @@ public class InteractionEvent {
         this.recordId = recordId;
         this.recordContactId = recordContactId;
         this.messageId = messageId;
-        this.messagingAccountId = messagingAccountId;
         this.channel = channel;
         this.resolutionId = resolutionId;
         this.resolutionCategoryId = resolutionCategoryId;
@@ -114,14 +112,6 @@ public class InteractionEvent {
 
     public void setMessageId(Integer messageId) {
         this.messageId = messageId;
-    }
-
-    public Integer getMessagingAccountId() {
-        return messagingAccountId;
-    }
-
-    public void setMessagingAccountId(Integer messagingAccountId) {
-        this.messagingAccountId = messagingAccountId;
     }
 
     public Channel getChannel() {
