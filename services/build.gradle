@@ -1,3 +1,5 @@
+project.version '1.0.0'
+
 jar {
     enabled = true
     manifest {
@@ -10,7 +12,6 @@ jar {
                 'Build-OS'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
         )
     }
-    version '1.0.0'
 }
 
 dependencies{
