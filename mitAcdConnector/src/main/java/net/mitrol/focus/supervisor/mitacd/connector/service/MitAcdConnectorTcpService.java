@@ -1,6 +1,7 @@
 package net.mitrol.focus.supervisor.mitacd.connector.service;
 
 import net.mitrol.focus.supervisor.mitacd.connector.tcp.MitAcdConnectorServer;
+import net.mitrol.focus.supervisor.mitacd.connector.tcp.SockMessage;
 import net.mitrol.utils.log.MitrolLogger;
 import net.mitrol.utils.log.MitrolLoggerImpl;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,9 +27,9 @@ public class MitAcdConnectorTcpService extends MitAcdConnectorServer {
     }
 
     @Override
-    public void onMitAcdMessageReceived(Object type, Object message) {
+    public void onMitAcdMessageReceived(SockMessage sockMessage) {
         //TODO
-        logger.info((String) message, "     ", (String) message);
+        logger.info((String) sockMessage.getType(), "     ", (String) sockMessage.getPayload());
 
     }
 }

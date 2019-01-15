@@ -48,7 +48,7 @@ public abstract class MitAcdConnectorServer {
         }
     }
 
-    public abstract void onMitAcdMessageReceived(Object type, Object message);
+    public abstract void onMitAcdMessageReceived(SockMessage sockMessage);
 
     private class MitAcdClientConn implements Runnable {
         private Socket socket;
@@ -57,7 +57,6 @@ public abstract class MitAcdConnectorServer {
         private ConnectionState state = ConnectionState.Disconnected;
         private String receivedMessage;
         private Type type = new TypeToken<Map<String, Object>>(){}.getType();
-        private Map.Entry entry;
 
         public MitAcdClientConn (Socket socket){
             this.socket = socket;
@@ -67,16 +66,16 @@ public abstract class MitAcdConnectorServer {
         public void run() {
             if (this.socket.isConnected()) {
                 this.state = ConnectionState.Connected;
-                disposeDataInputStream();
-                disposeDataOutPutStream();
+                this.disposeDataInputStream();
+                this.disposeDataOutPutStream();
                 try {
-                    checkInitDataInputStream();
-                    checkInitDataOutPutStream();
+                    this.checkInitDataInputStream();
+                    this.checkInitDataOutPutStream();
                 } catch (IOException e) {
                     logger.error(e);
-                    close();
+                    this.close();
                 }
-                state = ConnectionState.Listening;
+                this.state = ConnectionState.Listening;
                 int receivedBytes = 0;
                 byte[] headerBytes = new byte[4];
                 ByteBuffer byteBuffer = null;
@@ -84,20 +83,20 @@ public abstract class MitAcdConnectorServer {
                 byte b;
                 while (!ConnectionState.Closed.equals(this.state)) {
                     try {
-                        checkInitDataInputStream();
+                        this.checkInitDataInputStream();
                         b = this.dataInputStream.readByte();
                         //if we receive data from the service we are indicating state Listening.
                         this.state = ConnectionState.Listening;
                         logger.debug(String.format("MitAcd received byte: %s", b));
                     } catch (IOException e) {
-                        close();
+                        this.close();
                         continue;
                     }
                     receivedBytes++;
                     logger.debug(String.format("MitAcd received bytes count: %s", receivedBytes));
                     if (receivedBytes < 5) {
                         if (receivedBytes - 1 == 0 && b != 3) {
-                            close();
+                            this.close();
                             continue;
                         }
                         headerBytes[receivedBytes - 1] = b;
@@ -124,12 +123,11 @@ public abstract class MitAcdConnectorServer {
                             }
                             logger.debug(String.format("Processing MitAcdMessage %s started", this.receivedMessage));
                             try {
-                                Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(this.receivedMessage, this.type);
-                                this.entry = this.getEntry(map, 0);
-                                if (this.entry.getKey().equals(RegisterEvent.TYPE)) {
-                                    this.send("{\"register_event_response\":{\"charset\": \"UTF-8\"}}\r\n");
+                                SockMessage sockMessage = this.buildSockMessage(this.receivedMessage);
+                                if (sockMessage.getType().equals(RegisterEvent.TYPE)) {
+                                    this.send(SockMessage.EVENT_RESPONSE);
                                 } else {
-                                    onMitAcdMessageReceived(this.entry.getKey(), this.entry.getValue());
+                                    onMitAcdMessageReceived(sockMessage);
                                 }
                             } catch (JSONException e1) {
                                 logger.error(String.format("Error JSON parser: %s" , this.receivedMessage));
@@ -220,6 +218,17 @@ public abstract class MitAcdConnectorServer {
             }
         }
 
+        private SockMessage buildSockMessage (String receivedMessage) throws JSONException {
+            Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(receivedMessage, this.type);
+            Map.Entry entry = this.getEntry(map, 0);
+            SockMessage sockMessage = new SockMessage();
+            sockMessage.setReceivedMessage(receivedMessage);
+            sockMessage.setType(entry.getKey());
+            sockMessage.setPayload(entry.getValue());
+            return sockMessage;
+        }
+
+        @SuppressWarnings("unchecked")
         private Map.Entry<String, Object> getEntry(Map map, int i){
             Set<Map.Entry<String, Object>> entries = map.entrySet();
             int j = 0;
