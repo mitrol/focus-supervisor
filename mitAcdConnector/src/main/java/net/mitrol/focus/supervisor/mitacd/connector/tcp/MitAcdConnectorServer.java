@@ -1,6 +1,6 @@
 package net.mitrol.focus.supervisor.mitacd.connector.tcp;
 
-import com.google.common.reflect.TypeToken;
+import net.mitrol.focus.supervisor.mitct.mitacd.event.MitAcdEvent;
 import net.mitrol.focus.supervisor.mitct.mitacd.event.RegisterEvent;
 import net.mitrol.utils.ExecutorBuilder;
 import net.mitrol.utils.json.JsonMapper;
@@ -12,13 +12,10 @@ import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -48,7 +45,7 @@ public abstract class MitAcdConnectorServer {
         }
     }
 
-    public abstract void onMitAcdMessageReceived(SockMessage sockMessage);
+    public abstract void onMitAcdMessageReceived(String message);
 
     private class MitAcdClientConn implements Runnable {
         private Socket socket;
@@ -56,7 +53,6 @@ public abstract class MitAcdConnectorServer {
         private DataOutputStream dataOutputStream;
         private ConnectionState state = ConnectionState.Disconnected;
         private String receivedMessage;
-        private Type type = new TypeToken<Map<String, Object>>(){}.getType();
 
         public MitAcdClientConn (Socket socket){
             this.socket = socket;
@@ -123,11 +119,11 @@ public abstract class MitAcdConnectorServer {
                             }
                             logger.debug(String.format("Processing MitAcdMessage %s started", this.receivedMessage));
                             try {
-                                SockMessage sockMessage = this.buildSockMessage(this.receivedMessage);
-                                if (sockMessage.getType().equals(RegisterEvent.TYPE)) {
-                                    this.send(SockMessage.EVENT_RESPONSE);
+                                MitAcdEvent event = this.getMitAcdEvent(this.receivedMessage);
+                                if (event.getType().equals(RegisterEvent.TYPE)) {
+                                    this.send(MitAcdEvent.EVENT_RESPONSE);
                                 } else {
-                                    onMitAcdMessageReceived(sockMessage);
+                                    onMitAcdMessageReceived(receivedMessage);
                                 }
                             } catch (JSONException e1) {
                                 logger.error(String.format("Error JSON parser: %s" , this.receivedMessage));
@@ -218,26 +214,8 @@ public abstract class MitAcdConnectorServer {
             }
         }
 
-        private SockMessage buildSockMessage (String receivedMessage) throws JSONException {
-            Map<String, Object> map = JsonMapper.getInstance().getObjectFromString(receivedMessage, this.type);
-            Map.Entry entry = this.getEntry(map, 0);
-            SockMessage sockMessage = new SockMessage();
-            sockMessage.setReceivedMessage(receivedMessage);
-            sockMessage.setType(entry.getKey());
-            sockMessage.setPayload(entry.getValue());
-            return sockMessage;
-        }
-
-        @SuppressWarnings("unchecked")
-        private Map.Entry<String, Object> getEntry(Map map, int i){
-            Set<Map.Entry<String, Object>> entries = map.entrySet();
-            int j = 0;
-            for(Map.Entry<String, Object>entry : entries) {
-                if (j++ == i) {
-                    return entry;
-                }
-            }
-            return null;
+        private MitAcdEvent getMitAcdEvent (String receivedMessage) throws JSONException {
+            return JsonMapper.getInstance().getObjectFromString(receivedMessage, MitAcdEvent.class);
         }
     }
 }

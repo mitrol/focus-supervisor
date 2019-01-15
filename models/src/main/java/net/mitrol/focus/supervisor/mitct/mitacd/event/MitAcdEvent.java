@@ -2,6 +2,8 @@ package net.mitrol.focus.supervisor.mitct.mitacd.event;
 
 public class MitAcdEvent {
 
+    public static final String EVENT_RESPONSE = "{\"register_event_response\":{\"charset\": \"UTF-8\"}}\r\n";
+
     private String type;
     private String payload;
 
